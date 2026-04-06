@@ -1,0 +1,1321 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <base target="_top" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Director – New Product Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <script>
+        window.__APP_USER__ = <?!= appUserJson ?>;
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ["Inter", "system-ui", "-apple-system", "sans-serif"],
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family:
+                "Inter",
+                system-ui,
+                -apple-system,
+                sans-serif;
+            letter-spacing: -0.011em;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .drawer-enter {
+            animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .fade-enter {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .accordion-content.open {
+            max-height: 2000px;
+        }
+
+        tbody tr {
+            transition: all 0.2s ease-in-out;
+        }
+
+        tbody tr:hover {
+            background-color: rgba(248, 250, 252, 0.8) !important;
+            transform: translateX(2px);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0.375rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.025em;
+        }
+
+        .status-badge::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #713f12;
+            box-shadow: 0 0 0 1px rgba(234, 179, 8, 0.2);
+        }
+
+        .status-pending::before {
+            background: #eab308;
+        }
+
+        .status-approved {
+            background: #dcfce7;
+            color: #14532d;
+            box-shadow: 0 0 0 1px rgba(22, 163, 74, 0.2);
+        }
+
+        .status-approved::before {
+            background: #16a34a;
+        }
+
+        .status-rejected {
+            background: #fee2e2;
+            color: #7f1d1d;
+            box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.2);
+        }
+
+        .status-rejected::before {
+            background: #ef4444;
+        }
+
+        .glass-header {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+        }
+
+        input:not([type="checkbox"]),
+        select {
+            transition: all 0.2s ease-in-out;
+        }
+
+        input:focus:not([type="checkbox"]),
+        select:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        button {
+            transition: all 0.2s ease-in-out;
+        }
+
+        button:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        .card {
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow:
+                0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 font-sans">
+    <!-- Top App Bar -->
+    <header class="glass-header border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-[1800px] mx-auto px-6 py-4">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-1.5 bg-indigo-50 border border-indigo-200 px-3 py-1.5 rounded-lg">
+                        <span class="text-base">👔</span>
+                        <span class="text-sm font-semibold text-indigo-700">Director View</span>
+                    </div>
+                    <h1 class="text-xl font-semibold text-slate-900 tracking-tight">New Product Dashboard</h1>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg">
+                        <span class="inline-block w-2.5 h-2.5 rounded-full" id="dConnDot" style="background:#d97706"></span>
+                        <span class="text-xs font-medium text-slate-600" id="dConnTxt">Đang kết nối...</span>
+                    </div>
+                    <button id="btnRefresh" onclick="loadData()"
+                        class="px-4 py-2 bg-slate-100 text-slate-700 border border-slate-300 rounded-lg hover:bg-slate-200 transition-all duration-200 text-sm font-medium">
+                        ↺ Làm mới
+                    </button>
+                    <button onclick="exportCSV()"
+                        class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all duration-200 text-sm font-medium shadow-sm hover:shadow-md">
+                        📤 Export CSV
+                    </button>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-3 items-end">
+                <div class="flex-1 min-w-[250px]">
+                    <input type="text" id="searchBox" placeholder="Search Product, Supplier, Brand, ID..."
+                        class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white placeholder-slate-400 transition-all duration-200"
+                        oninput="applyFilters()" />
+                </div>
+                <select id="filterStatus" onchange="applyFilters()"
+                    class="px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white transition-all duration-200">
+                    <option value="">All Status</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Rejected">Rejected</option>
+                </select>
+                <select id="filterZone" onchange="applyFilters()"
+                    class="px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white transition-all duration-200">
+                    <option value="">All Zones</option>
+                </select>
+                <select id="filterGroup" onchange="applyFilters()"
+                    class="px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white transition-all duration-200">
+                    <option value="">All Groups</option>
+                </select>
+                <select id="filterCategory" onchange="applyFilters()"
+                    class="px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white transition-all duration-200">
+                    <option value="">All Categories</option>
+                </select>
+                <select id="filterSubCategory" onchange="applyFilters()"
+                    class="px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white transition-all duration-200">
+                    <option value="">All Sub Categories</option>
+                </select>
+                <select id="datePreset" onchange="handleDatePreset()"
+                    class="px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white transition-all duration-200">
+                    <option value="">All Dates</option>
+                    <option value="7">Last 7 days</option>
+                    <option value="30">Last 30 days</option>
+                    <option value="90">Last 90 days</option>
+                    <option value="custom">Custom Range</option>
+                </select>
+                <div id="customDateRange" class="hidden flex gap-2">
+                    <input type="date" id="dateFrom" onchange="applyFilters()"
+                        class="px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white transition-all duration-200" />
+                    <input type="date" id="dateTo" onchange="applyFilters()"
+                        class="px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white transition-all duration-200" />
+                </div>
+                <label
+                    class="flex items-center gap-2 px-4 py-2.5 bg-slate-50 rounded-lg cursor-pointer hover:bg-slate-100 transition-all duration-200 border border-slate-300">
+                    <input type="checkbox" id="showNA" onchange="applyFilters()"
+                        class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+                    <span class="text-sm font-medium text-slate-700">Show #N/A</span>
+                </label>
+            </div>
+        </div>
+    </header>
+
+    <!-- Loading Skeleton -->
+    <div id="loadingSkeleton" class="max-w-[1800px] mx-auto px-6 py-10" style="display:none">
+        <div class="grid grid-cols-6 gap-4 mb-6">
+            <div class="bg-white h-24 rounded-xl border border-slate-200 animate-pulse"></div>
+            <div class="bg-white h-24 rounded-xl border border-slate-200 animate-pulse"></div>
+            <div class="bg-white h-24 rounded-xl border border-slate-200 animate-pulse"></div>
+            <div class="bg-white h-24 rounded-xl border border-slate-200 animate-pulse"></div>
+            <div class="bg-white h-24 rounded-xl border border-slate-200 animate-pulse"></div>
+            <div class="bg-white h-24 rounded-xl border border-slate-200 animate-pulse"></div>
+        </div>
+        <div class="grid grid-cols-2 gap-6 mb-6">
+            <div class="bg-white h-64 rounded-xl border border-slate-200 animate-pulse"></div>
+            <div class="bg-white h-64 rounded-xl border border-slate-200 animate-pulse"></div>
+        </div>
+        <div class="bg-white h-80 rounded-xl border border-slate-200 animate-pulse mb-4"></div>
+        <p class="text-center text-slate-500 text-sm mt-4">⏳ Đang kết nối với Google Sheets...</p>
+    </div>
+
+    <main id="mainContent" class="max-w-[1800px] mx-auto px-6 py-6" style="display:none">
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+            <div onclick="filterByKPI('total')"
+                class="card bg-white p-5 rounded-xl shadow-sm border border-slate-200 cursor-pointer hover:shadow-md transition-all duration-200">
+                <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
+                    Total Items
+                </div>
+                <div id="kpiTotal" class="text-3xl font-bold text-slate-900">0</div>
+            </div>
+            <div onclick="filterByKPI('pending')"
+                class="card bg-gradient-to-br from-amber-50 to-amber-100/50 p-5 rounded-xl shadow-sm border border-amber-200 cursor-pointer hover:shadow-md transition-all duration-200">
+                <div class="text-xs font-semibold text-amber-600 uppercase tracking-wider mb-1.5">
+                    Pending
+                </div>
+                <div id="kpiPending" class="text-3xl font-bold text-amber-700">0</div>
+            </div>
+            <div onclick="filterByKPI('approved')"
+                class="card bg-gradient-to-br from-emerald-50 to-emerald-100/50 p-5 rounded-xl shadow-sm border border-emerald-200 cursor-pointer hover:shadow-md transition-all duration-200">
+                <div class="text-xs font-semibold text-emerald-600 uppercase tracking-wider mb-1.5">
+                    Approved
+                </div>
+                <div id="kpiApproved" class="text-3xl font-bold text-emerald-700">
+                    0
+                </div>
+            </div>
+            <div onclick="filterByKPI('rejected')"
+                class="card bg-gradient-to-br from-rose-50 to-rose-100/50 p-5 rounded-xl shadow-sm border border-rose-200 cursor-pointer hover:shadow-md transition-all duration-200">
+                <div class="text-xs font-semibold text-rose-600 uppercase tracking-wider mb-1.5">
+                    Rejected
+                </div>
+                <div id="kpiRejected" class="text-3xl font-bold text-rose-700">0</div>
+            </div>
+            <div class="card bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
+                    Avg GP% Tier 6
+                </div>
+                <div id="kpiAvgGP" class="text-3xl font-bold text-indigo-600">0%</div>
+            </div>
+            <div class="card bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
+                    Median Purchase
+                </div>
+                <div id="kpiMedianPrice" class="text-3xl font-bold text-slate-900">
+                    0
+                </div>
+            </div>
+        </div>
+
+        <!-- Insights Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <div class="card bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h3 class="text-base font-semibold text-slate-900 mb-4 tracking-tight">
+                    Status Distribution
+                </h3>
+                <div style="height: 250px; position: relative">
+                    <canvas id="chartStatus"></canvas>
+                </div>
+            </div>
+            <div class="card bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h3 class="text-base font-semibold text-slate-900 mb-4 tracking-tight">
+                    Avg GP% Tier 6 by Category
+                </h3>
+                <div style="height: 250px; position: relative">
+                    <canvas id="chartCategory"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Director Table -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="p-5 border-b border-slate-200 flex justify-between items-center">
+                <h2 class="text-base font-semibold text-slate-900 tracking-tight">
+                    Product Submissions
+                </h2>
+                <div class="flex items-center gap-3">
+                    <span class="text-sm font-medium text-slate-600">Items per page:</span>
+                    <select id="pageSize" onchange="changePageSize()"
+                        class="px-3 py-1.5 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200">
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-slate-50 border-b border-slate-200">
+                        <tr class="border-b border-slate-200">
+                            <th onclick="sortBy('Present Date')"
+                                class="px-4 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-all duration-200">
+                                Present Date <span id="sort-Present Date"></span>
+                            </th>
+                            <th onclick="sortBy('Status')"
+                                class="px-4 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-all duration-200">
+                                Status <span id="sort-Status"></span>
+                            </th>
+                            <th
+                                class="px-4 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                                Product Name
+                            </th>
+                            <th
+                                class="px-4 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                                Zone
+                            </th>
+                            <th
+                                class="px-4 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                                Category / Sub
+                            </th>
+                            <th onclick="sortBy('Purchase Price Excluded VAT')"
+                                class="px-4 py-4 text-right text-xs font-semibold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-all duration-200">
+                                Purchase <span id="sort-Purchase Price Excluded VAT"></span>
+                            </th>
+                            <th onclick="sortBy('Retail Price (+VAT) in Tier 6')"
+                                class="px-4 py-4 text-right text-xs font-semibold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-all duration-200">
+                                Tier 6 <span id="sort-Retail Price (+VAT) in Tier 6"></span>
+                            </th>
+                            <th onclick="sortBy('% GP Retail Price Tier 6')"
+                                class="px-4 py-4 text-right text-xs font-semibold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-all duration-200">
+                                GP% T6 <span id="sort-% GP Retail Price Tier 6"></span>
+                            </th>
+                            <th
+                                class="px-4 py-4 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                                Same Price
+                            </th>
+                            <th
+                                class="px-4 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                                Product ID
+                            </th>
+                            <th
+                                class="px-4 py-4 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                                Quyết định
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="emptyState" class="hidden p-16 text-center">
+                <svg class="mx-auto h-16 w-16 text-slate-300 mb-4" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                        d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                </svg>
+                <div class="text-slate-400 text-base font-medium mb-2">
+                    No results found
+                </div>
+                <button onclick="clearFilters()"
+                    class="text-indigo-600 hover:text-indigo-700 text-sm font-medium transition-colors duration-200">
+                    Clear all filters
+                </button>
+            </div>
+            <div class="p-5 border-t border-slate-200 flex justify-between items-center">
+                <div class="text-sm font-medium text-slate-600">
+                    Showing <span id="rangeStart">0</span> to
+                    <span id="rangeEnd">0</span> of <span id="totalItems">0</span> items
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="prevPage()" id="btnPrev"
+                        class="px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow">
+                        ← Previous
+                    </button>
+                    <button onclick="nextPage()" id="btnNext"
+                        class="px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow">
+                        Next →
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Detail Drawer -->
+    <div id="drawer" class="fixed inset-0 z-50 hidden">
+        <div onclick="closeDrawer()" class="absolute inset-0 bg-slate-900 bg-opacity-40 fade-enter backdrop-blur-sm">
+        </div>
+        <div
+            class="absolute right-0 top-0 bottom-0 w-full max-w-2xl bg-white border-l border-slate-200 shadow-2xl overflow-y-auto drawer-enter">
+            <div class="glass-header sticky top-0 border-b border-slate-200 p-6 z-10 shadow-sm">
+                <div class="flex justify-between items-start mb-3">
+                    <h2 id="drawerTitle" class="text-2xl font-semibold text-slate-900 pr-4 tracking-tight">
+                        Product Details
+                    </h2>
+                    <button onclick="closeDrawer()"
+                        class="text-slate-400 hover:text-slate-600 p-2 rounded-lg hover:bg-slate-100 transition-all duration-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="flex items-center gap-3 mb-3">
+                    <span id="drawerStatus" class="status-badge"></span>
+                    <span id="drawerZone" class="text-sm font-medium text-slate-600"></span>
+                </div>
+                <div id="drawerSubheader" class="text-sm text-slate-600"></div>
+            </div>
+
+            <div class="p-6">
+                <!-- Mini KPI Strip -->
+                <div class="grid grid-cols-4 gap-4 mb-6">
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                        <div class="text-xs text-gray-500 mb-1">Purchase</div>
+                        <div id="drawerPurchase" class="text-lg font-bold text-gray-900">
+                            —
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <div class="text-xs text-gray-500 mb-1">Tier 6 Retail</div>
+                        <div id="drawerTier6" class="text-lg font-bold text-gray-900">
+                            —
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <div class="text-xs text-gray-500 mb-1">GP% Tier 6</div>
+                        <div id="drawerGP" class="text-lg font-bold text-blue-600">—</div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <div class="text-xs text-gray-500 mb-1">GP/Unit</div>
+                        <div id="drawerGPUnit" class="text-lg font-bold text-gray-900">
+                            —
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Accordions -->
+                <div id="drawerAccordions" class="space-y-3">
+                    <!-- Populated by JS -->
+                </div>
+
+                <!-- Actions -->
+                <div class="mt-6 space-y-4 border-t border-gray-200 pt-6">
+                    <!-- Quick decision buttons -->
+                    <div class="flex gap-2">
+                        <button onclick="currentItem && quickDecision(currentItem._rowNumber, 'Approved', event)"
+                            class="flex-1 px-4 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition font-semibold text-sm flex items-center justify-center gap-2">
+                            ✅ Duyệt ngay
+                        </button>
+                        <button onclick="currentItem && quickDecision(currentItem._rowNumber, 'Rejected', event)"
+                            class="flex-1 px-4 py-2.5 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition font-semibold text-sm flex items-center justify-center gap-2">
+                            ❌ Từ chối ngay
+                        </button>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Thay đổi Status thủ công</label>
+                        <select id="drawerStatusSelect"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="Pending">Pending</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Add Director Note</label>
+                        <textarea id="drawerNote" rows="3"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            placeholder="Enter note..."></textarea>
+                    </div>
+                    <div class="flex gap-3">
+                        <button onclick="saveItem()"
+                            class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
+                            💾 Lưu quyết định
+                        </button>
+                        <button onclick="exportItemJSON()"
+                            class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition font-medium">
+                            JSON
+                        </button>
+                        <button onclick="copyExecutiveSummary()"
+                            class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium">
+                            📋 Copy tóm tắt
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ═══════════════════════════════════════════════════════
+        // DIRECTOR VIEW – Live data from Google Apps Script
+        // Access: ?page=director | Approve/Reject saves to Sheet
+        // ═══════════════════════════════════════════════════════
+
+        // ── Field helpers (handles different header spellings in sheet) ──
+        function getProductName(row) {
+            return row['Product Name']
+                || row['PIC input Product Name\n(Dưới 40 kí tự)']
+                || row['PIC input Product Name (Dưới 40 kí tự)']
+                || '—';
+        }
+        function getCompetitors(row) {
+            return row['Competitors (Retail Price)\n<Tên đối thủ: Giá tiền>']
+                || row['Competitors (Retail Price) <Tên đối thủ: Giá tiền>']
+                || '—';
+        }
+        function getGroup(row)      { return row['Group'] || row['Product Group'] || '—'; }
+        function getPICCat(row)     { return row['PIC CATEGORY'] || row['PIC Category'] || '—'; }
+
+        // ── Toast notifications ──
+        function toast(msg, type) {
+            var c = document.getElementById('toastContainer'); if (!c) return;
+            var clrs = { success:'#dcfce7:#166534', error:'#fee2e2:#991b1b', warning:'#fef3c7:#713f12', info:'#eff6ff:#1e40af' };
+            var clr = (clrs[type] || clrs.info).split(':');
+            var icons = { success:'✓', error:'✕', warning:'⚠', info:'ℹ' };
+            var el = document.createElement('div');
+            el.style.cssText = 'padding:12px 16px;border-radius:10px;font-size:13px;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,.12);display:flex;align-items:center;gap:10px;max-width:380px;background:'+clr[0]+';color:'+clr[1]+';border:1px solid rgba(0,0,0,.07)';
+            el.innerHTML = '<span style="font-size:15px">'+(icons[type]||'ℹ')+'</span><span style="flex:1">'+msg+'</span><button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;font-size:18px;line-height:1;color:inherit;opacity:.6;padding:0">×</button>';
+            c.appendChild(el);
+            setTimeout(function(){ if(el.parentElement) el.remove(); }, type==='error'?8000:4500);
+        }
+
+        // ── Connection indicator ──
+        function setConn(state, txt) {
+            var dot = document.getElementById('dConnDot'), lbl = document.getElementById('dConnTxt');
+            if (dot) dot.style.background = state==='ok'?'#16a34a':state==='err'?'#dc2626':'#d97706';
+            if (lbl) lbl.textContent = txt;
+        }
+
+        function authErrCode(payload) {
+            return payload && payload.error && payload.error.code ? String(payload.error.code) : (payload && payload.code ? String(payload.code) : '');
+        }
+
+        function isAuthErr(payload) {
+            var code = authErrCode(payload).toUpperCase();
+            return code === 'MISSING_TOKEN' || code === 'TOKEN_EXPIRED' || code === 'INVALID_TOKEN' || code === 'TOKEN_READ_ERROR';
+        }
+
+        function renderLoginRequired(msg) {
+            var safeMsg = String(msg || 'Vui long dang nhap de tiep tuc.')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+            document.body.innerHTML = ''
+                + '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(135deg,#eef2ff,#f8fafc);font-family:Inter,system-ui,sans-serif">'
+                + '<div style="width:min(460px,100%);background:#fff;border:1px solid #c7d2fe;border-radius:18px;box-shadow:0 20px 60px rgba(15,23,42,.12);padding:28px;text-align:center">'
+                + '<div style="font-size:40px;line-height:1">🔐</div>'
+                + '<div style="margin-top:12px;font-size:22px;font-weight:800;color:#0f172a">Can dang nhap lai</div>'
+                + '<div style="margin-top:8px;font-size:14px;line-height:1.6;color:#475569">' + safeMsg + '</div>'
+                + '<div style="margin-top:18px;display:flex;justify-content:center">'
+                + '<a href="?page=login" target="_top" style="display:inline-flex;align-items:center;justify-content:center;padding:11px 18px;border-radius:10px;background:#1d4ed8;color:#fff;text-decoration:none;font-size:14px;font-weight:700">Dang nhap lai</a>'
+                + '</div>'
+                + '</div>'
+                + '</div>';
+        }
+
+        function redirectToLogin(msg) {
+            renderLoginRequired(msg || 'Vui long dang nhap de tiep tuc.');
+        }
+
+        function handleAuthIssue(payload) {
+            if (!isAuthErr(payload)) return false;
+            redirectToLogin((payload && payload.error && payload.error.message) || 'Phien dang nhap khong hop le. Vui long dang nhap lai.');
+            return true;
+        }
+
+        // ── Loading state ──
+        function setLoading(on) {
+            var sk = document.getElementById('loadingSkeleton'), main = document.getElementById('mainContent');
+            if (sk) sk.style.display = on ? 'block' : 'none';
+            if (main) main.style.display = on ? 'none' : 'block';
+        }
+
+        var allData = [];
+        var filteredData = [];
+        var currentPage = 1;
+        var pageSize = 20;
+        var sortColumn = 'Present Date';
+        var sortDirection = 'desc';
+        var currentItem = null;
+        var charts = {};
+        var AUTH_TOKEN = (window.__APP_USER__ && window.__APP_USER__.authToken) || '';
+
+        // ── Init ──
+        window.addEventListener('DOMContentLoaded', function () {
+            if (!AUTH_TOKEN) {
+                redirectToLogin('Vui long dang nhap de vao Director view.');
+                return;
+            }
+            loadData();
+            setupKeyboardNav();
+        });
+
+        // ── Load from Code.gs ──
+        function loadData() {
+            setConn('loading', 'Đang kết nối...');
+            setLoading(true);
+            var btn = document.getElementById('btnRefresh'); if (btn) btn.disabled = true;
+            google.script.run
+                .withSuccessHandler(function (res) {
+                    if (btn) btn.disabled = false;
+                    if (!res || !res.ok) {
+                        if (handleAuthIssue(res)) return;
+                        setConn('err', 'Lỗi kết nối');
+                        toast('Không thể tải dữ liệu: ' + ((res && res.error && res.error.message) || 'Unknown'), 'error');
+                        setLoading(false); return;
+                    }
+                    allData = res.data.rows || [];
+                    setConn('ok', allData.length + ' sản phẩm đã tải');
+                    setLoading(false);
+                    populateFilters();
+                    applyFilters();
+                })
+                .withFailureHandler(function (err) {
+                    if (handleAuthIssue(err)) return;
+                    if (btn) btn.disabled = false;
+                    setConn('err', 'Lỗi');
+                    toast('Lỗi kết nối: ' + (err && err.message ? err.message : String(err)), 'error');
+                    setLoading(false);
+                })
+                .getInitData({ token: AUTH_TOKEN });
+        }
+
+        function populateSelect(id, options) {
+            var select = document.getElementById(id); if (!select) return;
+            var current = select.value;
+            var firstOpt = select.options[0] ? select.options[0].textContent : 'Tất cả';
+            select.innerHTML = '<option value="">' + firstOpt + '</option>';
+            options.forEach(function (opt) {
+                var option = document.createElement('option');
+                option.value = opt; option.textContent = opt;
+                select.appendChild(option);
+            });
+            select.value = current;
+        }
+
+        function applyFilters() {
+            var search = document.getElementById('searchBox').value.toLowerCase();
+            var status = document.getElementById('filterStatus').value;
+            var zone = document.getElementById('filterZone').value;
+            var group = document.getElementById('filterGroup').value;
+            var category = document.getElementById('filterCategory').value;
+            var subCategory = document.getElementById('filterSubCategory').value;
+            var showNA = document.getElementById('showNA').checked;
+            var dateFrom = document.getElementById('dateFrom').value;
+            var dateTo = document.getElementById('dateTo').value;
+
+            filteredData = allData.filter(function (item) {
+                if (!showNA && isNARow(item)) return false;
+                if (search) {
+                    var sf = [getProductName(item), item['Supplier Name'], item['Brand Name'],
+                              item['New Product ID'], item['NEW PRODUCT ID'], item['Ticket ID'], item['Zone']]
+                        .join(' ').toLowerCase();
+                    if (sf.indexOf(search) < 0) return false;
+                }
+                if (status && item.Status !== status) return false;
+                if (zone && item.Zone !== zone) return false;
+                if (group && getGroup(item) !== group) return false;
+                if (category && item.Category !== category) return false;
+                if (subCategory && item['Sub Category'] !== subCategory) return false;
+                if (dateFrom || dateTo) {
+                    var itemDate = parseDate(item['Present Date']);
+                    if (itemDate) {
+                        if (dateFrom && itemDate < new Date(dateFrom)) return false;
+                        if (dateTo && itemDate > new Date(dateTo + 'T23:59:59')) return false;
+                    }
+                }
+                return true;
+            });
+
+            sortData();
+            updateKPIs();
+            renderCharts();
+            currentPage = 1;
+            renderTable();
+        }
+
+        function sortData() {
+            filteredData.sort((a, b) => {
+                let valA = a[sortColumn];
+                let valB = b[sortColumn];
+
+                if (sortColumn === "Present Date") {
+                    valA = parseDate(valA);
+                    valB = parseDate(valB);
+                    if (!valA) return 1;
+                    if (!valB) return -1;
+                } else if (
+                    [
+                        "Purchase Price Excluded VAT",
+                        "Retail Price (+VAT) in Tier 6",
+                        "% GP Retail Price Tier 6",
+                    ].includes(sortColumn)
+                ) {
+                    valA = parseNumber(valA) || 0;
+                    valB = parseNumber(valB) || 0;
+                } else {
+                    valA = String(valA || "");
+                    valB = String(valB || "");
+                }
+
+                if (valA < valB) return sortDirection === "asc" ? -1 : 1;
+                if (valA > valB) return sortDirection === "asc" ? 1 : -1;
+                return 0;
+            });
+        }
+
+        function sortBy(column) {
+            if (sortColumn === column) {
+                sortDirection = sortDirection === "asc" ? "desc" : "asc";
+            } else {
+                sortColumn = column;
+                sortDirection = "desc";
+            }
+
+            document
+                .querySelectorAll('th span[id^="sort-"]')
+                .forEach((el) => (el.textContent = ""));
+            document.getElementById(`sort-${column}`).textContent =
+                sortDirection === "asc" ? "▲" : "▼";
+
+            sortData();
+            renderTable();
+        }
+
+        function updateKPIs() {
+            const validData = filteredData.filter((item) => !isNARow(item));
+            const pending = validData.filter((i) => i.Status === "Pending").length;
+            const approved = validData.filter(
+                (i) => i.Status === "Approved",
+            ).length;
+            const rejected = validData.filter(
+                (i) => i.Status === "Rejected",
+            ).length;
+
+            const gpValues = validData
+                .map((i) => parseNumber(i["% GP Retail Price Tier 6"]))
+                .filter((v) => v !== null);
+            const avgGP = gpValues.length ?
+                gpValues.reduce((a, b) => a + b, 0) / gpValues.length :
+                0;
+
+            const prices = validData
+                .map((i) => parseNumber(i["Purchase Price Excluded VAT"]))
+                .filter((v) => v !== null)
+                .sort((a, b) => a - b);
+            const medianPrice = prices.length ?
+                prices[Math.floor(prices.length / 2)] :
+                0;
+
+            document.getElementById("kpiTotal").textContent = validData.length;
+            document.getElementById("kpiPending").textContent = pending;
+            document.getElementById("kpiApproved").textContent = approved;
+            document.getElementById("kpiRejected").textContent = rejected;
+            document.getElementById("kpiAvgGP").textContent =
+                avgGP.toFixed(2) + "%";
+            document.getElementById("kpiMedianPrice").textContent =
+                formatNumber(medianPrice);
+        }
+
+        function renderTable() {
+            var tbody = document.getElementById('tableBody');
+            var start = (currentPage - 1) * pageSize;
+            var end = start + pageSize;
+            var pageData = filteredData.slice(start, end);
+
+            if (pageData.length === 0) {
+                tbody.innerHTML = '';
+                document.getElementById('emptyState').classList.remove('hidden');
+            } else {
+                document.getElementById('emptyState').classList.add('hidden');
+                tbody.innerHTML = pageData.map(function (item, idx) {
+                    var rn = item._rowNumber || 0;
+                    var name = getProductName(item);
+                    var st = (item.Status || 'pending').toLowerCase();
+                    var bg = idx % 2 === 0 ? 'bg-white hover:bg-indigo-50/40' : 'bg-slate-50 hover:bg-indigo-50/40';
+                    var npid = item['New Product ID'] || item['NEW PRODUCT ID'] || '—';
+                    var approveBtn = item.Status !== 'Approved'
+                        ? '<button onclick="quickDecision('+rn+',\'Approved\',event)" class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100">✓ Duyệt</button>' : '';
+                    var rejectBtn = item.Status !== 'Rejected'
+                        ? '<button onclick="quickDecision('+rn+',\'Rejected\',event)" class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 ml-1">✗ Từ chối</button>' : '';
+                    return '<tr onclick="openDrawer('+(start+idx)+')" class="border-b border-slate-100 cursor-pointer '+bg+' transition-colors duration-100">'
+                        + '<td class="px-4 py-3 text-sm text-slate-700 whitespace-nowrap">'+formatDate(item['Present Date'])+'</td>'
+                        + '<td class="px-4 py-3"><span class="status-badge status-'+st+'">'+(item.Status||'—')+'</span></td>'
+                        + '<td class="px-4 py-3 text-sm text-slate-900 font-medium max-w-xs truncate" title="'+name+'">'+name+'</td>'
+                        + '<td class="px-4 py-3 text-sm text-slate-600">'+(item.Zone||'—')+'</td>'
+                        + '<td class="px-4 py-3 text-sm text-slate-600">'+(item.Category||'—')+' / '+(item['Sub Category']||'—')+'</td>'
+                        + '<td class="px-4 py-3 text-sm text-slate-900 text-right font-medium">'+formatNumber(item['Purchase Price Excluded VAT'])+'</td>'
+                        + '<td class="px-4 py-3 text-sm text-slate-900 text-right font-medium">'+formatNumber(item['Retail Price (+VAT) in Tier 6'])+'</td>'
+                        + '<td class="px-4 py-3 text-sm font-semibold text-indigo-600 text-right">'+formatPercent(item['% GP Retail Price Tier 6'])+'</td>'
+                        + '<td class="px-4 py-3 text-sm text-center">'+((item['SAME PRICE PRODUCT']==='TRUE'||item['Same Price Product']==='TRUE')?'<span class="text-emerald-600 font-bold">✓</span>':'—')+'</td>'
+                        + '<td class="px-4 py-3 text-sm"><span class="font-mono text-xs bg-slate-100 px-2 py-1 rounded">'+npid+'</span></td>'
+                        + '<td class="px-4 py-3 text-center whitespace-nowrap" onclick="event.stopPropagation()">'+approveBtn+rejectBtn+'</td>'
+                        + '</tr>';
+                }).join('');
+            }
+
+            document.getElementById('rangeStart').textContent = pageData.length > 0 ? start + 1 : 0;
+            document.getElementById('rangeEnd').textContent = Math.min(end, filteredData.length);
+            document.getElementById('totalItems').textContent = filteredData.length;
+            document.getElementById('btnPrev').disabled = currentPage === 1;
+            document.getElementById('btnNext').disabled = end >= filteredData.length;
+        }
+
+        // ── Quick Approve / Reject (from table row buttons) ──
+        function quickDecision(rowNumber, status, event) {
+            if (event) event.stopPropagation();
+            if (!rowNumber) { toast('Không xác định được dòng để lưu', 'error'); return; }
+            var label = status === 'Approved' ? 'DUYỆT' : 'TỪ CHỐI';
+            if (!confirm('Xác nhận ' + label + ' sản phẩm này?')) return;
+            setConn('loading', 'Đang lưu...');
+            google.script.run
+                .withSuccessHandler(function (res) {
+                    if (!res || !res.ok) {
+                        setConn('err', 'Lỗi');
+                        toast('Lỗi lưu: ' + ((res && res.error && res.error.message) || 'Unknown'), 'error');
+                        return;
+                    }
+                    setConn('ok', 'Đã lưu');
+                    var row = allData.find(function (r) { return r._rowNumber === rowNumber; });
+                    if (row) row.Status = status;
+                    applyFilters();
+                    toast((status === 'Approved' ? '✅ Đã duyệt' : '❌ Đã từ chối') + ' — dòng ' + rowNumber, status === 'Approved' ? 'success' : 'warning');
+                })
+                .withFailureHandler(function (err) {
+                    setConn('err', 'Lỗi');
+                    toast('Lỗi: ' + (err && err.message ? err.message : 'Unknown'), 'error');
+                })
+                .updateRow({
+                    token: AUTH_TOKEN,
+                    rowNumber: rowNumber,
+                    changes: { Status: status },
+                    source: status === 'Approved' ? 'DIRECTOR_QUICK_APPROVE' : 'DIRECTOR_QUICK_REJECT'
+                });
+        }
+
+        function renderCharts() {
+            const validData = filteredData.filter((item) => !isNARow(item));
+
+            // Status Chart
+            const statusCounts = {
+                Pending: validData.filter((i) => i.Status === "Pending").length,
+                Approved: validData.filter((i) => i.Status === "Approved").length,
+                Rejected: validData.filter((i) => i.Status === "Rejected").length,
+            };
+
+            if (charts.status) charts.status.destroy();
+            const ctxStatus = document
+                .getElementById("chartStatus")
+                .getContext("2d");
+            charts.status = new Chart(ctxStatus, {
+                type: "doughnut",
+                data: {
+                    labels: Object.keys(statusCounts),
+                    datasets: [{
+                        data: Object.values(statusCounts),
+                        backgroundColor: ["#fbbf24", "#10b981", "#ef4444"],
+                    },],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: "bottom"
+                        },
+                    },
+                },
+            });
+
+            // Category GP Chart
+            const categoryGP = {};
+            validData.forEach((item) => {
+                const cat = item.Category || "Unknown";
+                const gp = parseNumber(item["% GP Retail Price Tier 6"]);
+                if (gp !== null) {
+                    if (!categoryGP[cat]) categoryGP[cat] = [];
+                    categoryGP[cat].push(gp);
+                }
+            });
+
+            const categoryAvgs = Object.entries(categoryGP)
+                .map(([cat, values]) => ({
+                    category: cat,
+                    avg: values.reduce((a, b) => a + b, 0) / values.length,
+                }))
+                .sort((a, b) => b.avg - a.avg)
+                .slice(0, 8);
+
+            if (charts.category) charts.category.destroy();
+            const ctxCategory = document
+                .getElementById("chartCategory")
+                .getContext("2d");
+            charts.category = new Chart(ctxCategory, {
+                type: "bar",
+                data: {
+                    labels: categoryAvgs.map((c) => c.category),
+                    datasets: [{
+                        label: "Avg GP% Tier 6",
+                        data: categoryAvgs.map((c) => c.avg),
+                        backgroundColor: "#3b82f6",
+                    },],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function (value) {
+                                    return value.toFixed(1) + "%";
+                                },
+                            },
+                        },
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                    },
+                },
+            });
+        }
+
+        function openDrawer(index) {
+            var item = filteredData[index]; if (!item) return;
+            currentItem = item;
+            var name = getProductName(item);
+            document.getElementById('drawerTitle').textContent = name;
+            var statusEl = document.getElementById('drawerStatus');
+            statusEl.textContent = item.Status || 'Unknown';
+            statusEl.className = 'status-badge status-' + (item.Status || 'pending').toLowerCase();
+            document.getElementById('drawerZone').textContent = item.Zone || '—';
+            document.getElementById('drawerSubheader').textContent =
+                (item.Category||'—') + ' / ' + (item['Sub Category']||'—') + ' • ' +
+                (item['Supplier Name']||'—') + ' • ' + (item['Country of Origin']||'—');
+            document.getElementById('drawerPurchase').textContent = formatNumber(item['Purchase Price Excluded VAT']);
+            document.getElementById('drawerTier6').textContent = formatNumber(item['Retail Price (+VAT) in Tier 6']);
+            document.getElementById('drawerGP').textContent = formatPercent(item['% GP Retail Price Tier 6']);
+            document.getElementById('drawerGPUnit').textContent = formatNumber(item['$ GP Retail Price Tier 6'] || item['$ GP RETAIL PRICE TIER 6']);
+
+            var accordions = [
+                {
+                    title: '🎯 Decision Context',
+                    content: '<div class="space-y-3 text-sm">'
+                        + '<div><span class="font-medium">New Product Type:</span> ' + (item['New product type']||'—') + '</div>'
+                        + '<div><span class="font-medium">Why List:</span> ' + (item['Why Do We List This Product?']||'—') + '</div>'
+                        + '<div><span class="font-medium">PIC Category:</span> ' + getPICCat(item) + '</div>'
+                        + '<div><span class="font-medium">Director Note:</span><div class="mt-1 whitespace-pre-wrap bg-slate-50 p-2 rounded text-slate-700">' + (item.Note||item.NOTE||'—') + '</div></div>'
+                        + '</div>'
+                },
+                {
+                    title: '💰 Pricing & GP (All Tiers)',
+                    content: '<div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-gray-50"><tr><th class="px-3 py-2 text-left">Tier</th><th class="px-3 py-2 text-right">Retail</th><th class="px-3 py-2 text-right">GP%</th><th class="px-3 py-2 text-right">GP$</th></tr></thead><tbody>'
+                        + '<tr><td class="px-3 py-1.5">Tier 6</td><td class="px-3 py-1.5 text-right">'+formatNumber(item['Retail Price (+VAT) in Tier 6'])+'</td><td class="px-3 py-1.5 text-right font-semibold text-indigo-600">'+formatPercent(item['% GP Retail Price Tier 6'])+'</td><td class="px-3 py-1.5 text-right">'+formatNumber(item['$ GP Retail Price Tier 6']||item['$ GP RETAIL PRICE TIER 6'])+'</td></tr>'
+                        + '<tr class="bg-slate-50"><td class="px-3 py-1.5">Tier 7</td><td class="px-3 py-1.5 text-right">'+formatNumber(item['Retail Price (+VAT) in Tier 7'])+'</td><td class="px-3 py-1.5 text-right">'+formatPercent(item['% GP Retail Price Tier 7']||item['% GP RETAIL PRICE TIER 7'])+'</td><td class="px-3 py-1.5 text-right">'+formatNumber(item['$ GP Retail Price Tier 7']||item['$ GP RETAIL PRICE TIER 7'])+'</td></tr>'
+                        + '<tr><td class="px-3 py-1.5">Tier 8</td><td class="px-3 py-1.5 text-right">'+formatNumber(item['Retail Price (+VAT) in Tier 8'])+'</td><td class="px-3 py-1.5 text-right">'+formatPercent(item['% GP Retail Price Tier 8']||item['% GP RETAIL PRICE TIER 8'])+'</td><td class="px-3 py-1.5 text-right">'+formatNumber(item['$ GP Retail Price Tier 8']||item['$ GP RETAIL PRICE TIER 8'])+'</td></tr>'
+                        + '<tr class="bg-slate-50"><td class="px-3 py-1.5">Tier 9</td><td class="px-3 py-1.5 text-right">'+formatNumber(item['Retail Price (+VAT) in Tier 9'])+'</td><td class="px-3 py-1.5 text-right">'+formatPercent(item['% GP Retail Price Tier 9']||item['% GP RETAIL PRICE TIER 9'])+'</td><td class="px-3 py-1.5 text-right">'+formatNumber(item['$ GP Retail Price Tier 9']||item['$ GP RETAIL PRICE TIER 9'])+'</td></tr>'
+                        + '<tr><td class="px-3 py-1.5">INTL</td><td class="px-3 py-1.5 text-right">'+formatNumber(item['Retail Price (+VAT) in INTL'])+'</td><td class="px-3 py-1.5 text-right">'+formatPercent(item['% GP Retail Price in INTL']||item['% GP RETAIL PRICE IN INTL'])+'</td><td class="px-3 py-1.5 text-right">'+formatNumber(item['$ GP Retail Price INTL']||item['$ GP RETAIL PRICE IN INTL'])+'</td></tr>'
+                        + '</tbody></table></div>'
+                },
+                {
+                    title: '🏪 Competitive Landscape',
+                    content: '<div class="space-y-3 text-sm">'
+                        + '<div><span class="font-medium">Competitors:</span><div class="mt-1 whitespace-pre-wrap">' + getCompetitors(item) + '</div></div>'
+                        + '<div><span class="font-medium">Reference Product:</span> ' + (item['REFERENCE PRODUCT ID']||'—') + ' — ' + (item['REFERENCE PRODUCT NAME']||'—') + '</div>'
+                        + '<div><span class="font-medium">Same Price Product:</span> ' + (item['SAME PRICE PRODUCT']||item['Same Price Product']||'—') + '</div>'
+                        + '</div>'
+                },
+                {
+                    title: '🎯 Targeting & Segmentation',
+                    content: '<div class="grid grid-cols-2 gap-3 text-sm">'
+                        + '<div><span class="font-medium">Group:</span> ' + getGroup(item) + '</div>'
+                        + '<div><span class="font-medium">Category:</span> ' + (item.Category||'—') + '</div>'
+                        + '<div><span class="font-medium">Sub Category:</span> ' + (item['Sub Category']||'—') + '</div>'
+                        + '<div><span class="font-medium">Primary Usage:</span> ' + (item['PRIMARY USAGE SEGMENT']||'—') + '</div>'
+                        + '<div><span class="font-medium">Target Stores:</span> ' + (item['TARGET STORE TYPES']||'—') + '</div>'
+                        + '<div><span class="font-medium">Target Customers:</span> ' + (item['TARGET CUSTOMER STORE TYPES']||'—') + '</div>'
+                        + '</div>'
+                },
+                {
+                    title: '📊 Subcategory Benchmarks',
+                    content: '<div class="grid grid-cols-2 gap-3 text-sm">'
+                        + '<div><span class="font-medium">GP/Unit:</span> ' + formatNumber(item['GP/Unit by Subcategory']||item['GP/UNIT BY SUBCATEGORY']) + '</div>'
+                        + '<div><span class="font-medium">%GP:</span> ' + formatPercent(item['% GP by Subcategory']||item['%GP BY SUBCATEGORY']) + '</div>'
+                        + '<div><span class="font-medium">UPSD/SKU:</span> ' + formatNumber(item['UPSD per SKU by Subcategory']||item['UPSD PER SKU BY SUBCATEGORY']) + '</div>'
+                        + '<div><span class="font-medium">#SKU:</span> ' + (item['#SKU by subcategory']||item['#SKU BY SUBCATEGORY']||'—') + '</div>'
+                        + '</div>'
+                }
+            ];
+
+            document.getElementById('drawerAccordions').innerHTML = accordions.map(function (acc, i) {
+                return '<div class="border border-gray-200 rounded-lg overflow-hidden"><button onclick="toggleAccordion('+i+')" class="w-full px-4 py-3 bg-gray-50 text-left font-medium text-gray-900 hover:bg-gray-100 flex justify-between items-center text-sm">'+acc.title+'<span id="accordion-icon-'+i+'">▼</span></button><div id="accordion-'+i+'" class="accordion-content px-4 py-3">'+acc.content+'</div></div>';
+            }).join('');
+
+            document.getElementById('drawerStatusSelect').value = item.Status || 'Pending';
+            document.getElementById('drawerNote').value = '';
+            document.getElementById('drawer').classList.remove('hidden');
+        }
+
+
+        function closeDrawer() {
+            document.getElementById("drawer").classList.add("hidden");
+            currentItem = null;
+        }
+
+        function toggleAccordion(index) {
+            var content = document.getElementById('accordion-' + index);
+            var icon = document.getElementById('accordion-icon-' + index);
+            if (!content || !icon) return;
+            content.classList.toggle('open');
+            icon.textContent = content.classList.contains('open') ? '▲' : '▼';
+        }
+
+        function saveItem() {
+            if (!currentItem) return;
+            if (!currentItem._rowNumber) { toast('Không xác định được dòng (định danh _rowNumber)', 'error'); return; }
+            var newStatus = document.getElementById('drawerStatusSelect').value;
+            var newNoteRaw = document.getElementById('drawerNote').value.trim();
+            var changes = { Status: newStatus };
+            if (newNoteRaw) {
+                var ts = new Date().toLocaleString('vi-VN', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+                var existing = currentItem.Note || currentItem.NOTE || '';
+                changes['Note'] = (existing ? existing + '\n\n' : '') + '[' + ts + '] [Director] ' + newNoteRaw;
+            }
+            setConn('loading', 'Đang lưu...');
+            google.script.run
+                .withSuccessHandler(function (res) {
+                    if (!res || !res.ok) {
+                        setConn('err', 'Lỗi'); toast('Lỗi lưu: ' + ((res && res.error && res.error.message)||'Unknown'), 'error'); return;
+                    }
+                    setConn('ok', 'Đã lưu');
+                    currentItem.Status = newStatus;
+                    if (changes['Note']) currentItem.Note = changes['Note'];
+                    toast('✅ Đã lưu quyết định thành công!', 'success');
+                    closeDrawer(); applyFilters();
+                })
+                .withFailureHandler(function (err) {
+                    setConn('err', 'Lỗi'); toast('Lỗi: ' + (err && err.message ? err.message : 'Unknown'), 'error');
+                })
+                .updateRow({
+                    token: AUTH_TOKEN,
+                    rowNumber: currentItem._rowNumber,
+                    changes: changes,
+                    source: 'DIRECTOR_DRAWER_SAVE'
+                });
+        }
+
+        function exportItemJSON() {
+            if (!currentItem) return;
+            var json = JSON.stringify(currentItem, null, 2);
+            var blob = new Blob([json], { type: 'application/json' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a'); a.href = url;
+            a.download = (currentItem['New Product ID'] || currentItem['NEW PRODUCT ID'] || 'product') + '.json';
+            a.click(); URL.revokeObjectURL(url);
+        }
+
+        function copyExecutiveSummary() {
+            if (!currentItem) return;
+            var name = getProductName(currentItem);
+            var summary = name + ' | Zone: ' + (currentItem.Zone||'—')
+                + ' | ' + (currentItem.Category||'—') + '/' + (currentItem['Sub Category']||'—')
+                + ' | Purchase: ' + formatNumber(currentItem['Purchase Price Excluded VAT'])
+                + ' | Tier6: ' + formatNumber(currentItem['Retail Price (+VAT) in Tier 6'])
+                + ' | GP%: ' + formatPercent(currentItem['% GP Retail Price Tier 6'])
+                + ' | Status: ' + (currentItem.Status||'—')
+                + ' | Reason: ' + (currentItem['Why Do We List This Product?']||'—')
+                + ' | Note: ' + (currentItem.Note||currentItem.NOTE||'None');
+            navigator.clipboard.writeText(summary).then(function() { toast('Đã sao chép Executive Summary!', 'success'); });
+        }
+
+        function filterByKPI(type) {
+            const statusFilter = document.getElementById("filterStatus");
+            if (type === "pending") statusFilter.value = "Pending";
+            else if (type === "approved") statusFilter.value = "Approved";
+            else if (type === "rejected") statusFilter.value = "Rejected";
+            else statusFilter.value = "";
+            applyFilters();
+        }
+
+        function handleDatePreset() {
+            const preset = document.getElementById("datePreset").value;
+            const customRange = document.getElementById("customDateRange");
+
+            if (preset === "custom") {
+                customRange.classList.remove("hidden");
+            } else {
+                customRange.classList.add("hidden");
+                document.getElementById("dateFrom").value = "";
+                document.getElementById("dateTo").value = "";
+
+                if (preset) {
+                    const today = new Date();
+                    const from = new Date(today);
+                    from.setDate(today.getDate() - parseInt(preset));
+                    document.getElementById("dateFrom").value = from
+                        .toISOString()
+                        .split("T")[0];
+                    document.getElementById("dateTo").value = today
+                        .toISOString()
+                        .split("T")[0];
+                }
+
+                applyFilters();
+            }
+        }
+
+        function clearFilters() {
+            document.getElementById("searchBox").value = "";
+            document.getElementById("filterStatus").value = "";
+            document.getElementById("filterZone").value = "";
+            document.getElementById("filterGroup").value = "";
+            document.getElementById("filterCategory").value = "";
+            document.getElementById("filterSubCategory").value = "";
+            document.getElementById("datePreset").value = "";
+            document.getElementById("dateFrom").value = "";
+            document.getElementById("dateTo").value = "";
+            document.getElementById("customDateRange").classList.add("hidden");
+            applyFilters();
+        }
+
+        function exportCSV() {
+            if (!filteredData.length) { toast('Không có dữ liệu để xuất', 'warning'); return; }
+            var keys = Object.keys(filteredData[0]).filter(function(k){ return k !== '_rowNumber'; });
+            var csv = ['\uFEFF' + keys.map(function(k){ return '"'+k.replace(/"/g,'""')+'"'; }).join(',')]
+                .concat(filteredData.map(function(row){
+                    return keys.map(function(h){ return '"'+String(row[h]||'').replace(/"/g,'""')+'"'; }).join(',');
+                })).join('\n');
+            var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a'); a.href = url;
+            a.download = 'director_export_' + new Date().toISOString().slice(0,10) + '.csv';
+            a.click(); URL.revokeObjectURL(url);
+            toast('Đã xuất ' + filteredData.length + ' dòng CSV', 'success');
+        }
+
+        function exportOverrides() { toast('Đặc tính Export Overrides đã được thay bằng Export CSV', 'info'); }
+        function resetOverrides() { if (confirm('Làm mới đata từ Google Sheets?')) loadData(); }
+
+        function copyToClipboard(text, event) {
+            event.stopPropagation();
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = event.target;
+                const original = btn.textContent;
+                btn.textContent = "✓";
+                setTimeout(() => (btn.textContent = original), 1000);
+            });
+        }
+
+        function changePageSize() {
+            pageSize = parseInt(document.getElementById("pageSize").value);
+            currentPage = 1;
+            renderTable();
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTable();
+            }
+        }
+
+        function nextPage() {
+            const maxPage = Math.ceil(filteredData.length / pageSize);
+            if (currentPage < maxPage) {
+                currentPage++;
+                renderTable();
+            }
+        }
+
+        function setupKeyboardNav() {
+            document.addEventListener("keydown", (e) => {
+                if (
+                    e.key === "Escape" &&
+                    !document.getElementById("drawer").classList.contains("hidden")
+                ) {
+                    closeDrawer();
+                }
+            });
+        }
+
+        function isNARow(item) {
+            var name = getProductName(item);
+            return !name || name === '#N/A' || name.trim() === '' || name === '—';
+        }
+
+        function parseNumber(val) {
+            if (!val || val === '#N/A') return null;
+            var num = parseFloat(String(val).replace(/,/g, '').replace(/%/g, ''));
+            return isNaN(num) ? null : num;
+        }
+
+        function formatNumber(val) { var num = parseNumber(val); return num !== null ? num.toLocaleString('vi-VN') : '—'; }
+        function formatPercent(val) { var num = parseNumber(val); return num !== null ? num.toFixed(2) + '%' : '—'; }
+
+        function parseDate(dateStr) {
+            if (!dateStr || dateStr === '#N/A') return null;
+            var s = String(dateStr);
+            // Handle YYYY-MM-DD returned by Code.gs
+            if (/^\d{4}-\d{2}-\d{2}/.test(s)) return new Date(s);
+            // Handle DD/MM/YYYY
+            var parts = s.split('/');
+            if (parts.length === 3) return new Date(parseInt(parts[2]), parseInt(parts[1])-1, parseInt(parts[0]));
+            return null;
+        }
+
+        function formatDate(dateStr) {
+            var d = parseDate(dateStr); if (!d) return '—';
+            return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+'/'+d.getFullYear();
+        }
+
+        function populateFilters() {
+            var zones={}, groups={}, categories={}, subCategories={};
+            allData.forEach(function(item) {
+                if (isNARow(item)) return;
+                if (item.Zone) zones[item.Zone] = 1;
+                var g = getGroup(item); if (g !== '—') groups[g] = 1;
+                if (item.Category) categories[item.Category] = 1;
+                if (item['Sub Category']) subCategories[item['Sub Category']] = 1;
+            });
+            populateSelect('filterZone', Object.keys(zones).sort());
+            populateSelect('filterGroup', Object.keys(groups).sort());
+            populateSelect('filterCategory', Object.keys(categories).sort());
+            populateSelect('filterSubCategory', Object.keys(subCategories).sort());
+        }
+    </script>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" style="position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;align-items:flex-end"></div>
+
+</body>
+
+</html>
