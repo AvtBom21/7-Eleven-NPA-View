@@ -3,7 +3,8 @@
 // ========================================
 var CONFIG = {
   SPREADSHEET_ID: '1W8oN5mha-GZ6wLIct-hsWQXSbFKreeICw2Y0-SFgQnY',
-  SHEET_NAME: 'Category',
+  SHEET_NAME_CATEGORY: 'Category',
+  SHEET_NAME_MANAGER: 'Manager',
   DROPDOWN_SHEET: 'Dropdown_Master',
   USER_MASTER_SHEET: 'User_Master',
   AUDIT_LOG_SHEET: 'Audit_Log',
@@ -74,15 +75,8 @@ function doGet(e) {
     var token = e && e.parameter ? String(e.parameter.token || '').trim() : '';
     var access;
     if (!token) {
-      // Bypass login for testing - create default PIC access
-      token = 'bypass_token_' + Date.now(); // Generate a temporary token
-      access = _ok({
-        email: 'test@example.com',
-        fullName: 'Test User',
-        role: 'PIC',
-        scope: ['ALL'],
-        canEdit: true
-      });
+      // Force login for production - no bypass
+      return _renderLoginPage('Vui lòng đăng nhập để tiếp tục.', _resolveRequestEmail_(e) || '');
     } else {
       access = _getAccessByToken_(token);
       if (!access.ok) {
@@ -126,12 +120,13 @@ function doGet(e) {
 // ========================================
 // HELPER: Safe sheet access
 // ========================================
-function _openSheet() {
+function _openSheet(access) {
+  var sheetName = (access && access.role === 'MANAGER') ? CONFIG.SHEET_NAME_MANAGER : CONFIG.SHEET_NAME_CATEGORY;
   var ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
-  var sheet = ss.getSheetByName(CONFIG.SHEET_NAME);
+  var sheet = ss.getSheetByName(sheetName);
   if (!sheet) {
     var names = ss.getSheets().map(function(s) { return s.getName(); }).join(', ');
-    throw new Error('Sheet "' + CONFIG.SHEET_NAME + '" not found. Available: ' + names);
+    throw new Error('Sheet "' + sheetName + '" not found. Available: ' + names);
   }
   return sheet;
 }
@@ -143,6 +138,12 @@ function _getHeaders(sheet) {
   return vals.map(function(h) {
     return (h === null || h === undefined) ? '' : String(h).trim();
   });
+}
+
+function _trimTrailingEmptyHeaders_(headers) {
+  var out = Array.isArray(headers) ? headers.slice() : [];
+  while (out.length > 0 && out[out.length - 1] === '') out.pop();
+  return out;
 }
 
 function _cellToString(val) {
@@ -501,17 +502,13 @@ function getInitData(params) {
     if (!accessRes.ok) return accessRes;
     var editableFields = _getEditableFieldsForAccess_(accessRes.data);
 
-    var sheet = _openSheet();
+    var sheet = _openSheet(accessRes.data);
     var lastRow = sheet.getLastRow();
     var lastCol = sheet.getLastColumn();
 
     Logger.log('Dimensions: lastRow=' + lastRow + ' lastCol=' + lastCol);
 
-    var headers = _getHeaders(sheet);
-    // Trim trailing empty headers
-    while (headers.length > 0 && headers[headers.length - 1] === '') {
-      headers.pop();
-    }
+    var headers = _trimTrailingEmptyHeaders_(_getHeaders(sheet));
     var numCols = headers.length;
 
     Logger.log('Headers (' + numCols + '): ' + headers.slice(0, 5).join(', ') + '...');
@@ -702,10 +699,12 @@ function searchRows(params) {
     params = params || {};
     Logger.log('searchRows params: ' + JSON.stringify(params));
 
-    var sheet = _openSheet();
+    var accessRes = _resolveAccessForDataApi_(params);
+    if (!accessRes.ok) return accessRes;
+
+    var sheet = _openSheet(accessRes.data);
     var lastRow = sheet.getLastRow();
-    var headers = _getHeaders(sheet);
-    while (headers.length > 0 && headers[headers.length - 1] === '') headers.pop();
+    var headers = _trimTrailingEmptyHeaders_(_getHeaders(sheet));
     var numCols = headers.length;
 
     if (numCols === 0 || lastRow < CONFIG.DATA_START_ROW) {
@@ -873,9 +872,8 @@ function updateRow(payload) {
     var validation = _validateChanges(payload.changes);
     if (!validation.ok) return validation;
 
-    var sheet = _openSheet();
-    var headers = _getHeaders(sheet);
-    while (headers.length > 0 && headers[headers.length - 1] === '') headers.pop();
+    var sheet = _openSheet(accessRes.data);
+    var headers = _trimTrailingEmptyHeaders_(_getHeaders(sheet));
     var allowedFields = _getEditableFieldsForAccess_(accessRes.data);
 
     var lastRow = sheet.getLastRow();
@@ -920,9 +918,8 @@ function updateBatch(payload) {
     var accessRes = _requireWriteAccess_(payload.token);
     if (!accessRes.ok) return accessRes;
 
-    var sheet = _openSheet();
-    var headers = _getHeaders(sheet);
-    while (headers.length > 0 && headers[headers.length - 1] === '') headers.pop();
+    var sheet = _openSheet(accessRes.data);
+    var headers = _trimTrailingEmptyHeaders_(_getHeaders(sheet));
     var lastRow = sheet.getLastRow();
     var allowedFields = _getEditableFieldsForAccess_(accessRes.data);
     var requestId = Utilities.getUuid();
@@ -1491,17 +1488,6 @@ function _getAccessByToken_(token) {
   try {
     var tk = String(token || '').trim();
     if (!tk) return _err('MISSING_TOKEN', 'Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.');
-
-    // Handle bypass token for testing
-    if (tk.startsWith('bypass_token_')) {
-      return _ok({
-        email: 'test@example.com',
-        fullName: 'Test User',
-        role: 'PIC',
-        scope: ['ALL'],
-        canEdit: true
-      });
-    }
 
     var raw = CacheService.getScriptCache().get('AUTH_' + tk);
     if (!raw) return _err('TOKEN_EXPIRED', 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');

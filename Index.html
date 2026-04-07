@@ -3249,7 +3249,7 @@
     </nav>
     <div id="userBadge" style="display:flex;align-items:center;gap:6px;padding:4px 10px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;flex-shrink:0">
       <span style="font-size:14px">👤</span>
-      <span id="userBadgeLabel" style="font-size:11px;font-weight:700;color:#1d4ed8">PIC / Category Manager</span>
+      <span id="userBadgeLabel" style="font-size:11px;font-weight:700;color:#1d4ed8">Loading...</span>
     </div>
     <div class="topbar-right">
       <div class="conn" id="conn">
@@ -4354,7 +4354,7 @@
             return s && String(s).trim() && String(s).trim().toUpperCase() !== 'ALL';
           });
           var scopeSuffix = visibleScopes.length
-            ? (' · ' + visibleScopes[0] + (visibleScopes.length > 1 ? (' +' + (visibleScopes.length - 1)) : ''))
+            ? (' · ' + visibleScopes.join(' · '))
             : '';
           userBadge.style.background = USER_CAN_EDIT ? '#eff6ff' : '#f8fafc';
           userBadge.style.borderColor = USER_CAN_EDIT ? '#bfdbfe' : '#cbd5e1';
@@ -4363,7 +4363,7 @@
             userBadgeLabel.textContent = 'Test Mode - PIC';
             userBadge.title = 'Bypass login mode for testing';
           } else {
-            userBadgeLabel.textContent = USER_CAN_EDIT ? ('PIC / Category Manager' + scopeSuffix) : 'View Only';
+            userBadgeLabel.textContent = USER_CAN_EDIT ? (APP_USER.fullName + scopeSuffix) : 'View Only';
             userBadge.title = visibleScopes.length ? ('Scope: ' + visibleScopes.join(', ')) : '';
           }
         }
@@ -5638,6 +5638,31 @@
         'Inventory Type': 'Inventory_Type',
         'UOM Information': 'UOMInfo'
       };
+
+      var DETAIL_DROPDOWN_FIELD_IDS = {
+        'Status': 'sd_Status',
+        'New product type': 'sd_New_product_type',
+        'Premium products': 'sd_Premium_products',
+        'Branded': 'sd_Branded',
+        'Sub Category': 'sd_Sub_Category',
+        'PRIMARY USAGE SEGMENT': 'sd_PRIMARY_USAGE_SEGMENT',
+        'TARGET STORE TYPES': 'sd_TARGET_STORE_TYPES',
+        'TARGET CUSTOMER STORE TYPES': 'sd_TARGET_CUSTOMER_STORE_TYPES',
+        'Preservation temperature': 'sd_Preservation_temperature',
+        'Logistics Group South': 'sd_Logistics_South',
+        'Logistics Group North': 'sd_Logistics_North',
+        'Inventory Type': 'sd_Inventory_Type',
+        'SAME PRICE PRODUCT': 'sd_Same_Price_Product',
+        'REFERENCE PRODUCT ID (Nếu không có điền NO)': 'sd_Ref_ID'
+      };
+
+      function _getDetailFieldValueFromUi_(field) {
+        var ddId = DETAIL_DROPDOWN_FIELD_IDS[field];
+        if (ddId) return getDropdownValue(ddId);
+        var input = document.getElementById('mf_' + FIELD_MAP[field]);
+        return input ? input.value : '';
+      }
+
       var READ_MAP = {
         'Zone': 'r_zone', 'UOM Information': 'r_uom', 'UOM INFORMATION': 'r_uom',
         'Create Date': 'r_cdate', 'CREATE DATE': 'r_cdate',
@@ -6276,20 +6301,7 @@
       }
 
       function _getFieldInputValue(field) {
-        var ddFields = {
-          'Status': 'sd_Status', 'New product type': 'sd_New_product_type',
-          'Premium products': 'sd_Premium_products', 'Branded': 'sd_Branded',
-          'Sub Category': 'sd_Sub_Category', 'PRIMARY USAGE SEGMENT': 'sd_PRIMARY_USAGE_SEGMENT',
-          'TARGET STORE TYPES': 'sd_TARGET_STORE_TYPES', 'TARGET CUSTOMER STORE TYPES': 'sd_TARGET_CUSTOMER_STORE_TYPES',
-          'Preservation temperature': 'sd_Preservation_temperature',
-          'Logistics Group South': 'sd_Logistics_South', 'Logistics Group North': 'sd_Logistics_North',
-          'Inventory Type': 'sd_Inventory_Type',
-          'SAME PRICE PRODUCT': 'sd_Same_Price_Product',
-          'REFERENCE PRODUCT ID (Nếu không có điền NO)': 'sd_Ref_ID'
-        };
-        if (ddFields[field]) return getDropdownValue(ddFields[field]);
-        var input = document.getElementById('mf_' + FIELD_MAP[field]);
-        return input ? input.value : '';
+        return _getDetailFieldValueFromUi_(field);
       }
 
       function _getRowFieldValue(row, field) {
@@ -6570,23 +6582,10 @@
       };
 
       function refreshDirtyState(row) {
-        var ddFields = {
-          'Status': 'sd_Status', 'New product type': 'sd_New_product_type',
-          'Premium products': 'sd_Premium_products', 'Branded': 'sd_Branded',
-          'Sub Category': 'sd_Sub_Category', 'PRIMARY USAGE SEGMENT': 'sd_PRIMARY_USAGE_SEGMENT',
-          'TARGET STORE TYPES': 'sd_TARGET_STORE_TYPES', 'TARGET CUSTOMER STORE TYPES': 'sd_TARGET_CUSTOMER_STORE_TYPES',
-          'Preservation temperature': 'sd_Preservation_temperature',
-          'Logistics Group South': 'sd_Logistics_South', 'Logistics Group North': 'sd_Logistics_North',
-          'Inventory Type': 'sd_Inventory_Type',
-          'SAME PRICE PRODUCT': 'sd_Same_Price_Product',
-          'REFERENCE PRODUCT ID (Nếu không có điền NO)': 'sd_Ref_ID'
-        };
         var total = 0;
         for (var field in FIELD_MAP) {
           var ov = _normalizeFieldValue(field, _getRowFieldValue(row, field));
-          var nv;
-          if (ddFields[field]) { nv = getDropdownValue(ddFields[field]); }
-          else { var e = document.getElementById('mf_' + FIELD_MAP[field]); nv = e ? e.value : ''; }
+          var nv = _getDetailFieldValueFromUi_(field);
           nv = _normalizeFieldValue(field, nv);
           var isDirty = nv !== ov;
           if (isDirty) total++;
@@ -6761,22 +6760,9 @@
         var row = _findAnyRowByRn(rn); if (!row) return;
         if (MODAL_UOM_DIRTY) _syncModalUomField();
         var ch = {}, has = false;
-        var ddFields = {
-          'Status': 'sd_Status', 'New product type': 'sd_New_product_type',
-          'Premium products': 'sd_Premium_products', 'Branded': 'sd_Branded',
-          'Sub Category': 'sd_Sub_Category', 'PRIMARY USAGE SEGMENT': 'sd_PRIMARY_USAGE_SEGMENT',
-          'TARGET STORE TYPES': 'sd_TARGET_STORE_TYPES', 'TARGET CUSTOMER STORE TYPES': 'sd_TARGET_CUSTOMER_STORE_TYPES',
-          'Preservation temperature': 'sd_Preservation_temperature',
-          'Logistics Group South': 'sd_Logistics_South', 'Logistics Group North': 'sd_Logistics_North',
-          'Inventory Type': 'sd_Inventory_Type',
-          'SAME PRICE PRODUCT': 'sd_Same_Price_Product',
-          'REFERENCE PRODUCT ID (Nếu không có điền NO)': 'sd_Ref_ID'
-        };
         for (var field in FIELD_MAP) {
           var ov = _normalizeFieldValue(field, _getRowFieldValue(row, field));
-          var nv;
-          if (ddFields[field]) { nv = getDropdownValue(ddFields[field]); }
-          else { var el = document.getElementById('mf_' + FIELD_MAP[field]); if (!el) continue; nv = el.value; }
+          var nv = _getDetailFieldValueFromUi_(field);
           nv = _normalizeFieldValue(field, nv);
           if (nv !== ov) { ch[field] = nv; has = true; }
         }
