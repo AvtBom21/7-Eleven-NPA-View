@@ -2759,6 +2759,61 @@
       font-weight: 400
     }
 
+    .mc-auto {
+      background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+      border-color: #d8e4f3;
+    }
+
+    .mc-auto-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 18px;
+      padding: 0 6px;
+      border-radius: 999px;
+      border: 1px solid #d7e6fb;
+      background: #edf5ff;
+      color: #1d4ed8;
+      font: 700 8px var(--mono);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .mc-auto-readout {
+      min-height: 74px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+      padding: 12px 13px;
+      border-radius: 14px;
+      border: 1px solid #dbe7f5;
+      background: linear-gradient(180deg, #fdfefe 0%, #f4f8fd 100%);
+    }
+
+    .mc-auto-readout.is-empty {
+      border-style: dashed;
+      background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+    }
+
+    .mc-auto-meta {
+      font: 700 9px var(--mono);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #64748b;
+    }
+
+    .mc-auto-value {
+      font: 600 14px/1.5 var(--font);
+      color: #0f172a;
+      word-break: break-word;
+    }
+
+    .mc-auto-readout.is-empty .mc-auto-value {
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
     .mc input[type=text],
     .mc input[type=date],
     .mc input[type=number] {
@@ -5323,7 +5378,7 @@
       display: grid;
       grid-template-columns: 92px minmax(0, 1fr) 42px;
       gap: 12px;
-      align-items: start;
+      align-items: end;
       padding: 12px;
       border-radius: 16px;
       border: 1px solid #dbe3ee;
@@ -5346,10 +5401,15 @@
     }
 
     .pog-slot-main {
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(240px, .92fr);
       gap: 10px;
       min-width: 0;
+      align-items: end;
+    }
+
+    .pog-slot-row:not(.has-product) .pog-slot-main {
+      grid-template-columns: minmax(0, 1fr);
     }
 
     .pog-slot-field {
@@ -5371,22 +5431,11 @@
     }
 
     .pog-slot-field.is-action {
-      padding-top: 10px;
-      border-top: 1px dashed #dbe3ee;
+      min-width: 0;
     }
 
     .pog-slot-field.is-action select {
       min-height: 42px;
-    }
-
-    .pog-slot-hint {
-      font-size: 12px;
-      line-height: 1.5;
-      color: #64748b;
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px dashed #d6e0ee;
-      background: #f8fafc;
     }
 
     .pog-slot-clear {
@@ -5409,6 +5458,10 @@
     .pog-slot-clear:disabled {
       opacity: .4;
       cursor: not-allowed;
+    }
+
+    .pog-slot-clear-slot {
+      align-self: end;
     }
 
     .pog-module-actions {
@@ -6070,6 +6123,10 @@
 
       .pog-decision-top,
       .pog-slot-row {
+        grid-template-columns: 1fr;
+      }
+
+      .pog-slot-main {
         grid-template-columns: 1fr;
       }
 
@@ -6931,13 +6988,23 @@
                 <div class="mc-label">Sub Category <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
                 <div class="mc-body"><div class="sdrop searchable ef" id="sd_Sub_Category"></div></div>
               </div>
-              <div class="mc">
-                <div class="mc-label">Category (Auto)</div>
-                <div class="mc-body"><div class="mc-ro muted" id="r_cat">—</div></div>
+              <div class="mc mc-auto" id="mc_cat_auto_card">
+                <div class="mc-label">Category (Auto)<span class="mc-auto-chip">Resolved</span></div>
+                <div class="mc-body">
+                  <div class="mc-auto-readout is-empty" id="r_cat_wrap">
+                    <div class="mc-auto-meta" id="r_cat_meta">Waiting for sub category mapping</div>
+                    <div class="mc-auto-value" id="r_cat">—</div>
+                  </div>
+                </div>
               </div>
-              <div class="mc">
-                <div class="mc-label">Group (Auto)</div>
-                <div class="mc-body"><div class="mc-ro muted" id="r_pg">—</div></div>
+              <div class="mc mc-auto" id="mc_pg_auto_card">
+                <div class="mc-label">Group (Auto)<span class="mc-auto-chip">Resolved</span></div>
+                <div class="mc-body">
+                  <div class="mc-auto-readout is-empty" id="r_pg_wrap">
+                    <div class="mc-auto-meta" id="r_pg_meta">Waiting for sub category mapping</div>
+                    <div class="mc-auto-value" id="r_pg">—</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -9098,7 +9165,7 @@
           var slot = MODAL_POG_STATE[i] || _newPogSlot(i);
           var hasProduct = !!String(slot.product || '').trim();
           var canRemove = MODAL_POG_STATE.length > 1 || hasProduct || String(slot.action || '').trim();
-          html += '<div class="pog-slot-row">'
+          html += '<div class="pog-slot-row' + (hasProduct ? ' has-product' : '') + '">'
             + '<div class="pog-slot-index">Product ' + (i + 1) + '</div>'
             + '<div class="pog-slot-main">'
             + '<div class="pog-slot-field">'
@@ -9107,7 +9174,7 @@
             + '</div>'
             + (hasProduct
                 ? ('<div class="pog-slot-field is-action">'
-                  + '<div class="pog-slot-label">Action for Product ' + (i + 1) + '</div>'
+                  + '<div class="pog-slot-label">Action</div>'
                   + '<select class="bfp-fc pog-slot-action" id="pog_action_' + i + '">'
                   + '<option value="">Choose action</option>'
                   + _getPogActionOptions(i + 1).map(function (action) {
@@ -9115,9 +9182,9 @@
                     }).join('')
                   + '</select>'
                   + '</div>')
-                : '<div class="pog-slot-hint">Select the product first to unlock the matching cut / reduce-facing action for this slot.</div>')
+                : '')
             + '</div>'
-            + '<button type="button" class="pog-slot-clear" title="Remove product slot" aria-label="Remove product slot" onclick="App.modalClearPogSlot(' + i + ')"' + (canRemove ? '' : ' disabled') + '>×</button>'
+            + '<button type="button" class="pog-slot-clear pog-slot-clear-slot" title="Remove product slot" aria-label="Remove product slot" onclick="App.modalClearPogSlot(' + i + ')"' + (canRemove ? '' : ' disabled') + '>×</button>'
             + '</div>';
         }
         list.innerHTML = html;
@@ -10341,15 +10408,44 @@
         var sameSub = !!fallbackSub && fallbackSub.replace(/\s+/g, ' ').trim().toLowerCase() === sc.toLowerCase();
         var group = sameSub ? _cleanDisplayValue(fallbackRow['Group'] || fallbackRow['GROUP'] || '') : '';
         var category = sameSub ? _cleanDisplayValue(fallbackRow['Category'] || fallbackRow['CATEGORY'] || '') : '';
+        var groupSource = group ? 'Current row value' : '';
+        var categorySource = category ? 'Current row value' : '';
         var mapGroup = map && map.group ? _cleanDisplayValue(map.group) : '';
         var mapCategory = map && map.category ? _cleanDisplayValue(map.category) : '';
-        if (!group) group = mapGroup;
-        if (!category) category = mapCategory;
-        if ((!group || !category) && fallbackRow && !sameSub) {
-          if (!group) group = _cleanDisplayValue(fallbackRow['Group'] || fallbackRow['GROUP'] || '');
-          if (!category) category = _cleanDisplayValue(fallbackRow['Category'] || fallbackRow['CATEGORY'] || '');
+        if (!group && mapGroup) {
+          group = mapGroup;
+          groupSource = 'Sub category mapping';
         }
-        return { group: group, category: category };
+        if (!category && mapCategory) {
+          category = mapCategory;
+          categorySource = 'Sub category mapping';
+        }
+        if ((!group || !category) && fallbackRow && !sameSub) {
+          if (!group) {
+            group = _cleanDisplayValue(fallbackRow['Group'] || fallbackRow['GROUP'] || '');
+            if (group) groupSource = 'Current row value';
+          }
+          if (!category) {
+            category = _cleanDisplayValue(fallbackRow['Category'] || fallbackRow['CATEGORY'] || '');
+            if (category) categorySource = 'Current row value';
+          }
+        }
+        return {
+          group: group,
+          category: category,
+          groupSource: groupSource || 'No auto value yet',
+          categorySource: categorySource || 'No auto value yet'
+        };
+      }
+
+      function _setAutoResolvedField(valueId, wrapId, metaId, value, sourceLabel) {
+        var valueEl = document.getElementById(valueId);
+        var wrapEl = document.getElementById(wrapId);
+        var metaEl = document.getElementById(metaId);
+        var clean = _cleanDisplayValue(value);
+        if (valueEl) valueEl.textContent = clean || '—';
+        if (metaEl) metaEl.textContent = clean ? (sourceLabel || 'Auto resolved') : 'No auto value yet';
+        if (wrapEl) wrapEl.classList.toggle('is-empty', !clean);
       }
 
       function _resolveSubcateBench(subCategory, fallbackRow) {
@@ -10389,8 +10485,8 @@
         var ce = document.getElementById('mf_cat_auto');
         if (ge) ge.value = meta.group || '';
         if (ce) ce.value = meta.category || '';
-        setText('r_pg', meta.group || '—');
-        setText('r_cat', meta.category || '—');
+        _setAutoResolvedField('r_pg', 'r_pg_wrap', 'r_pg_meta', meta.group || '', meta.groupSource);
+        _setAutoResolvedField('r_cat', 'r_cat_wrap', 'r_cat_meta', meta.category || '', meta.categorySource);
       }
 
       function initModalDropdowns(row) {
