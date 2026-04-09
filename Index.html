@@ -2027,24 +2027,24 @@
       color: #0f172a
     }
 
-    .s1-top-grid {
-      margin-top: 10px;
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 8px
-    }
-
-    .s1-key-grid {
+    .s1-context-sub {
       margin-top: 8px;
+      max-width: 780px;
+      font: 500 13px/1.55 var(--font);
+      color: #475569
+    }
+
+    .s1-top-grid {
+      margin-top: 14px;
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 8px
     }
 
-    .s1-content-grid {
+    .s1-baseline-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1.45fr) minmax(280px, .55fr);
-      gap: 10px;
+      grid-template-columns: minmax(0, 1.45fr) minmax(260px, .72fr);
+      gap: 14px;
       align-items: start
     }
 
@@ -2078,57 +2078,11 @@
       margin-bottom: 8px
     }
 
-    .s1-price-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px
-    }
-
-    .s1-price-item {
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      background: #fafafa;
-      padding: 9px 10px
-    }
-
-    .s1-price-item .s1-value {
-      font-size: 20px;
-      font-weight: 700;
-      line-height: 1.2;
-      color: #0f172a
-    }
-
-    .s1-meta-grid {
-      margin-top: 8px;
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px
-    }
-
-    .s1-meta-grid.ops {
-      grid-template-columns: repeat(3, minmax(0, 1fr))
-    }
-
-    .s1-note {
-      margin-top: 8px;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 8px 10px;
-      background: #fcfcfd
-    }
-
-    .s1-note-value {
-      margin-top: 3px;
-      font: 500 13px/1.52 var(--font);
-      color: #1f2937;
-      white-space: pre-wrap;
-      word-break: break-word
-    }
-
-    .s1-visual-panel {
+    .s1-image-card {
       display: flex;
       flex-direction: column;
-      gap: 8px
+      gap: 12px;
+      min-width: 0
     }
 
     .s1-image-frame {
@@ -2167,14 +2121,507 @@
       border-bottom-color: rgba(37, 99, 235, .72)
     }
 
+    .s1-section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 12px
+    }
+
+    .s1-section-sub {
+      margin-top: 4px;
+      font: 500 12px/1.5 var(--font);
+      color: #64748b
+    }
+
+    .s1-section-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font: 700 10px var(--mono);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      white-space: nowrap
+    }
+
+    .s1-section-badge.is-source {
+      border-color: #d8e1ec;
+      background: #f8fafc;
+      color: #475569
+    }
+
+    .s1-section-badge.is-filled {
+      border-color: #bfdbfe;
+      background: #eff6ff;
+      color: #1d4ed8
+    }
+
+    .s1-overview-groups {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px
+    }
+
+    .s1-panel.is-source-panel {
+      background: linear-gradient(180deg, #fff 0%, #fbfcfe 100%);
+      border-color: #dbe3ee
+    }
+
+    .s1-panel.is-filled-panel {
+      background: linear-gradient(180deg, #f9fbff 0%, #fff 100%);
+      border-color: #cfe0f7;
+      box-shadow: inset 0 1px 0 rgba(191, 219, 254, .55)
+    }
+
+    .s1-group-card,
+    .s1-health-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      background: #fff;
+      padding: 14px;
+      min-width: 0
+    }
+
+    .s1-group-card.is-wide {
+      grid-column: 1 / -1
+    }
+
+    .s1-group-card.is-supplier {
+      border-color: #dbe3ee;
+      background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%)
+    }
+
+    .s1-group-card.is-filled {
+      border-color: #c7dcf8;
+      background: linear-gradient(180deg, #f8fbff 0%, #fdfefe 100%);
+      box-shadow: 0 10px 22px rgba(148, 163, 184, .06), inset 0 1px 0 rgba(255, 255, 255, .72)
+    }
+
+    .s1-group-head {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 12px
+    }
+
+    .s1-group-head-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px
+    }
+
+    .s1-group-title,
+    .s1-mini-title {
+      font: 700 12px/1.35 var(--font);
+      color: #0f172a
+    }
+
+    .s1-group-sub,
+    .s1-mini-sub {
+      font: 500 11px/1.45 var(--font);
+      color: #64748b
+    }
+
+    .s1-group-card.is-filled .s1-group-title {
+      color: #0f3b82
+    }
+
+    .s1-group-card.is-filled .s1-group-sub {
+      color: #52637a
+    }
+
+    .s1-group-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 22px;
+      padding: 0 8px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font: 700 9px var(--mono);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      white-space: nowrap
+    }
+
+    .s1-group-badge.is-supplier {
+      border-color: #dbe3ee;
+      background: #f8fafc;
+      color: #475569
+    }
+
+    .s1-group-badge.is-filled {
+      border-color: #bfdbfe;
+      background: #dbeafe;
+      color: #1d4ed8
+    }
+
+    .s1-field-list,
+    .s1-issue-list,
+    .s1-step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    .s1-field-row {
+      display: grid;
+      grid-template-columns: minmax(140px, .72fr) minmax(0, 1fr);
+      gap: 10px;
+      padding: 8px 0;
+      border-top: 1px solid #eef2f7
+    }
+
+    .s1-field-row:first-child {
+      padding-top: 0;
+      border-top: 0
+    }
+
+    .s1-field-row.is-stack {
+      grid-template-columns: 1fr
+    }
+
+    .s1-field-row.is-supplier {
+      border-top-color: #edf2f7
+    }
+
+    .s1-field-row.is-filled {
+      padding: 10px 12px;
+      border-top: 0;
+      border-radius: 10px;
+      background: rgba(239, 246, 255, .54)
+    }
+
+    .s1-field-row.is-filled + .s1-field-row.is-filled {
+      margin-top: 2px
+    }
+
+    .s1-field-row.is-filled.is-edited {
+      background: linear-gradient(90deg, rgba(219, 234, 254, .95) 0%, rgba(248, 250, 252, .96) 100%);
+      box-shadow: inset 3px 0 0 #2563eb
+    }
+
+    .s1-field-row.is-filled.is-empty {
+      background: linear-gradient(90deg, rgba(255, 247, 237, .98) 0%, rgba(255, 251, 235, .92) 100%);
+      box-shadow: inset 3px 0 0 #f59e0b
+    }
+
+    .s1-field-row.is-filled.is-key {
+      background: linear-gradient(90deg, rgba(239, 246, 255, .98) 0%, rgba(248, 250, 252, .94) 100%)
+    }
+
+    .s1-field-key {
+      font: 700 9px var(--mono);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #64748b
+    }
+
+    .s1-field-key-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 5px
+    }
+
+    .s1-field-origin {
+      font: 600 10px/1.4 var(--font);
+      color: #64748b
+    }
+
+    .s1-group-card.is-filled .s1-field-origin {
+      color: #2563eb
+    }
+
+    .s1-field-body {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0
+    }
+
+    .s1-field-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px
+    }
+
+    .s1-field-val {
+      font: 600 12px/1.55 var(--font);
+      color: #111827;
+      word-break: break-word
+    }
+
+    .s1-field-val.is-multiline {
+      white-space: normal
+    }
+
+    .s1-field-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: flex-end
+    }
+
+    .s1-state-tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 20px;
+      padding: 0 7px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font: 700 9px var(--mono);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      white-space: nowrap
+    }
+
+    .s1-state-tag.is-workspace {
+      border-color: #bfdbfe;
+      background: #eff6ff;
+      color: #1d4ed8
+    }
+
+    .s1-state-tag.is-edited {
+      border-color: #93c5fd;
+      background: #dbeafe;
+      color: #1e40af
+    }
+
+    .s1-state-tag.is-empty {
+      border-color: #fcd34d;
+      background: #fffbeb;
+      color: #b45309
+    }
+
+    .s1-state-tag.is-key {
+      border-color: #cbd5e1;
+      background: #f8fafc;
+      color: #475569
+    }
+
+    .s1-field-compare {
+      font: 500 11px/1.45 var(--font);
+      color: #64748b
+    }
+
+    .s1-field-row.is-filled.is-edited .s1-field-compare {
+      color: #1d4ed8
+    }
+
+    .s1-field-row.is-filled.is-empty .s1-field-compare {
+      color: #b45309
+    }
+
+    .s1-field-val .blank,
+    .s1-empty-state {
+      color: #94a3b8;
+      font-style: italic
+    }
+
+    .s1-field-row.is-filled .s1-field-val .blank {
+      color: #b45309;
+      font-style: normal;
+      font-weight: 700
+    }
+
+    .s1-health-readiness {
+      min-width: 280px;
+      max-width: 360px;
+      padding: 14px;
+      border: 1px solid #dbe3ee;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #f8fbff 0%, #fff 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    .s1-health-label {
+      font: 700 10px var(--mono);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: #64748b
+    }
+
+    .s1-health-state {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font: 700 10px var(--mono);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      white-space: nowrap
+    }
+
+    .s1-health-note {
+      font: 500 12px/1.5 var(--font);
+      color: #475569
+    }
+
+    .s1-health-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      width: fit-content;
+      padding: 0 14px;
+      border-radius: 10px;
+      border: 1px solid #bfdbfe;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font: 700 12px var(--font);
+      cursor: pointer;
+      transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease
+    }
+
+    .s1-health-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(37, 99, 235, .14);
+      border-color: #93c5fd
+    }
+
+    .s1-health-metrics {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px
+    }
+
+    .s1-health-metric {
+      padding: 12px 14px;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      background: #f8fafc
+    }
+
+    .s1-health-metric .lbl {
+      display: block;
+      font: 700 9px var(--mono);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #64748b
+    }
+
+    .s1-health-metric strong {
+      display: block;
+      margin-top: 7px;
+      font: 700 18px/1.1 var(--font);
+      color: #0f172a
+    }
+
+    .s1-health-grid {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.02fr) minmax(320px, .98fr);
+      gap: 12px
+    }
+
+    .s1-step-item {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid #dbe3ee;
+      background: #fff;
+      color: inherit;
+      text-align: left;
+      cursor: pointer;
+      transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease
+    }
+
+    .s1-step-item:hover {
+      transform: translateY(-1px);
+      border-color: #bfdbfe;
+      box-shadow: 0 10px 20px rgba(15, 23, 42, .05)
+    }
+
+    .s1-step-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0
+    }
+
+    .s1-step-title {
+      font: 700 12px/1.35 var(--font);
+      color: #0f172a
+    }
+
+    .s1-step-meta {
+      font: 500 12px/1.45 var(--font);
+      color: #64748b
+    }
+
+    .s1-step-state {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font: 700 9px var(--mono);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      flex-shrink: 0
+    }
+
+    .s1-issue {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid #dbe3ee;
+      background: #fff;
+      font: 600 12px/1.5 var(--font);
+      color: #1f2937
+    }
+
+    .s1-issue.is-warn {
+      border-color: #fed7aa;
+      background: #fff7ed;
+      color: #9a3412
+    }
+
+    .s1-issue.is-ok {
+      border-color: #bbf7d0;
+      background: #f0fdf4;
+      color: #166534
+    }
+
     @media(max-width:1180px) {
       .s1-top-grid,
-      .s1-key-grid {
+      .s1-overview-groups,
+      .s1-health-metrics {
         grid-template-columns: repeat(2, minmax(0, 1fr))
       }
 
-      .s1-content-grid {
+      .s1-baseline-grid,
+      .s1-health-grid {
         grid-template-columns: 1fr
+      }
+
+      .s1-section-head {
+        flex-direction: column
+      }
+
+      .s1-health-readiness {
+        min-width: 0;
+        max-width: none;
+        width: 100%
       }
     }
 
@@ -2188,15 +2635,31 @@
       }
 
       .s1-top-grid,
-      .s1-key-grid,
-      .s1-price-grid,
-      .s1-meta-grid,
-      .s1-meta-grid.ops {
+      .s1-overview-groups,
+      .s1-health-metrics {
         grid-template-columns: 1fr
       }
 
       .s1-image-frame {
         min-height: 180px
+      }
+
+      .s1-field-row {
+        grid-template-columns: 1fr
+      }
+
+      .s1-field-top {
+        flex-direction: column;
+        align-items: flex-start
+      }
+
+      .s1-field-tags {
+        justify-content: flex-start
+      }
+
+      .s1-step-item {
+        flex-direction: column;
+        align-items: flex-start
       }
     }
 
@@ -3046,12 +3509,37 @@
       align-items: center
     }
 
+    .sdrop.is-multi .sdrop-input {
+      padding: 10px 56px 10px 11px;
+      min-height: 42px;
+      height: auto;
+      white-space: normal;
+      overflow: visible;
+      text-overflow: clip;
+      align-items: flex-start;
+    }
+
     .sdrop-value {
       min-width: 0;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
       flex: 1
+    }
+
+    .sdrop.is-multi .sdrop-value {
+      font-weight: 600;
+      white-space: normal;
+      overflow: visible;
+      text-overflow: clip;
+      line-height: 1.5;
+      padding-right: 2px;
+    }
+
+    .sdrop.is-multi .sdrop-clear,
+    .sdrop.is-multi .sdrop-arrow {
+      top: 12px;
+      transform: none;
     }
 
     .sdrop-input.pv {
@@ -3179,6 +3667,40 @@
       color: var(--text);
       border-radius: 7px;
       transition: all .1s
+    }
+
+    .sdrop.is-multi .sdrop-opt {
+      position: relative;
+      padding-left: 34px;
+    }
+
+    .sdrop.is-multi .sdrop-opt::before {
+      content: '';
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+      border: 1.5px solid #cbd5e1;
+      background: #fff;
+      transform: translateY(-50%);
+      box-sizing: border-box;
+      transition: all .12s ease;
+    }
+
+    .sdrop.is-multi .sdrop-opt.selected::before {
+      border-color: var(--blue);
+      background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
+      box-shadow: inset 0 0 0 2px #fff;
+    }
+
+    .sdrop.is-multi .sdrop-opt.sdrop-opt-clear {
+      padding-left: 10px;
+    }
+
+    .sdrop.is-multi .sdrop-opt.sdrop-opt-clear::before {
+      display: none;
     }
 
     .sdrop-opt:hover {
@@ -5733,17 +6255,11 @@
               </div>
               <div class="bfc" id="bfc_StoreType">
                 <div class="bfc-lbl">Target Store Types <span class="required">*</span></div>
-                <div class="bfc-inp"><select class="bfp-fc" id="bf_StoreType"
-                    onchange="App.bfChange('StoreType',this.value)">
-                    <option value="">— Chọn —</option>
-                  </select></div>
+                <div class="bfc-inp"><div class="sdrop ef" id="bf_StoreType"></div></div>
               </div>
               <div class="bfc" id="bfc_CustType">
                 <div class="bfc-lbl">Target Customer Types <span class="required">*</span></div>
-                <div class="bfc-inp"><select class="bfp-fc" id="bf_CustType"
-                    onchange="App.bfChange('CustType',this.value)">
-                    <option value="">— Chọn —</option>
-                  </select></div>
+                <div class="bfc-inp"><div class="sdrop ef" id="bf_CustType"></div></div>
               </div>
               <div class="bfc full" id="bfc_WhyList">
                 <div class="bfc-lbl">Why Do We List? <span class="required">*</span></div>
@@ -5972,100 +6488,130 @@
         <div class="m-step-pane on" id="detailStep1">
           <div class="m-static-wrap">
             <div class="s1-flow">
-              <section class="s1-panel" aria-label="Product Basics">
-                <div class="s1-overline">Overview · Product Snapshot</div>
+              <section class="s1-panel" aria-label="Product Overview">
+                <div class="s1-overline">Overview · Product Context</div>
                 <h3 class="s1-product-name" id="st_product">—</h3>
+                <div class="s1-context-sub">Identify the product first, then review supplier baseline, current workspace data, and readiness before editing or saving.</div>
                 <div class="s1-top-grid">
-                  <div class="s1-fact">
-                    <div class="s1-label">Supplier Name</div>
-                    <div class="s1-value" id="st_supplier">—</div>
-                  </div>
-                  <div class="s1-fact">
-                    <div class="s1-label">Brand Name</div>
-                    <div class="s1-value" id="st_brand">—</div>
-                  </div>
-                  <div class="s1-fact">
-                    <div class="s1-label">Country of Origin</div>
-                    <div class="s1-value" id="st_coo">—</div>
-                  </div>
-                  <div class="s1-fact">
-                    <div class="s1-label">Product Group</div>
-                    <div class="s1-value" id="st_group">—</div>
-                  </div>
-                </div>
-                <div class="s1-key-grid">
                   <div class="s1-fact">
                     <div class="s1-label">Ticket ID</div>
                     <div class="s1-value" id="st_ticket">—</div>
                   </div>
                   <div class="s1-fact">
-                    <div class="s1-label">New Product ID</div>
-                    <div class="s1-value" id="st_newpid">—</div>
+                    <div class="s1-label">Status</div>
+                    <div class="s1-value" id="st_status">—</div>
                   </div>
                   <div class="s1-fact">
-                    <div class="s1-label">Reference Product Name</div>
-                    <div class="s1-value" id="st_refname">—</div>
+                    <div class="s1-label">Present Date</div>
+                    <div class="s1-value" id="st_present">—</div>
+                  </div>
+                  <div class="s1-fact">
+                    <div class="s1-label">Supplier</div>
+                    <div class="s1-value" id="st_supplier">—</div>
+                  </div>
+                  <div class="s1-fact">
+                    <div class="s1-label">Brand</div>
+                    <div class="s1-value" id="st_brand">—</div>
                   </div>
                   <div class="s1-fact">
                     <div class="s1-label">Zone</div>
                     <div class="s1-value" id="st_zone">—</div>
                   </div>
-                  <div class="s1-fact">
-                    <div class="s1-label">UOM Information</div>
-                    <div class="s1-value uom-multiline" id="st_uom">—</div>
-                  </div>
                 </div>
               </section>
 
-              <div class="s1-content-grid">
-                <section class="s1-panel" aria-label="Commercial And Operational Snapshot">
-                  <div class="s1-section-title">Commercial Snapshot</div>
-                  <div class="s1-price-grid">
-                    <div class="s1-price-item">
-                      <div class="s1-label">Supplier’s Suggested Retail Price</div>
-                      <div class="s1-value" id="st_ssrp">—</div>
-                    </div>
-                    <div class="s1-price-item">
-                      <div class="s1-label">Purchase Price Excluded VAT</div>
-                      <div class="s1-value" id="st_pp">—</div>
-                    </div>
+              <section class="s1-panel is-source-panel" aria-label="Supplier Baseline">
+                <div class="s1-section-head">
+                  <div>
+                    <div class="s1-section-title">Supplier Baseline</div>
+                    <div class="s1-section-sub">Source data from supplier submission and existing record. This is the baseline you compare against before editing.</div>
                   </div>
-                  <div class="s1-meta-grid">
-                    <div class="s1-fact">
-                      <div class="s1-label">Inbound VAT</div>
-                      <div class="s1-value" id="st_vat">—</div>
+                  <div class="s1-section-badge is-source">Source Data</div>
+                </div>
+                <div class="s1-baseline-grid">
+                  <div class="s1-overview-groups" id="ovSupplierGroups"></div>
+                  <aside class="s1-group-card is-supplier s1-image-card" aria-label="Supplier Image Reference">
+                    <div class="s1-group-head">
+                      <div class="s1-group-head-top">
+                        <div class="s1-group-title">Source Image</div>
+                        <div class="s1-group-badge is-supplier">Reference</div>
+                      </div>
+                      <div class="s1-group-sub">Quick visual check of the original image submitted with supplier data.</div>
                     </div>
-                  </div>
+                    <figure class="s1-image-frame is-empty" id="st_img_frame">
+                      <img class="s1-image" id="st_img" alt="Product Image" loading="lazy" style="display:none" />
+                    </figure>
+                    <a id="st_url" class="s1-image-link" href="#" target="_blank" rel="noopener noreferrer" style="display:none">Open original image</a>
+                  </aside>
+                </div>
+              </section>
 
-                  <div class="s1-section-title" style="margin-top:10px">Operational Snapshot</div>
-                  <div class="s1-meta-grid ops">
-                    <div class="s1-fact">
-                      <div class="s1-label">Storage Conditions</div>
-                      <div class="s1-value" id="st_storage">—</div>
-                    </div>
-                    <div class="s1-fact">
-                      <div class="s1-label">Shelf Life</div>
-                      <div class="s1-value" id="st_shelf">—</div>
-                    </div>
-                    <div class="s1-fact">
-                      <div class="s1-label">Zone</div>
-                      <div class="s1-value" id="st_zone_display">—</div>
-                    </div>
+              <section class="s1-panel is-filled-panel" aria-label="Filled Information Summary">
+                <div class="s1-section-head">
+                  <div>
+                    <div class="s1-section-title">Filled Information Summary</div>
+                    <div class="s1-section-sub">Current workspace-managed values grouped by workflow logic. This is the user-entered layer that is moving toward save.</div>
                   </div>
-                  <div class="s1-note">
-                    <div class="s1-label">Note Zone</div>
-                    <div class="s1-note-value" id="st_note">—</div>
-                  </div>
-                </section>
+                  <div class="s1-section-badge is-filled">Workspace Data</div>
+                </div>
+                <div class="s1-overview-groups" id="ovFilledGroups"></div>
+              </section>
 
-                <section class="s1-panel s1-visual-panel" aria-label="Product Visual">
-                  <div class="s1-section-title">Product Image</div>
-                  <figure class="s1-image-frame is-empty" id="st_img_frame">
-                    <img class="s1-image" id="st_img" alt="Product Image" loading="lazy" style="display:none" />
-                  </figure>
-                  <a id="st_url" class="s1-image-link" href="#" target="_blank" rel="noopener noreferrer" style="display:none">Open original image</a>
-                </section>
-              </div>
+              <section class="s1-panel" aria-label="Workspace Health and Readiness">
+                <div class="s1-section-head">
+                  <div>
+                    <div class="s1-section-title">Workspace Health / Readiness</div>
+                    <div class="s1-section-sub">See what is complete, what is missing, what changed, and where the next edit should happen before saving.</div>
+                  </div>
+                  <div class="s1-health-readiness">
+                    <div class="s1-health-label">Save readiness</div>
+                    <div class="s1-health-state state-idle" id="ovReadyState">Ready to start</div>
+                    <div class="s1-health-note" id="ovReadyNote">Review supplier baseline, then open the right workspace step.</div>
+                    <button type="button" class="s1-health-btn" id="ovNextFocusBtn" onclick="App.openDetailWorkspaceStep(1)">Open Identity</button>
+                  </div>
+                </div>
+
+                <div class="s1-health-metrics">
+                  <div class="s1-health-metric">
+                    <span class="lbl">Pending Changes</span>
+                    <strong id="ovMetricPending">0</strong>
+                  </div>
+                  <div class="s1-health-metric">
+                    <span class="lbl">Required Complete</span>
+                    <strong id="ovMetricRequired">0/0</strong>
+                  </div>
+                  <div class="s1-health-metric">
+                    <span class="lbl">Warnings</span>
+                    <strong id="ovMetricWarnings">0</strong>
+                  </div>
+                  <div class="s1-health-metric">
+                    <span class="lbl">Missing Inputs</span>
+                    <strong id="ovMetricMissing">0</strong>
+                  </div>
+                </div>
+
+                <div class="s1-health-grid">
+                  <div class="s1-health-card">
+                    <div class="s1-mini-title">Step / Section Status</div>
+                    <div class="s1-mini-sub">Jump into the correct edit step without guessing.</div>
+                    <div class="s1-step-list" id="ovStepStates"></div>
+                  </div>
+                  <div class="s1-health-card">
+                    <div class="s1-mini-title">Missing Inputs</div>
+                    <div class="s1-mini-sub">Required inputs that still block a clean save.</div>
+                    <div class="s1-issue-list" id="ovMissingList"></div>
+                    <div class="s1-mini-title" style="margin-top:14px">Warnings</div>
+                    <div class="s1-mini-sub">Validation or quality signals that still need attention.</div>
+                    <div class="s1-issue-list" id="ovWarningList"></div>
+                  </div>
+                </div>
+
+                <div class="s1-health-card" style="margin-top:16px">
+                  <div class="s1-mini-title">High-signal Changes</div>
+                  <div class="s1-mini-sub">Most important edits stay visible in one summary before you enter or save.</div>
+                  <div class="dwov-summary-list" id="ovChangeSummary"></div>
+                </div>
+              </section>
             </div>
           </div>
         </div>
@@ -6691,6 +7237,44 @@
       var LOGISTICS_FIELD_SOUTH = 'Logistics Group South';
       var LOGISTICS_FIELD_NORTH = 'Logistics Group North';
       var PATTERN_OPTIONS = ['Miền Nam', 'Miền Bắc', 'Hai miền'];
+      var MULTI_VALUE_FIELDS = {
+        'TARGET STORE TYPES': true,
+        'TARGET CUSTOMER STORE TYPES': true
+      };
+
+      function _isMultiValueField(field) {
+        return !!MULTI_VALUE_FIELDS[field];
+      }
+
+      function parseMultiValue(raw) {
+        var source = Array.isArray(raw) ? raw.slice() : String(raw == null ? '' : raw).split(',');
+        var seen = {};
+        var out = [];
+        source.forEach(function (item) {
+          var txt = String(item == null ? '' : item).trim();
+          if (!txt) return;
+          var key = txt.toUpperCase();
+          if (seen[key]) return;
+          seen[key] = true;
+          out.push(txt);
+        });
+        return out;
+      }
+
+      function serializeMultiValue(values) {
+        return parseMultiValue(values).join(', ');
+      }
+
+      function normalizeMultiValue(value) {
+        return serializeMultiValue(value);
+      }
+
+      function formatMultiValueForDisplay(values, compact) {
+        var items = parseMultiValue(values);
+        if (!items.length) return '';
+        if (!compact || items.length <= 2) return items.join(', ');
+        return items.slice(0, 2).join(', ') + ' +' + (items.length - 2);
+      }
 
       function _stripVietnameseTone(value) {
         var txt = String(value == null ? '' : value).toLowerCase().trim();
@@ -6749,6 +7333,7 @@
 
       function _normalizeFieldValue(field, value) {
         var v = value === null || value === undefined ? '' : String(value);
+        if (_isMultiValueField(field)) return normalizeMultiValue(v);
         if (field === 'Retail Price (+VAT) in Tier 6') {
           v = v.replace(/,/g, '').trim();
         } else {
@@ -7042,8 +7627,7 @@
         var rn = _getQuickPanelActiveRow();
         if (!rn) return;
         openModal(rn);
-        setDetailStep(2);
-        setStep2Tab(parseInt(S.step2Tab, 10) || 1);
+        setDetailStep(1);
       }
 
       function goSection(section) {
@@ -7575,12 +8159,19 @@
         card.querySelectorAll('.bfp-fc').forEach(function (inp) {
           inp.classList.toggle('modified', !!modified);
         });
+        card.querySelectorAll('.sdrop-input').forEach(function (inp) {
+          inp.classList.toggle('modified', !!modified);
+        });
       }
 
       function _setBatchFieldValue(key, value, markDirty) {
         var el = document.getElementById('bf_' + key);
-        if (key === 'Pattern') value = _normalizeFieldValue(PATTERN_FIELD, value);
-        if (el) el.value = value || '';
+        var field = BF_MAP[key];
+        value = _normalizeFieldValue(field, value);
+        if (el) {
+          if (el.classList && el.classList.contains('sdrop')) setDropdownValue('bf_' + key, value || '', true);
+          else el.value = value || '';
+        }
         _setBfCardVisual(key, !!markDirty);
       }
 
@@ -7591,7 +8182,9 @@
 
       function _batchPreviewValue(key) {
         var el = document.getElementById('bf_' + key);
-        return el ? String(el.value || '') : '';
+        if (!el) return '';
+        if (el.classList && el.classList.contains('sdrop')) return getDropdownValue('bf_' + key);
+        return String(el.value || '');
       }
 
       function _formatBatchImpactValueHtml(value) {
@@ -7622,6 +8215,7 @@
         var card = document.getElementById('bfc_' + key);
         if (!card) return;
         card.hidden = !visible;
+        card.style.display = visible ? '' : 'none';
         var mark = card.querySelector('.required');
         if (mark) mark.style.display = required ? '' : 'none';
       }
@@ -8103,41 +8697,72 @@
 
       function getBfOpts(field) {
         var opts = getDropdownOptions(field);
-        if (!opts.length) { var seen = {}; S.rows.forEach(function (r) { if (r[field]) seen[r[field]] = 1; }); opts = Object.keys(seen).sort(); }
+        if (!opts.length) {
+          var seen = {};
+          S.rows.forEach(function (r) {
+            var raw = r ? r[field] : '';
+            if (_isMultiValueField(field)) {
+              parseMultiValue(raw).forEach(function (item) { seen[item] = 1; });
+              return;
+            }
+            var txt = String(raw == null ? '' : raw).trim();
+            if (txt) seen[txt] = 1;
+          });
+          opts = Object.keys(seen).sort();
+        }
         return opts;
       }
 
       function populateBfDropdowns() {
         var ddMap = {
-          'bf_Status': 'Status', 'bf_NewType': 'New product type', 'bf_InventoryType': 'Inventory Type',
-          'bf_SubCat': 'Sub Category', 'bf_Premium': 'Premium products', 'bf_Branded': 'Branded',
-          'bf_UsageSeg': 'PRIMARY USAGE SEGMENT', 'bf_StoreType': 'TARGET STORE TYPES',
-          'bf_CustType': 'TARGET CUSTOMER STORE TYPES', 'bf_PreserveTemp': 'Preservation temperature',
-          'bf_LogisticS': 'Logistics Group South', 'bf_LogisticN': 'Logistics Group North',
-          'bf_Pattern': 'Pattern',
-          'bf_RefID': 'REFERENCE PRODUCT ID (Nếu không có điền NO)',
-          'bf_SamePrice': 'SAME PRICE PRODUCT'
+          'bf_Status': { field: 'Status' },
+          'bf_NewType': { field: 'New product type' },
+          'bf_InventoryType': { field: 'Inventory Type' },
+          'bf_SubCat': { field: 'Sub Category' },
+          'bf_Premium': { field: 'Premium products' },
+          'bf_Branded': { field: 'Branded' },
+          'bf_UsageSeg': { field: 'PRIMARY USAGE SEGMENT' },
+          'bf_StoreType': { field: 'TARGET STORE TYPES', multiple: true, searchable: true },
+          'bf_CustType': { field: 'TARGET CUSTOMER STORE TYPES', multiple: true, searchable: true },
+          'bf_PreserveTemp': { field: 'Preservation temperature' },
+          'bf_LogisticS': { field: 'Logistics Group South' },
+          'bf_LogisticN': { field: 'Logistics Group North' },
+          'bf_Pattern': { field: 'Pattern' },
+          'bf_RefID': { field: 'REFERENCE PRODUCT ID (Nếu không có điền NO)' },
+          'bf_SamePrice': { field: 'SAME PRICE PRODUCT' }
         };
         Object.keys(ddMap).forEach(function (id) {
-          var sel = document.getElementById(id); if (!sel) return;
-          var curVal = sel.value; // preserve if any
-          if (sel.options.length) {
-            sel.options[0].value = '';
-            sel.options[0].textContent = 'Leave unchanged';
-          }
-          while (sel.options.length > 1) sel.remove(1);
-          var opts = ddMap[id] === PATTERN_FIELD ? PATTERN_OPTIONS.slice() : getBfOpts(ddMap[id]);
+          var cfg = ddMap[id];
+          var el = document.getElementById(id); if (!el) return;
+          var curVal = cfg.multiple ? getDropdownValue(id) : (el.value || '');
+          var opts = cfg.field === PATTERN_FIELD ? PATTERN_OPTIONS.slice() : getBfOpts(cfg.field);
           if (id === 'bf_RefID' && (!opts || !opts.length) && S.mdProductIds.length) opts = S.mdProductIds;
           if (id === 'bf_SamePrice' && (!opts || !opts.length)) opts = ['TRUE', 'FALSE'];
-          _prepareDropdownOptions(ddMap[id], opts).forEach(function (o) {
+          if (cfg.multiple) {
+            el.innerHTML = createDropdownHTML(cfg.field, opts, cfg.searchable, { multiple: true });
+            initDropdown(id, cfg.field, curVal, { multiple: true });
+            if (el.dataset.batchBound !== '1') {
+              el.dataset.batchBound = '1';
+              el.addEventListener('change', function () {
+                App.bfChange(id === 'bf_StoreType' ? 'StoreType' : 'CustType', getDropdownValue(id));
+              });
+            }
+            return;
+          }
+          if (el.options.length) {
+            el.options[0].value = '';
+            el.options[0].textContent = 'Leave unchanged';
+          }
+          while (el.options.length > 1) el.remove(1);
+          _prepareDropdownOptions(cfg.field, opts).forEach(function (o) {
             var item = _toDropdownOption(o);
-            var opt = document.createElement('option'); 
+            var opt = document.createElement('option');
             opt.value = item.value;
             opt.textContent = item.label;
-            sel.appendChild(opt); 
+            el.appendChild(opt);
           });
-          if (id === 'bf_Pattern') curVal = _normalizeFieldValue(PATTERN_FIELD, curVal);
-          if(curVal) sel.value = curVal;
+          if (cfg.field === PATTERN_FIELD) curVal = _normalizeFieldValue(PATTERN_FIELD, curVal);
+          if (curVal) el.value = curVal;
         });
       }
 
@@ -8235,9 +8860,7 @@
         var template = {};
         dirtyKeys.forEach(function (key) {
           var field = BF_MAP[key];
-          var el = document.getElementById('bf_' + key);
-          if (!el) return;
-          template[field] = _normalizeFieldValue(field, el.value);
+          template[field] = _normalizeFieldValue(field, _batchPreviewValue(key));
         });
         var err = validate(template, { values: _collectCurrentBatchValues(), changedFields: Object.keys(template) });
         if (err) { toast(err, 'error'); return; }
@@ -8605,6 +9228,10 @@
         var seen = {};
         var prepared = [];
         function addOpt(raw) {
+          if (_isMultiValueField(fieldName) && (raw == null || typeof raw !== 'object')) {
+            parseMultiValue(raw).forEach(function (item) { addOpt({ value: item, label: item }); });
+            return;
+          }
           var item = _toDropdownOption(raw);
           var val = item.value || item.label;
           var key = _isRefDropdownField(fieldName)
@@ -8627,82 +9254,171 @@
         var placeholder = inp.dataset.placeholder || '';
         var normalized = String(value == null ? '' : value);
         var hasValue = !!normalized;
-        if (txt) txt.textContent = hasValue ? String(label == null ? normalized : label) : placeholder;
+        if (txt) {
+          var display = hasValue ? String(label == null ? normalized : label) : placeholder;
+          txt.textContent = display;
+          txt.title = hasValue ? normalized : '';
+        }
         inp.dataset.value = hasValue ? normalized : '';
         inp.classList.toggle('pv', !hasValue);
         c.classList.toggle('has-value', hasValue);
       }
 
-      function createDropdownHTML(fieldName, opts, hasSearch) {
+      function _normalizeDropdownOptionValue(fieldName, rawValue) {
+        var raw = String(rawValue == null ? '' : rawValue).trim();
+        if (!raw) return '';
+        if (_isRefDropdownField(fieldName)) return _extractRefProductId(raw);
+        if (fieldName === PATTERN_FIELD) return _getCanonicalPatternValue(raw);
+        return raw;
+      }
+
+      function createDropdownHTML(fieldName, opts, hasSearch, config) {
+        var cfg = config || {};
+        var multiple = !!cfg.multiple || _isMultiValueField(fieldName);
         var ph = _dropdownPlaceholder(fieldName);
         var prepared = _prepareDropdownOptions(fieldName, opts);
-        var html = '<div class="sdrop-input pv" tabindex="0" data-value="" data-placeholder="' + esc(ph) + '"><span class="sdrop-value">' + esc(ph) + '</span><button type="button" class="sdrop-clear" title="Clear selection" aria-label="Clear selection">×</button></div>';
+        var html = '<div class="sdrop-input pv' + (multiple ? ' is-multi' : '') + '" tabindex="0" data-value="" data-placeholder="' + esc(ph) + '"><span class="sdrop-value">' + esc(ph) + '</span><button type="button" class="sdrop-clear" title="' + esc(multiple ? 'Clear all selections' : 'Clear selection') + '" aria-label="' + esc(multiple ? 'Clear all selections' : 'Clear selection') + '">×</button></div>';
         html += '<span class="sdrop-arrow">▾</span><div class="sdrop-menu">';
         if (hasSearch) html += '<div class="sdrop-search"><input type="text" placeholder="🔍 Tìm..." autocomplete="off"></div>';
         html += '<ul class="sdrop-options">';
-        html += '<li class="sdrop-opt sdrop-opt-clear" data-value="" data-label="' + esc(ph) + '">Clear selection</li>';
+        html += '<li class="sdrop-opt sdrop-opt-clear" data-value="" data-label="' + esc(ph) + '">' + (multiple ? 'Clear all' : 'Clear selection') + '</li>';
         if (!prepared.length) html += '<li class="sdrop-empty">Không có dữ liệu</li>';
         else prepared.forEach(function (item) {
           html += '<li class="sdrop-opt" data-value="' + esc(item.value) + '" data-label="' + esc(item.label) + '">' + esc(item.label) + '</li>';
         });
         html += '</ul></div>'; return html;
       }
-      function initDropdown(cid, fieldName, curVal) {
+      function initDropdown(cid, fieldName, curVal, config) {
         var c = document.getElementById(cid); if (!c) return;
-        var inp = c.querySelector('.sdrop-input'), srch = c.querySelector('.sdrop-search input'), clearBtn = c.querySelector('.sdrop-clear'), opts = c.querySelectorAll('.sdrop-opt');
+        var cfg = config || {};
+        var multiple = !!cfg.multiple || _isMultiValueField(fieldName);
+        c.classList.toggle('is-multi', multiple);
+        c.dataset.multiple = multiple ? '1' : '0';
+        var inp = c.querySelector('.sdrop-input'), srch = c.querySelector('.sdrop-search input'), clearBtn = c.querySelector('.sdrop-clear');
         if (!inp) return;
-        function syncSelectedState(selectedOpt) {
-          opts.forEach(function (o) { o.classList.toggle('selected', !!selectedOpt && o === selectedOpt); });
+        var menu = c.querySelector('.sdrop-menu');
+        var optionsWrap = c.querySelector('.sdrop-options');
+        function listOptions() {
+          return Array.prototype.slice.call(c.querySelectorAll('.sdrop-opt'));
         }
-        function clearSelection(silent) {
-          _setDropdownDisplay(c, '', '');
-          syncSelectedState(null);
-          c.classList.remove('open');
-          if (!silent) c.dispatchEvent(new Event('change', { bubbles: true }));
-        }
-        if (curVal) {
-          var isRefField = _isRefDropdownField(fieldName);
-          var targetVal = isRefField ? _extractRefProductId(curVal) : curVal;
-          var matched = null;
-          opts.forEach(function (o) {
-            if (o.classList.contains('sdrop-opt-clear')) return;
-            var ov = isRefField ? _extractRefProductId(o.dataset.value) : o.dataset.value;
-            if (!matched && ov === targetVal) matched = o;
-          });
-          if (matched) {
-            _setDropdownDisplay(c, targetVal || matched.dataset.value || curVal, matched.dataset.label || matched.textContent || curVal);
-          } else {
-            _setDropdownDisplay(c, targetVal || curVal, curVal);
+        function findOptionByValue(rawValue) {
+          var target = _normalizeDropdownOptionValue(fieldName, rawValue);
+          if (!target) return null;
+          var opts = listOptions();
+          for (var i = 0; i < opts.length; i++) {
+            var opt = opts[i];
+            if (opt.classList.contains('sdrop-opt-clear')) continue;
+            if (_normalizeDropdownOptionValue(fieldName, opt.dataset.value) === target) return opt;
           }
-          opts.forEach(function (o) {
+          return null;
+        }
+        function ensureOption(rawValue, rawLabel) {
+          var val = _normalizeDropdownOptionValue(fieldName, rawValue);
+          if (!val || !optionsWrap) return null;
+          var found = findOptionByValue(val);
+          if (found) return found;
+          var opt = document.createElement('li');
+          opt.className = 'sdrop-opt';
+          opt.dataset.value = val;
+          opt.dataset.label = String(rawLabel == null ? val : rawLabel).trim() || val;
+          opt.textContent = opt.dataset.label;
+          var empty = c.querySelector('.sdrop-empty');
+          optionsWrap.insertBefore(opt, empty || null);
+          return opt;
+        }
+        function getSelectedValues() {
+          return multiple ? parseMultiValue(inp.dataset.value || '') : [inp.dataset.value || ''].filter(Boolean);
+        }
+        function syncSelectedState() {
+          var selected = getSelectedValues();
+          listOptions().forEach(function (o) {
             if (o.classList.contains('sdrop-opt-clear')) {
               o.classList.remove('selected');
               return;
             }
-            var ov = isRefField ? _extractRefProductId(o.dataset.value) : o.dataset.value;
-            o.classList.toggle('selected', ov === targetVal);
+            var isSelected = selected.indexOf(_normalizeDropdownOptionValue(fieldName, o.dataset.value)) >= 0;
+            o.classList.toggle('selected', isSelected);
           });
-        } else {
-          clearSelection(true);
         }
-        function posMenu() { var m = c.querySelector('.sdrop-menu'); if (!m) return; var r = c.getBoundingClientRect(); var mh = Math.min(264, opts.length * 36 + (srch ? 50 : 0) + 10); var sb = window.innerHeight - r.bottom; if (sb < mh && r.top > mh) m.style.top = (r.top - mh - 2) + 'px'; else m.style.top = (r.bottom + 4) + 'px'; m.style.left = r.left + 'px'; m.style.width = r.width + 'px'; }
+        function applyValue(rawValue, silent) {
+          if (multiple) {
+            var values = parseMultiValue(rawValue);
+            values.forEach(function (val) { ensureOption(val, val); });
+            var labels = values.map(function (val) {
+              var matched = findOptionByValue(val);
+              return matched ? (matched.dataset.label || matched.textContent || val) : val;
+            });
+            _setDropdownDisplay(c, serializeMultiValue(values), formatMultiValueForDisplay(labels, false));
+          } else {
+            var normalized = _normalizeDropdownOptionValue(fieldName, rawValue);
+            if (normalized) {
+              var matched = ensureOption(normalized, rawValue);
+              _setDropdownDisplay(c, normalized, matched ? (matched.dataset.label || matched.textContent || normalized) : normalized);
+            } else {
+              _setDropdownDisplay(c, '', '');
+            }
+          }
+          syncSelectedState();
+          if (!silent) c.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        function clearSelection(silent, keepOpen) {
+          _setDropdownDisplay(c, '', '');
+          syncSelectedState();
+          if (!keepOpen) c.classList.remove('open');
+          if (!silent) c.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        c._setValue = applyValue;
+        c._getValue = function () { return inp ? (inp.dataset.value || '') : ''; };
+        c._getValues = function () { return getSelectedValues(); };
+        applyValue(curVal || '', true);
+        function posMenu() {
+          var m = c.querySelector('.sdrop-menu'); if (!m) return;
+          var optCount = listOptions().length;
+          var r = c.getBoundingClientRect();
+          var mh = Math.min(264, optCount * 36 + (srch ? 50 : 0) + 10);
+          var sb = window.innerHeight - r.bottom;
+          if (sb < mh && r.top > mh) m.style.top = (r.top - mh - 2) + 'px';
+          else m.style.top = (r.bottom + 4) + 'px';
+          m.style.left = r.left + 'px';
+          m.style.width = r.width + 'px';
+        }
         // Stop prop on menu to allow scrolling/dragging without closing
         var menuFn = c.querySelector('.sdrop-menu'); if (menuFn) menuFn.addEventListener('click', function (e) { e.stopPropagation(); });
         function toggle(e) { e.stopPropagation(); var was = c.classList.contains('open'); document.querySelectorAll('.sdrop.open').forEach(function (el) { el.classList.remove('open'); }); if (!was) { c.classList.add('open'); posMenu(); if (srch) { srch.value = ''; filterOpts(''); srch.focus(); } } }
         function selOpt(opt) {
           if (opt.classList.contains('sdrop-opt-clear')) {
-            clearSelection();
+            clearSelection(false, multiple);
             return;
           }
-          var rawVal = opt.dataset.value;
-          var val = _isRefDropdownField(fieldName) ? _extractRefProductId(rawVal) : rawVal;
-          var lbl = opt.dataset.label || opt.textContent || rawVal;
-          _setDropdownDisplay(c, val, lbl);
-          syncSelectedState(opt);
+          var rawVal = _normalizeDropdownOptionValue(fieldName, opt.dataset.value);
+          if (multiple) {
+            var selected = getSelectedValues();
+            var idx = selected.indexOf(rawVal);
+            if (idx >= 0) selected.splice(idx, 1);
+            else selected.push(rawVal);
+            applyValue(selected, false);
+            posMenu();
+            if (srch) srch.focus();
+            return;
+          }
+          applyValue(rawVal, false);
           c.classList.remove('open');
-          c.dispatchEvent(new Event('change', { bubbles: true }));
         }
-        function filterOpts(q) { var lq = q.toLowerCase(); var vis = 0; opts.forEach(function (o) { var m = o.textContent.toLowerCase().indexOf(lq) >= 0; o.classList.toggle('hidden', !m); if (m && !o.classList.contains('sdrop-opt-clear')) vis++; }); var em = c.querySelector('.sdrop-empty'); if (em) em.style.display = vis === 0 ? 'block' : 'none'; }
+        function filterOpts(q) {
+          var lq = q.toLowerCase();
+          var vis = 0;
+          listOptions().forEach(function (o) {
+            if (o.classList.contains('sdrop-opt-clear')) {
+              o.classList.remove('hidden');
+              return;
+            }
+            var matched = o.textContent.toLowerCase().indexOf(lq) >= 0;
+            o.classList.toggle('hidden', !matched);
+            if (matched) vis++;
+          });
+          var em = c.querySelector('.sdrop-empty');
+          if (em) em.style.display = vis === 0 ? 'block' : 'none';
+        }
         inp.addEventListener('click', toggle);
         inp.addEventListener('keydown', function (e) {
           if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(e); return; }
@@ -8715,13 +9431,44 @@
           clearBtn.addEventListener('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
-            clearSelection();
+            clearSelection(false, false);
           });
         }
         if (srch) { srch.addEventListener('input', function () { filterOpts(this.value); }); srch.addEventListener('click', function (e) { e.stopPropagation(); }); }
-        opts.forEach(function (o) { o.addEventListener('click', function (e) { e.stopPropagation(); selOpt(this); }); });
+        if (menu) {
+          menu.addEventListener('click', function (e) {
+            var opt = e.target && e.target.closest ? e.target.closest('.sdrop-opt') : null;
+            if (!opt || !c.contains(opt)) return;
+            e.stopPropagation();
+            selOpt(opt);
+          });
+        }
       }
-      function getDropdownValue(id) { var c = document.getElementById(id); if (!c) return ''; var el = c.querySelector('.sdrop-input'); return el ? (el.dataset.value || '') : ''; }
+      function getDropdownValue(id) {
+        var c = document.getElementById(id);
+        if (!c) return '';
+        if (typeof c._getValue === 'function') return c._getValue();
+        var el = c.querySelector('.sdrop-input');
+        return el ? (el.dataset.value || '') : '';
+      }
+      function getMultiDropdownValues(id) {
+        var c = document.getElementById(id);
+        if (!c) return [];
+        if (typeof c._getValues === 'function') return c._getValues();
+        return parseMultiValue(getDropdownValue(id));
+      }
+      function setDropdownValue(id, value, silent) {
+        var c = document.getElementById(id);
+        if (!c) return;
+        if (typeof c._setValue === 'function') {
+          c._setValue(value, !!silent);
+          return;
+        }
+        _setDropdownDisplay(c, value || '', value || '');
+      }
+      function setMultiDropdownValues(id, values, silent) {
+        setDropdownValue(id, serializeMultiValue(values), silent);
+      }
 
       function setText(id, value) {
         var el = document.getElementById(id);
@@ -8945,8 +9692,8 @@
           { id: 'sd_Branded', field: 'Branded', s: false },
           { id: 'sd_Sub_Category', field: 'Sub Category', s: true },
           { id: 'sd_PRIMARY_USAGE_SEGMENT', field: 'PRIMARY USAGE SEGMENT', s: true },
-          { id: 'sd_TARGET_STORE_TYPES', field: 'TARGET STORE TYPES', s: false },
-          { id: 'sd_TARGET_CUSTOMER_STORE_TYPES', field: 'TARGET CUSTOMER STORE TYPES', s: false },
+          { id: 'sd_TARGET_STORE_TYPES', field: 'TARGET STORE TYPES', s: true, m: true },
+          { id: 'sd_TARGET_CUSTOMER_STORE_TYPES', field: 'TARGET CUSTOMER STORE TYPES', s: true, m: true },
           { id: 'sd_Preservation_temperature', field: 'Preservation temperature', s: false },
           { id: 'sd_Logistics_South', field: 'Logistics Group South', s: true },
           { id: 'sd_Logistics_North', field: 'Logistics Group North', s: true },
@@ -8964,11 +9711,11 @@
           if (dd.id === 'sd_Same_Price_Product' && (!ddOpts || !ddOpts.length)) ddOpts = ['TRUE', 'FALSE'];
           // Reference Product ID: ưu tiên Dropdown_Master (cột L dạng ID-Tên), fallback sang MD list nếu trống
           if (dd.id === 'sd_Ref_ID' && (!ddOpts || !ddOpts.length) && S.mdProductOptions.length) ddOpts = S.mdProductOptions;
-          c.innerHTML = createDropdownHTML(dd.field, ddOpts, dd.s);
           var cv = pending[dd.field] !== undefined ? pending[dd.field] : (row[dd.field] || '');
           if (dd.field === PATTERN_FIELD) cv = _normalizeFieldValue(PATTERN_FIELD, cv);
           if (dd.id === 'sd_Same_Price_Product' && !cv) cv = row['Same Price Product'] || '';
-          initDropdown(dd.id, dd.field, cv);
+          c.innerHTML = createDropdownHTML(dd.field, ddOpts, dd.s, { multiple: !!dd.m });
+          initDropdown(dd.id, dd.field, cv, { multiple: !!dd.m });
           if (dd.id === 'sd_Ref_ID' && c.dataset.refBound !== '1') {
             c.dataset.refBound = '1';
             c.addEventListener('change', function () { loadReferenceProductDetail(getDropdownValue('sd_Ref_ID')); });
@@ -9260,6 +10007,7 @@
         var card = document.getElementById(cardId);
         if (!card) return;
         card.hidden = !visible;
+        card.style.display = visible ? '' : 'none';
         var mark = card.querySelector('.mc-rq');
         if (mark) mark.style.display = required ? '' : 'none';
       }
@@ -9286,12 +10034,17 @@
         var diffs = [];
         var values = _collectCurrentDetailValues();
         for (var field in FIELD_MAP) {
-          var oldNorm = _normalizeFieldValue(field, _getRowFieldValue(row, field));
+          var oldRaw = _getRowFieldValue(row, field);
+          var oldNorm = _normalizeFieldValue(field, oldRaw);
           var newRaw = _getFieldInputValue(field);
           var newNorm = values[field];
           if (!_isFieldActiveForPattern(field, values)) continue;
           if (newNorm !== oldNorm) {
-            diffs.push({ field: field, before: row[field], after: newRaw });
+            diffs.push({
+              field: field,
+              before: _isMultiValueField(field) ? oldNorm : oldRaw,
+              after: _isMultiValueField(field) ? newNorm : newRaw
+            });
           }
         }
         return { diffs: diffs, values: values };
@@ -9338,6 +10091,143 @@
         return txt ? esc(txt) : '<span style="color:var(--text4);font-style:italic">Blank</span>';
       }
 
+      function _fmtOverviewMoney(text) {
+        var raw = String(text == null ? '' : text).trim();
+        if (!raw) return '';
+        var num = parseFloat(raw.replace(/[^0-9.-]/g, ''));
+        if (isNaN(num)) return raw;
+        return new Intl.NumberFormat('vi-VN').format(Math.round(num)) + ' ₫';
+      }
+
+      function _fmtOverviewVat(text) {
+        var raw = String(text == null ? '' : text).trim();
+        if (!raw) return '';
+        if (raw.indexOf('%') >= 0) return raw;
+        var num = parseFloat(raw.replace(/[^0-9.-]/g, ''));
+        if (isNaN(num)) return raw;
+        return String(num) + '%';
+      }
+
+      var OVERVIEW_SUPPLIER_GROUPS = [
+        {
+          title: 'Commercial Baseline',
+          subtitle: 'Commercial inputs already supplied before workspace edits begin.',
+          fields: [
+            { label: "Supplier's Suggested Retail Price", keys: ["Supplier's Suggested Retail Price", "SUPPLIER'S SUGGESTED RETAIL PRICE", 'Supplier’s Suggested Retail Price'], format: 'money' },
+            { label: 'Purchase Price Excluded VAT', keys: ['Purchase Price Excluded VAT', 'PURCHASE PRICE EXCLUDED VAT'], format: 'money' },
+            { label: 'Inbound VAT', keys: ['Inbound VAT', 'INBOUND VAT'], format: 'vat' },
+            { label: 'Country of Origin', keys: ['Country of Origin'] }
+          ]
+        },
+        {
+          title: 'Operations Baseline',
+          subtitle: 'Operational and source reference fields already present from supplier data.',
+          wide: true,
+          fields: [
+            { label: 'Storage Conditions', keys: ['Storage Conditions', 'STORAGE CONDITIONS'] },
+            { label: 'Shelf Life', keys: ['Shelf Life', 'SHELF LIFE'] },
+            { label: 'UOM Information', keys: ['UOM Information', 'UOM INFORMATION'], multiline: true },
+            { label: 'Source Note', keys: ['Note', 'NOTE'], multiline: true }
+          ]
+        }
+      ];
+
+      var OVERVIEW_FILLED_GROUPS = [
+        {
+          title: 'Product Identity',
+          subtitle: 'Identity and reference setup currently managed inside the Edit Workspace.',
+          fields: [
+            { field: 'New product type' },
+            { field: 'PIC input Product Name (Dưới 40 kí tự)' },
+            { field: 'REFERENCE PRODUCT ID (Nếu không có điền NO)' },
+            { field: 'SAME PRICE PRODUCT' },
+            { field: 'Sub Category' }
+          ]
+        },
+        {
+          title: 'Commercial & Positioning',
+          subtitle: 'Why it is listed, how it is positioned, and which commercial inputs support the decision.',
+          wide: true,
+          fields: [
+            { field: 'Why Do We List This Product?', multiline: true },
+            { field: 'Premium products' },
+            { field: 'Branded' },
+            { field: 'Product description (Dưới 250 Kí tự)', multiline: true },
+            { field: 'PRIMARY USAGE SEGMENT' },
+            { field: 'TARGET STORE TYPES' },
+            { field: 'TARGET CUSTOMER STORE TYPES' },
+            { field: 'Retail Price (+VAT) in Tier 6', format: 'money' },
+            { field: 'FC UPSD of NEW SKU' },
+            { field: 'Competitors (Retail Price) <Tên đối thủ: Giá tiền>', multiline: true }
+          ]
+        },
+        {
+          title: 'Operations & Logistics',
+          subtitle: 'Execution setup and logistics routing derived from the current workspace configuration.',
+          fields: [
+            { field: 'Display area (POG CONCEPT) Bắt Buộc' },
+            { field: 'Inventory Type' },
+            { field: 'Preservation temperature' },
+            { field: 'Pattern' },
+            { field: 'Logistics Group South' },
+            { field: 'Logistics Group North' }
+          ]
+        },
+        {
+          title: 'UOM / Packaging / Image',
+          subtitle: 'Packaging structure and barcode or image details that support execution.',
+          wide: true,
+          fields: [
+            { field: 'UOM Information', multiline: true }
+          ]
+        },
+        {
+          title: 'Internal Notes',
+          subtitle: 'Operational notes captured for internal execution and follow-up.',
+          wide: true,
+          fields: [
+            { field: 'SSV Note Product', multiline: true }
+          ]
+        }
+      ];
+
+      function _getOverviewContextValue(values, row, field, rowKeys) {
+        if (values && Object.prototype.hasOwnProperty.call(values, field)) {
+          return String(values[field] == null ? '' : values[field]).trim();
+        }
+        return String(_pickRowValue(row, rowKeys || [field]) || '').trim();
+      }
+
+      function _renderOverviewContext(row, values) {
+        if (!row) return;
+        setText('st_product', _pickRowValue(row, ['Product Name']) || '—');
+        setText('st_ticket', _pickRowValue(row, ['Ticket ID']) || '—');
+        setText('st_supplier', _pickRowValue(row, ['Supplier Name']) || '—');
+        setText('st_brand', _pickRowValue(row, ['Brand Name']) || '—');
+        setText('st_zone', _pickRowValue(row, ['Zone']) || '—');
+        setText('st_status', _getOverviewContextValue(values, row, 'Status', ['Status']) || '—');
+        setText('st_present', _getOverviewContextValue(values, row, 'Present Date', ['Present Date']) || '—');
+      }
+
+      function _getMissingRequiredFields(values) {
+        return _getRequiredProductFieldsForValues(values).filter(function (field) {
+          return !_isFieldCompleteForReview(field, values[field]);
+        });
+      }
+
+      function _collectDetailValidationWarnings(values) {
+        var warnings = [];
+        var picName = String(values['PIC input Product Name (Dưới 40 kí tự)'] || '');
+        var desc = String(values['Product description (Dưới 250 Kí tự)'] || '');
+        if (picName.length > 40) warnings.push('PIC Product Name exceeds 40 characters.');
+        if (desc.length > 250) warnings.push('Product Description exceeds 250 characters.');
+        if (Object.prototype.hasOwnProperty.call(values, 'UOM Information')) {
+          var uomErr = _validateUomInfoText(values['UOM Information']);
+          if (uomErr) warnings.push(uomErr);
+        }
+        return _dedupeMessages(warnings);
+      }
+
       function _isFieldCompleteForReview(field, value) {
         if (field === 'Retail Price (+VAT) in Tier 6') {
           var raw = String(value == null ? '' : value).replace(/[^0-9.-]/g, '');
@@ -9360,23 +10250,11 @@
       }
 
       function _collectDetailWarnings(values) {
-        var warnings = [];
-        var picName = String(values['PIC input Product Name (Dưới 40 kí tự)'] || '');
-        var desc = String(values['Product description (Dưới 250 Kí tự)'] || '');
-        if (picName.length > 40) warnings.push('PIC Product Name exceeds 40 characters.');
-        if (desc.length > 250) warnings.push('Product Description exceeds 250 characters.');
-
-        _getRequiredProductFieldsForValues(values).forEach(function (field) {
-          if (!_isFieldCompleteForReview(field, values[field])) {
-            warnings.push(_fieldUiLabel(field) + ' is missing.');
-          }
-        });
-
-        if (Object.prototype.hasOwnProperty.call(values, 'UOM Information')) {
-          var uomErr = _validateUomInfoText(values['UOM Information']);
-          if (uomErr) warnings.push(uomErr);
-        }
-        return _dedupeMessages(warnings);
+        return _dedupeMessages(
+          _getMissingRequiredFields(values).map(function (field) {
+            return _fieldUiLabel(field) + ' is missing.';
+          }).concat(_collectDetailValidationWarnings(values))
+        );
       }
 
       function _getReviewGroupLabel(field) {
@@ -9424,6 +10302,208 @@
           }
         }
         return _dedupeMessages(warnings);
+      }
+
+      function _getOverviewDisplayValue(raw, format) {
+        if (format === 'money') return _fmtOverviewMoney(raw);
+        if (format === 'vat') return _fmtOverviewVat(raw);
+        return String(raw == null ? '' : raw).trim();
+      }
+
+      function _formatOverviewFullValueHtml(value, multiline, blankLabel) {
+        var txt = String(value == null ? '' : value).trim();
+        if (!txt) return '<span class="blank">' + esc(blankLabel || 'Blank') + '</span>';
+        return multiline ? esc(txt).replace(/\n/g, '<br>') : esc(txt);
+      }
+
+      function _formatOverviewCompareHtml(value, multiline) {
+        var txt = String(value == null ? '' : value).trim();
+        if (!txt) return '<span class="blank">No source value</span>';
+        if (!multiline) txt = _truncateReviewText(txt, 88);
+        return multiline ? esc(txt).replace(/\n/g, '<br>') : esc(txt);
+      }
+
+      function _isOverviewKeyField(field) {
+        return [
+          'Why Do We List This Product?',
+          'Product description (Dưới 250 Kí tự)',
+          'Competitors (Retail Price) <Tên đối thủ: Giá tiền>',
+          'Display area (POG CONCEPT) Bắt Buộc',
+          'UOM Information',
+          'SSV Note Product'
+        ].indexOf(field) >= 0;
+      }
+
+      function _renderOverviewGroups(containerId, groups, row, values, mode) {
+        var container = document.getElementById(containerId);
+        if (!container) return;
+        container.innerHTML = (groups || []).map(function (group) {
+          var rows = (group.fields || []).map(function (def) {
+            var field = def.field || def.label || '';
+            if (mode === 'filled' && field && !_isFieldActiveForPattern(field, values)) return '';
+            var label = def.label || _fieldUiLabel(field);
+            var raw = '';
+            var baseRaw = '';
+            if (mode === 'supplier') {
+              raw = _pickRowValue(row, def.keys || [field]);
+            } else {
+              raw = values && field ? values[field] : '';
+              baseRaw = _getRowFieldValue(row, field);
+            }
+            var val = _getOverviewDisplayValue(raw, def.format);
+            var multiline = !!def.multiline;
+            var rowClasses = ['s1-field-row', mode === 'supplier' ? 'is-supplier' : 'is-filled'];
+            if (multiline) rowClasses.push('is-stack');
+            var fieldOrigin = mode === 'supplier' ? '' : 'Current workspace value';
+            var compareHtml = '';
+            var tagsHtml = '';
+
+            if (mode === 'filled') {
+              var currentNorm = _normalizeFieldValue(field, raw);
+              var baseNorm = _normalizeFieldValue(field, baseRaw);
+              var isEmpty = !String(currentNorm || '').trim();
+              var isEdited = currentNorm !== baseNorm;
+              var isKey = multiline || _isOverviewKeyField(field);
+              if (isEmpty) rowClasses.push('is-empty');
+              if (isEdited) rowClasses.push('is-edited');
+              if (isKey) rowClasses.push('is-key');
+
+              var tags = ['<span class="s1-state-tag is-workspace">Workspace</span>'];
+              if (isEdited) tags.push('<span class="s1-state-tag is-edited">Edited</span>');
+              if (isEmpty) tags.push('<span class="s1-state-tag is-empty">Pending input</span>');
+              if (isKey) tags.push('<span class="s1-state-tag is-key">' + (multiline ? 'Long text' : 'Key field') + '</span>');
+              tagsHtml = '<div class="s1-field-tags">' + tags.join('') + '</div>';
+
+              if (isEdited) {
+                compareHtml = '<div class="s1-field-compare">Source: ' + _formatOverviewCompareHtml(_getOverviewDisplayValue(baseRaw, def.format), multiline) + '</div>';
+              } else if (isEmpty) {
+                compareHtml = '<div class="s1-field-compare">Awaiting workspace input' + (String(baseNorm || '').trim() ? ' · Source: ' + _formatOverviewCompareHtml(_getOverviewDisplayValue(baseRaw, def.format), false) : '') + '</div>';
+              }
+            }
+
+            return '<div class="' + rowClasses.join(' ') + '">'
+              + '<div class="s1-field-key-wrap">'
+              + '<div class="s1-field-key">' + esc(label) + '</div>'
+              + (fieldOrigin ? ('<div class="s1-field-origin">' + esc(fieldOrigin) + '</div>') : '')
+              + '</div>'
+              + '<div class="s1-field-body">'
+              + '<div class="s1-field-top">'
+              + '<div class="s1-field-val' + (multiline ? ' is-multiline' : '') + '">' + _formatOverviewFullValueHtml(val, multiline, mode === 'filled' ? 'Pending input' : 'Blank') + '</div>'
+              + tagsHtml
+              + '</div>'
+              + compareHtml
+              + '</div>'
+              + '</div>';
+          }).filter(Boolean).join('');
+          if (!rows) rows = '<div class="s1-empty-state">No fields to review in this section yet.</div>';
+          return '<article class="s1-group-card ' + (mode === 'supplier' ? 'is-supplier' : 'is-filled') + (group.wide ? ' is-wide' : '') + '">'
+            + '<div class="s1-group-head">'
+            + '<div class="s1-group-head-top">'
+            + '<div class="s1-group-title">' + esc(group.title || 'Section') + '</div>'
+            + '<div class="s1-group-badge ' + (mode === 'supplier' ? 'is-supplier">Supplier source' : 'is-filled">User managed') + '</div>'
+            + '</div>'
+            + (group.subtitle ? ('<div class="s1-group-sub">' + esc(group.subtitle) + '</div>') : '')
+            + '</div>'
+            + '<div class="s1-field-list">' + rows + '</div>'
+            + '</article>';
+        }).join('');
+      }
+
+      function _getOverviewNextFocus(stepStates, totalDiffs) {
+        var list = stepStates || [];
+        for (var i = 0; i < list.length; i++) {
+          if (list[i].tone === 'warn') return list[i];
+        }
+        for (var j = 0; j < list.length; j++) {
+          if (list[j].tone === 'idle') return list[j];
+        }
+        if (totalDiffs > 0) {
+          for (var k = 0; k < list.length; k++) {
+            if (list[k].changesCount) return list[k];
+          }
+        }
+        return list.length ? list[0] : null;
+      }
+
+      function _renderOverviewHealth(diffs, values, validationWarnings, reqOk, reqTotal, stepStates) {
+        var missingFields = _getMissingRequiredFields(values);
+        var readyState = document.getElementById('ovReadyState');
+        var readyNote = document.getElementById('ovReadyNote');
+        var nextFocusBtn = document.getElementById('ovNextFocusBtn');
+        var pendingMetric = document.getElementById('ovMetricPending');
+        var requiredMetric = document.getElementById('ovMetricRequired');
+        var warningMetric = document.getElementById('ovMetricWarnings');
+        var missingMetric = document.getElementById('ovMetricMissing');
+        if (pendingMetric) pendingMetric.textContent = String(diffs.length);
+        if (requiredMetric) requiredMetric.textContent = reqOk + '/' + reqTotal;
+        if (warningMetric) warningMetric.textContent = String(validationWarnings.length);
+        if (missingMetric) missingMetric.textContent = String(missingFields.length);
+
+        var nextFocus = _getOverviewNextFocus(stepStates, diffs.length);
+        var stateClass = 'state-idle';
+        var stateLabel = 'Ready to start';
+        var stateNote = 'Review supplier baseline, then open the workspace section you want to edit.';
+        if (missingFields.length) {
+          stateClass = 'state-warn';
+          stateLabel = 'Needs input';
+          stateNote = missingFields.length + ' required input(s) still need completion before a clean save.';
+        } else if (validationWarnings.length) {
+          stateClass = 'state-warn';
+          stateLabel = 'Review warnings';
+          stateNote = validationWarnings[0];
+        } else if (diffs.length) {
+          stateClass = 'state-ready';
+          stateLabel = 'Ready to save';
+          stateNote = diffs.length + ' change(s) are ready to save.';
+        }
+        if (readyState) {
+          readyState.className = 's1-health-state ' + stateClass;
+          readyState.textContent = stateLabel;
+        }
+        if (readyNote) readyNote.textContent = stateNote;
+        if (nextFocusBtn) {
+          nextFocusBtn.textContent = nextFocus ? nextFocus.buttonLabel : 'Open Identity';
+          nextFocusBtn.setAttribute('onclick', 'App.openDetailWorkspaceStep(' + (nextFocus ? nextFocus.step : 1) + ')');
+        }
+
+        var stepBox = document.getElementById('ovStepStates');
+        if (stepBox) {
+          stepBox.innerHTML = (stepStates || []).map(function (state) {
+            return '<button type="button" class="s1-step-item" onclick="App.openDetailWorkspaceStep(' + state.step + ')">'
+              + '<span class="s1-step-copy">'
+              + '<span class="s1-step-title">' + esc(state.title) + '</span>'
+              + '<span class="s1-step-meta">' + esc(state.meta || state.hint || '') + '</span>'
+              + '</span>'
+              + '<span class="s1-step-state ' + _stepStateToneClass(state.tone) + '">' + esc(state.label) + '</span>'
+              + '</button>';
+          }).join('');
+        }
+
+        var missingBox = document.getElementById('ovMissingList');
+        if (missingBox) {
+          missingBox.innerHTML = missingFields.length
+            ? missingFields.map(function (field) {
+                return '<div class="s1-issue is-warn">Missing required · ' + esc(_fieldUiLabel(field)) + '</div>';
+              }).join('')
+            : '<div class="s1-issue is-ok">All required inputs currently look complete.</div>';
+        }
+
+        var warningBox = document.getElementById('ovWarningList');
+        if (warningBox) {
+          warningBox.innerHTML = validationWarnings.length
+            ? validationWarnings.map(function (warning) {
+                return '<div class="s1-issue is-warn">' + esc(warning) + '</div>';
+              }).join('')
+            : '<div class="s1-issue is-ok">No validation warnings at the moment.</div>';
+        }
+      }
+
+      function _renderDetailOverviewStep(row, diffs, values, validationWarnings, reqOk, reqTotal, stepStates) {
+        if (!row) return;
+        _renderOverviewContext(row, values);
+        _renderOverviewGroups('ovSupplierGroups', OVERVIEW_SUPPLIER_GROUPS, row, values, 'supplier');
+        _renderOverviewGroups('ovFilledGroups', OVERVIEW_FILLED_GROUPS, row, values, 'filled');
+        _renderOverviewHealth(diffs, values, validationWarnings, reqOk, reqTotal, stepStates);
       }
 
       function _buildStep2State(step, diffs, values) {
@@ -9570,31 +10650,32 @@
           'Logistics Group North',
           'Pattern'
         ];
-        var summary = document.getElementById('dwChangeSummary');
-        if (summary) {
-          var ranked = diffs.slice().sort(function (a, b) {
-            var ai = importantOrder.indexOf(a.field);
-            var bi = importantOrder.indexOf(b.field);
-            if (ai < 0) ai = importantOrder.length + 1;
-            if (bi < 0) bi = importantOrder.length + 1;
-            return ai - bi;
-          }).slice(0, 5);
-          summary.innerHTML = ranked.length
-            ? ranked.map(function (item) {
-                return '<div class="dwov-summary-item">'
-                  + '<div class="dwov-summary-k">' + esc(_fieldUiLabel(item.field)) + '</div>'
-                  + '<div class="dwov-summary-v">' + _formatOverviewValueHtml(item.before, 34) + ' → ' + _formatOverviewValueHtml(item.after, 40) + '</div>'
-                  + '</div>';
-              }).join('')
-            : '<div class="dwov-empty">No edits yet. Start with identity, positioning, or pricing.</div>';
-        }
+        var ranked = diffs.slice().sort(function (a, b) {
+          var ai = importantOrder.indexOf(a.field);
+          var bi = importantOrder.indexOf(b.field);
+          if (ai < 0) ai = importantOrder.length + 1;
+          if (bi < 0) bi = importantOrder.length + 1;
+          return ai - bi;
+        }).slice(0, 6);
+        var html = ranked.length
+          ? ranked.map(function (item) {
+              return '<div class="dwov-summary-item">'
+                + '<div class="dwov-summary-k">' + esc(_fieldUiLabel(item.field)) + '</div>'
+                + '<div class="dwov-summary-v">' + _formatOverviewValueHtml(item.before, 34) + ' → ' + _formatOverviewValueHtml(item.after, 40) + '</div>'
+                + '</div>';
+            }).join('')
+          : '<div class="dwov-empty">No edits yet. Start with identity, positioning, or operations when you are ready.</div>';
+        ['dwChangeSummary', 'ovChangeSummary'].forEach(function (id) {
+          var summary = document.getElementById(id);
+          if (summary) summary.innerHTML = html;
+        });
       }
 
       function renderStep2Review(row) {
         var boxChanges = document.getElementById('s2ReviewChanges');
         var boxReq = document.getElementById('s2ReviewRequired');
         var boxWarn = document.getElementById('s2ReviewWarnings');
-        if (!boxChanges || !boxReq || !boxWarn || !row) return;
+        if (!row) return;
 
         var data = _collectStep2Diffs(row);
         var diffs = data.diffs;
@@ -9602,9 +10683,9 @@
         var countEl = document.getElementById('s2ReviewCount');
         if (countEl) countEl.textContent = diffs.length + ' pending changes';
 
-        if (!diffs.length) {
+        if (boxChanges && !diffs.length) {
           boxChanges.innerHTML = '<div class="s2-review-empty">No pending changes.</div>';
-        } else {
+        } else if (boxChanges) {
           var grouped = {};
           diffs.forEach(function (d) {
             var group = _getReviewGroupLabel(d.field);
@@ -9626,26 +10707,30 @@
 
         var reqFields = _getRequiredProductFieldsForValues(values);
         var reqOk = 0;
-        boxReq.innerHTML = reqFields.map(function (f) {
+        var reqHtml = reqFields.map(function (f) {
           var val = values[f] || '';
           var ok = _isFieldCompleteForReview(f, val);
           if (ok) reqOk++;
           return '<div class="s2-review-check ' + (ok ? 'ok' : 'bad') + '">' + (ok ? 'OK' : 'Missing') + ' · ' + esc(_fieldUiLabel(f)) + '</div>';
         }).join('');
+        if (boxReq) boxReq.innerHTML = reqHtml;
         var reqMeta = document.getElementById('s2ReviewRequiredMeta');
         if (reqMeta) reqMeta.textContent = reqOk + '/' + reqFields.length + ' completed';
 
-        var warnings = _collectDetailWarnings(values);
-        boxWarn.innerHTML = warnings.length
-          ? warnings.slice(0, 8).map(function (w) { return '<div class="s2-review-check bad">' + esc(w) + '</div>'; }).join('')
-              + (warnings.length > 8 ? ('<div class="s2-review-empty">+' + (warnings.length - 8) + ' more warning(s).</div>') : '')
-          : '<div class="s2-review-check ok">No validation warning.</div>';
+        var validationWarnings = _collectDetailValidationWarnings(values);
+        if (boxWarn) {
+          boxWarn.innerHTML = validationWarnings.length
+            ? validationWarnings.slice(0, 8).map(function (w) { return '<div class="s2-review-check bad">' + esc(w) + '</div>'; }).join('')
+                + (validationWarnings.length > 8 ? ('<div class="s2-review-empty">+' + (validationWarnings.length - 8) + ' more warning(s).</div>') : '')
+            : '<div class="s2-review-check ok">No validation warning.</div>';
+        }
         var warnMeta = document.getElementById('s2ReviewWarnMeta');
-        if (warnMeta) warnMeta.textContent = warnings.length ? (warnings.length + ' warning(s)') : (diffs.length ? 'No warnings' : 'Overview is ready to start');
+        if (warnMeta) warnMeta.textContent = validationWarnings.length ? (validationWarnings.length + ' warning(s)') : (diffs.length ? 'No warnings' : 'Overview is ready to start');
 
         var stepStates = _buildAllStep2States(diffs, values);
         _renderStep2WorkflowUi(stepStates);
         _renderDetailChangeSummary(diffs);
+        _renderDetailOverviewStep(row, diffs, values, validationWarnings, reqOk, reqFields.length, stepStates);
       }
 
       function setStep2Tab(step) {
@@ -9685,6 +10770,10 @@
 
       function prevStep2Tab() { setStep2Tab((S.step2Tab || 1) - 1); }
       function nextStep2Tab() { setStep2Tab((S.step2Tab || 1) + 1); }
+      function openDetailWorkspaceStep(step) {
+        setDetailStep(2);
+        setStep2Tab(step || 1);
+      }
 
       function bindStep2TabKeyboard() {
         var nav = document.getElementById('s2TabNav');
@@ -9710,40 +10799,6 @@
       }
 
       function fillPresetSummary(row) {
-        function _fmtMoney(text) {
-          var raw = String(text || '').trim();
-          if (!raw) return '—';
-          var num = parseFloat(raw.replace(/[^0-9.-]/g, ''));
-          if (isNaN(num)) return raw;
-          return new Intl.NumberFormat('vi-VN').format(Math.round(num)) + ' ₫';
-        }
-        function _fmtVat(text) {
-          var raw = String(text || '').trim();
-          if (!raw) return '—';
-          if (raw.indexOf('%') >= 0) return raw;
-          var num = parseFloat(raw.replace(/[^0-9.-]/g, ''));
-          if (isNaN(num)) return raw;
-          return String(num) + '%';
-        }
-
-        setText('st_note', _pickRowValue(row, ['Note', 'NOTE']));
-        setText('st_ticket', _pickRowValue(row, ['Ticket ID']));
-        setText('st_newpid', _pickRowValue(row, ['New Product ID', 'NEW PRODUCT ID']));
-        setText('st_refname', _pickRowValue(row, ['Reference Product Name', 'REFERENCE PRODUCT NAME']));
-        setText('st_zone', _pickRowValue(row, ['Zone']));
-        setText('st_zone_display', _pickRowValue(row, ['Zone']));
-        setText('st_supplier', _pickRowValue(row, ['Supplier Name']));
-        setText('st_product', _pickRowValue(row, ['Product Name']));
-        setText('st_coo', _pickRowValue(row, ['Country of Origin']));
-        setText('st_uom', _pickRowValue(row, ['UOM Information', 'UOM INFORMATION']));
-        setText('st_brand', _pickRowValue(row, ['Brand Name']));
-        setText('st_group', _pickRowValue(row, ['Product Group']));
-        setText('st_storage', _pickRowValue(row, ['Storage Conditions', 'STORAGE CONDITIONS']));
-        setText('st_shelf', _pickRowValue(row, ['Shelf Life', 'SHELF LIFE']));
-        setText('st_pp', _fmtMoney(_pickRowValue(row, ['Purchase Price Excluded VAT', 'PURCHASE PRICE EXCLUDED VAT'])));
-        setText('st_vat', _fmtVat(_pickRowValue(row, ['Inbound VAT', 'INBOUND VAT'])));
-        setText('st_ssrp', _fmtMoney(_pickRowValue(row, ["Supplier's Suggested Retail Price", "SUPPLIER'S SUGGESTED RETAIL PRICE", 'Supplier’s Suggested Retail Price'])));
-
         var rawUrl = _pickRowValue(row, ['URL Image', 'Url Image', 'URL IMAGE']);
         var previewUrl = '';
         if (rawUrl) {
@@ -9960,7 +11015,7 @@
         document.getElementById('mChips').innerHTML = chips;
         fillPresetSummary(row);
         S.step2Tab = 1;
-        setDetailStep(USER_CAN_EDIT ? 2 : 1);
+        setDetailStep(1);
         bindStep2TabKeyboard();
         // READ_MAP fills
         S.headers.forEach(function (h) { if (!h) return; var elId = READ_MAP[h]; if (elId) { var el = document.getElementById(elId); if (!el) return; var val = row[h] == null ? '' : String(row[h]); el.textContent = val || '—'; } });
@@ -10432,7 +11487,7 @@
         reload: reload, setView: setView, openModal: openModal, closeModal: closeModal,
         saveModal: saveModal, resetModal: resetModal, saveRow: saveRow, saveAll: saveAll, cancelEdit: cancelEdit,
         clearFilters: clearFilters, goPage: goPage, doSearch: doSearch, switchTab: switchTab, setDetailStep: setDetailStep,
-        setStep2Tab: setStep2Tab, prevStep2Tab: prevStep2Tab, nextStep2Tab: nextStep2Tab,
+        setStep2Tab: setStep2Tab, prevStep2Tab: prevStep2Tab, nextStep2Tab: nextStep2Tab, openDetailWorkspaceStep: openDetailWorkspaceStep,
         toggleSelect: toggleSelect, toggleSelectAll: toggleSelectAll, clearSelection: clearSelection,
         openBatchFill: openBatchFill, closeBatchFill: closeBatchFill,
         bfChange: bfChange, bfToggleAcc: bfToggleAcc,
