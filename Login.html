@@ -503,6 +503,22 @@
     var _progressBar = document.getElementById('loginProgressBar');
     var _loadingTimer = null;
 
+    function _toErrorText(err, fallback) {
+      var fb = fallback || 'Unknown';
+      try {
+        if (err === null || err === undefined) return fb;
+        if (typeof err === 'string') return err;
+        if (typeof err.message === 'string' && err.message.trim()) return err.message;
+        if (err.error && typeof err.error.message === 'string' && err.error.message.trim()) return err.error.message;
+        var s = (typeof err.toString === 'function') ? err.toString() : '';
+        if (s && s !== '[object Object]') return s;
+        var json = JSON.stringify(err);
+        return (json && json !== '{}') ? json : fb;
+      } catch (e) {
+        return fb;
+      }
+    }
+
     function setMsg(text, mode) {
       var el = document.getElementById('msg');
       el.textContent = text || '';
@@ -564,7 +580,7 @@
         .withSuccessHandler(function(res) {
           setLoading(false);
           if (!res || !res.ok) {
-            setMsg((res && res.error && res.error.message) || 'Đăng nhập thất bại', 'err');
+            setMsg(_toErrorText(res && res.error ? res.error : res, 'Đăng nhập thất bại'), 'err');
             errorMotion();
             completeProgress();
             return;
@@ -576,7 +592,7 @@
         })
         .withFailureHandler(function(err) {
           setLoading(false);
-          setMsg('Lỗi hệ thống: ' + (err && err.message ? err.message : 'Unknown'), 'err');
+          setMsg('Lỗi hệ thống: ' + _toErrorText(err, 'Unknown'), 'err');
           errorMotion();
           completeProgress();
         })

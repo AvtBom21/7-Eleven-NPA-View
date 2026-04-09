@@ -5,6 +5,7 @@ var CONFIG = {
   SPREADSHEET_ID: '1W8oN5mha-GZ6wLIct-hsWQXSbFKreeICw2Y0-SFgQnY',
   SHEET_NAME_CATEGORY: 'Category',
   SHEET_NAME_MANAGER: 'Manager',
+  SHEET_NAME_DIRECTOR: 'Director',
   DROPDOWN_SHEET: 'Dropdown_Master',
   USER_MASTER_SHEET: 'User_Master',
   AUDIT_LOG_SHEET: 'Audit_Log',
@@ -50,6 +51,22 @@ var DIRECTOR_EDITABLE_FIELDS = [
 
 var EDITABLE_FIELDS = PIC_EDITABLE_FIELDS.slice();
 
+function _safeErrorText_(err, fallback) {
+  var fb = fallback || 'Unknown error';
+  try {
+    if (err === null || err === undefined) return fb;
+    if (typeof err === 'string') return err;
+    if (typeof err.message === 'string' && err.message.trim()) return err.message;
+    if (err.error && typeof err.error.message === 'string' && err.error.message.trim()) return err.error.message;
+    var s = (typeof err.toString === 'function') ? err.toString() : '';
+    if (s && s !== '[object Object]') return s;
+    var json = JSON.stringify(err);
+    return (json && json !== '{}') ? json : fb;
+  } catch (e) {
+    return fb;
+  }
+}
+
 // ========================================
 // ENTRY POINT — Role-based routing
 // ========================================
@@ -84,15 +101,9 @@ function doGet(e) {
       }
     }
 
-    // Guard director page
+    // If non-director requests director page, always show index page.
     if (page === 'director' && access.data.role !== 'DIRECTOR') {
-      return HtmlService.createHtmlOutput(
-        '<div style="font-family:Arial,sans-serif;padding:24px">' +
-          '<h2 style="margin:0 0 8px;color:#b91c1c">Không có quyền truy cập</h2>' +
-          '<p>Tài khoản của bạn không có quyền Director.</p>' +
-          '<p><a href="?page=index&token=' + encodeURIComponent(token) + '">Về trang chính</a></p>' +
-        '</div>'
-      );
+      page = 'index';
     }
 
     var fileName = page === 'director' ? 'Director_View' : 'Index';
@@ -111,8 +122,9 @@ function doGet(e) {
     html.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
     return html;
   } catch (err) {
+    var msg = _safeErrorText_(err, 'Unknown error');
     return HtmlService.createHtmlOutput(
-      '<h2 style="font-family:sans-serif;color:red">Error: ' + err.message + '</h2>'
+      '<h2 style="font-family:sans-serif;color:red">Error: ' + msg + '</h2>'
     );
   }
 }
@@ -1731,8 +1743,13 @@ function _ok(data) {
 }
 
 function _err(code, message, details) {
+  var safeMessage = _safeErrorText_(message, 'Unknown error');
+  var safeDetails = details || '';
+  if (typeof safeDetails !== 'string') {
+    safeDetails = _safeErrorText_(safeDetails, '');
+  }
   return {
     ok: false,
-    error: { code: code, message: message || 'Unknown error', details: details || '' }
+    error: { code: code, message: safeMessage, details: safeDetails }
   };
 }
