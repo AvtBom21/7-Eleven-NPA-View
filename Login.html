@@ -557,8 +557,18 @@
       _card.classList.add('is-error');
     }
 
+    function normalizeLoginEmail(value) {
+      var raw = String(value || '');
+      if (raw && typeof raw.normalize === 'function') raw = raw.normalize('NFKC');
+      return raw
+        .replace(/[\u200B-\u200D\uFEFF]/g, '')
+        .replace(/\s+/g, '')
+        .trim()
+        .toLowerCase();
+    }
+
     function doLogin() {
-      var email = (_email.value || '').trim().toLowerCase();
+      var email = normalizeLoginEmail(_email.value || '');
       var password = (_pwd.value || '');
       _email.value = email;
 

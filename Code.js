@@ -32,6 +32,8 @@ var PIC_EDITABLE_FIELDS = [
   'SAME PRICE PRODUCT',
   'REFERENCE PRODUCT ID (Nếu không có điền NO)',
   'Retail Price (+VAT) in Tier 6',
+  'Other Income + Listing Fee',
+  'Pricing Strategy',
   'Competitors (Retail Price) <Tên đối thủ: Giá tiền>',
   'Product description (Dưới 250 Kí tự)',
   'Pattern',
@@ -41,6 +43,8 @@ var PIC_EDITABLE_FIELDS = [
   'FC UPSD of NEW SKU',
   'Display area (POG CONCEPT) Bắt Buộc',
   'Inventory Type',
+  'POG_Choose Reduce product facing',
+  'POG_Choose type Reduce product facing',
   'UOM Information'
 ];
 
@@ -1076,6 +1080,66 @@ function uploadUomImage(payload) {
 // ========================================
 // VALIDATION
 // ========================================
+function _splitCsvListPreserve_(raw) {
+  return String(raw == null ? '' : raw).split(',').map(function(item) {
+    return String(item == null ? '' : item).trim();
+  });
+}
+
+function _trimTrailingEmptyTokens_(list) {
+  var out = Array.isArray(list) ? list.slice() : [];
+  while (out.length && !String(out[out.length - 1] || '').trim()) out.pop();
+  return out;
+}
+
+function _getPogActionIntent_(raw) {
+  var txt = String(raw == null ? '' : raw).toLowerCase().replace(/\s+/g, ' ').trim();
+  if (!txt) return '';
+  if (txt.indexOf('cut product') >= 0 || txt === 'cut') return 'cut';
+  if (txt.indexOf('reduce facing') >= 0 || txt.indexOf('reduce product facing') >= 0 || txt === 'reduce') return 'reduce';
+  return '';
+}
+
+function _normalizePogActionForSlot_(raw, slotNumber) {
+  var intent = _getPogActionIntent_(raw);
+  if (!intent) return '';
+  return intent === 'cut'
+    ? ('Cut Product ' + slotNumber)
+    : ('Reduce facing product ' + slotNumber);
+}
+
+function _validatePogFields_(productsRaw, actionsRaw) {
+  var errors = [];
+  var products = _trimTrailingEmptyTokens_(_splitCsvListPreserve_(productsRaw));
+  var actions = _trimTrailingEmptyTokens_(_splitCsvListPreserve_(actionsRaw));
+  var seen = {};
+
+  if (products.length > 5) errors.push('POG reduce product facing supports up to 5 products.');
+  if (actions.length > 5) errors.push('POG reduce action supports up to 5 slots.');
+
+  for (var i = 0; i < products.length; i++) {
+    var product = String(products[i] || '').trim();
+    var action = String(actions[i] || '').trim();
+    if (!product) continue;
+    var productKey = product.toUpperCase();
+    if (seen[productKey]) errors.push('POG reduce product cannot repeat the same product.');
+    seen[productKey] = true;
+    if (!action) {
+      errors.push('POG action is missing for Product ' + (i + 1) + '.');
+      continue;
+    }
+    if (_normalizePogActionForSlot_(action, i + 1) !== action) {
+      errors.push('POG action must match the same slot number as its product.');
+    }
+  }
+
+  for (var j = products.length; j < actions.length; j++) {
+    if (String(actions[j] || '').trim()) errors.push('POG action cannot exist without a selected product.');
+  }
+
+  return errors;
+}
+
 function _validateChanges(changes) {
   var errors = [];
 
@@ -1109,6 +1173,18 @@ function _validateChanges(changes) {
     if (isNaN(price) || price < 0) errors.push('Retail Price phải là số ≥ 0');
   }
 
+  if (changes['Pricing Strategy'] !== undefined) {
+    var pricing = String(changes['Pricing Strategy'] || '').trim();
+    if (pricing && ['Tier 7', 'Tier 8', 'Tier 9'].indexOf(pricing) < 0) {
+      errors.push('Pricing Strategy must be Tier 7, Tier 8, or Tier 9.');
+    }
+  }
+
+  errors = errors.concat(_validatePogFields_(
+    changes['POG_Choose Reduce product facing'],
+    changes['POG_Choose type Reduce product facing']
+  ));
+
   if (errors.length > 0) {
     return _err('VALIDATION_ERROR', errors.join('; '));
   }
@@ -1124,12 +1200,45 @@ function getMDProductIDs(params) {
   try {
     var accessRes = _resolveAccessForDataApi_(params);
     if (!accessRes.ok) return accessRes;
-
-    var ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
-    var allSheets = ss.getSheets();
-    var allNames = allSheets.map(function(s) { return s.getName(); });
+    var md = _readMDProductTable_();
+    var allNames = md.available || [];
     Logger.log('getMDProductIDs: available sheets = ' + allNames.join(' | '));
+    if (!md.sheet) {
+      Logger.log('getMDProductIDs: no matching sheet found. Available: ' + allNames.join(', '));
+      return _ok({ ids: [], items: [], debug: 'Sheet not found. Available: ' + allNames.join(', ') });
+    }
+    if (!md.headers.length) return _ok({ ids: [], items: [] });
 
+    var idCol = -1;
+    var nameCol = -1;
+    var nameAliases = ['product_short_name', 'product_name', 'product full name', 'item_name', 'name'];
+    for (var h = 0; h < md.headers.length; h++) {
+      var header = String(md.headers[h] || '').trim().toLowerCase();
+      if (header === 'product_id') idCol = h;
+      if (nameAliases.indexOf(header) >= 0 && nameCol < 0) nameCol = h;
+    }
+    if (idCol < 0) {
+      Logger.log('getMDProductIDs: product_id column not found');
+      return _ok({ ids: [], items: [], debug: 'product_id column not found' });
+    }
+
+    var ids = [];
+    var items = [];
+    var seen = {};
+    for (var i = 0; i < md.rows.length; i++) {
+      var row = md.rows[i] || [];
+      var pid = String(row[idCol] == null ? '' : row[idCol]).trim();
+      if (!pid) continue;
+      var key = pid.toUpperCase();
+      if (seen[key]) continue;
+      seen[key] = true;
+      ids.push(pid);
+      var name = nameCol >= 0 ? String(row[nameCol] == null ? '' : row[nameCol]).trim() : '';
+      items.push(name ? (pid + '_' + name) : pid);
+    }
+    Logger.log('getMDProductIDs: ' + ids.length + ' IDs loaded, ' + items.length + ' display labels built');
+    return _ok({ ids: ids, items: items });
+/*
     // Try exact name first, then fallback variations
     var candidates = [
       '[Data} MD Product',
@@ -1170,6 +1279,7 @@ function getMDProductIDs(params) {
     }
     Logger.log('getMDProductIDs: ' + ids.length + ' IDs loaded');
     return _ok({ ids: ids });
+*/
   } catch (err) {
     Logger.log('getMDProductIDs ERROR: ' + err.toString());
     return _err('MD_PRODUCT_ERROR', err.message, err.stack);
@@ -1392,9 +1502,39 @@ function _resolveRequestEmail_(e) {
   }
 }
 
+function _normalizeUserMasterHeader_(text) {
+  return String(text == null ? '' : text)
+    .replace(/[\u200B-\u200D\uFEFF]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+}
+
+function _findUserMasterHeaderIndex_(headers, candidates) {
+  var map = {};
+  for (var i = 0; i < headers.length; i++) {
+    map[_normalizeUserMasterHeader_(headers[i])] = i;
+  }
+  for (var j = 0; j < candidates.length; j++) {
+    var idx = map[_normalizeUserMasterHeader_(candidates[j])];
+    if (idx !== undefined) return idx;
+  }
+  return -1;
+}
+
+function _normalizeLoginEmail_(value) {
+  var raw = String(value == null ? '' : value);
+  if (raw && typeof raw.normalize === 'function') raw = raw.normalize('NFKC');
+  return raw
+    .replace(/[\u200B-\u200D\uFEFF]/g, '')
+    .replace(/\s+/g, '')
+    .trim()
+    .toLowerCase();
+}
+
 function _getUserAccessByEmail_(email, password, enforcePassword) {
   try {
-    var em = String(email || '').trim().toLowerCase();
+    var em = _normalizeLoginEmail_(email);
     if (!em) return _err('MISSING_EMAIL', 'Không tìm thấy email đăng nhập');
     var pwd = String(password || '');
 
@@ -1406,21 +1546,21 @@ function _getUserAccessByEmail_(email, password, enforcePassword) {
     var lastCol = sheet.getLastColumn();
     if (lastRow < 2 || lastCol < 1) return _err('USER_NOT_FOUND', 'User_Master chưa có dữ liệu');
 
-    var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0].map(function(h) {
+    var headers = sheet.getRange(1, 1, 1, lastCol).getDisplayValues()[0].map(function(h) {
       return String(h || '').trim();
     });
-    var data = sheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
+    var data = sheet.getRange(2, 1, lastRow - 1, lastCol).getDisplayValues();
 
-    var hEmail = headers.indexOf('Email');
-    var hPassword = headers.indexOf('Password');
-    var hName = headers.indexOf('Full Name');
-    var hRole = headers.indexOf('Role');
-    var hStatus = headers.indexOf('Status');
-    var hCategory = headers.indexOf('Category');
-    var hManaged = headers.indexOf('Managed Categories');
-    var hLanding = headers.indexOf('Landing Page (Auto)');
-    var hCanEdit = headers.indexOf('Can Edit');
-    var hScope = headers.indexOf('Effective Scope (Auto)');
+    var hEmail = _findUserMasterHeaderIndex_(headers, ['Email']);
+    var hPassword = _findUserMasterHeaderIndex_(headers, ['Password']);
+    var hName = _findUserMasterHeaderIndex_(headers, ['Full Name', 'FullName']);
+    var hRole = _findUserMasterHeaderIndex_(headers, ['Role']);
+    var hStatus = _findUserMasterHeaderIndex_(headers, ['Status']);
+    var hCategory = _findUserMasterHeaderIndex_(headers, ['Category']);
+    var hManaged = _findUserMasterHeaderIndex_(headers, ['Managed Categories', 'Managed Category']);
+    var hLanding = _findUserMasterHeaderIndex_(headers, ['Landing Page (Auto)', 'Landing Page']);
+    var hCanEdit = _findUserMasterHeaderIndex_(headers, ['Can Edit', 'Permission']);
+    var hScope = _findUserMasterHeaderIndex_(headers, ['Effective Scope (Auto)', 'Effective Scope']);
 
     if (hEmail < 0 || hRole < 0 || hStatus < 0) {
       return _err('USER_MASTER_SCHEMA_ERROR', 'Thiếu cột Email/Role/Status trong User_Master');
@@ -1428,13 +1568,16 @@ function _getUserAccessByEmail_(email, password, enforcePassword) {
 
     var found = null;
     for (var i = 0; i < data.length; i++) {
-      var rowEmail = String(data[i][hEmail] || '').trim().toLowerCase();
+      var rowEmail = _normalizeLoginEmail_(data[i][hEmail]);
       if (rowEmail === em) {
         found = data[i];
         break;
       }
     }
-    if (!found) return _err('USER_NOT_FOUND', 'Không tìm thấy tài khoản trong User_Master');
+    if (!found) {
+      Logger.log('USER_NOT_FOUND lookup=' + em + ' headers=' + headers.join(' | '));
+      return _err('USER_NOT_FOUND', 'Không tìm thấy tài khoản trong User_Master cho email: ' + em);
+    }
 
     var status = String(found[hStatus] || '').trim().toUpperCase();
     if (status !== 'ACTIVE') return _err('USER_INACTIVE', 'Tài khoản đang bị khóa (INACTIVE)');

@@ -5254,6 +5254,191 @@
       min-height: 148px;
     }
 
+    .pog-module-card {
+      background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+      border-color: #cfe0f7;
+    }
+
+    .pog-decision-top {
+      display: grid;
+      grid-template-columns: minmax(240px, .88fr) minmax(0, 1.12fr);
+      gap: 14px;
+      margin-bottom: 14px;
+      align-items: stretch;
+    }
+
+    .pog-decision-note {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+      border-radius: 16px;
+      border: 1px solid #dbe8f8;
+      background: linear-gradient(180deg, #eef6ff 0%, #f8fbff 100%);
+      padding: 14px 16px;
+      min-height: 100%;
+    }
+
+    .pog-decision-note-title {
+      font: 700 10px var(--mono);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #1d4ed8;
+    }
+
+    .pog-decision-note-copy {
+      font-size: 13px;
+      line-height: 1.55;
+      color: #475569;
+    }
+
+    .pog-module {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .pog-module-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .pog-helper {
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--text3);
+    }
+
+    .pog-helper.muted {
+      color: #64748b;
+    }
+
+    .pog-slot-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .pog-slot-row {
+      display: grid;
+      grid-template-columns: 92px minmax(0, 1fr) 42px;
+      gap: 12px;
+      align-items: start;
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid #dbe3ee;
+      background: #fff;
+      box-shadow: 0 8px 22px rgba(15, 23, 42, .04);
+    }
+
+    .pog-slot-index {
+      min-height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1d4ed8;
+      font: 700 10px var(--mono);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .pog-slot-main {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .pog-slot-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .pog-slot-label {
+      font: 700 9px var(--mono);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #64748b;
+    }
+
+    .pog-slot-field .sdrop {
+      min-width: 0;
+    }
+
+    .pog-slot-field.is-action {
+      padding-top: 10px;
+      border-top: 1px dashed #dbe3ee;
+    }
+
+    .pog-slot-field.is-action select {
+      min-height: 42px;
+    }
+
+    .pog-slot-hint {
+      font-size: 12px;
+      line-height: 1.5;
+      color: #64748b;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px dashed #d6e0ee;
+      background: #f8fafc;
+    }
+
+    .pog-slot-clear {
+      width: 42px;
+      min-height: 46px;
+      border-radius: 12px;
+      border: 1px solid #dbe3ee;
+      background: #fff;
+      color: #64748b;
+      cursor: pointer;
+      transition: all .16s ease;
+    }
+
+    .pog-slot-clear:hover {
+      border-color: #fca5a5;
+      color: #b91c1c;
+      background: #fff5f5;
+    }
+
+    .pog-slot-clear:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+    }
+
+    .pog-module-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .pog-add-btn {
+      min-height: 40px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid #bfdbfe;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .16s ease;
+    }
+
+    .pog-add-btn:hover {
+      background: #dbeafe;
+      border-color: #93c5fd;
+    }
+
+    .pog-add-btn:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
     .s2-prominent .mc-body input {
       font-size: 16px;
       font-weight: 700;
@@ -5883,6 +6068,15 @@
         grid-template-columns: 1fr;
       }
 
+      .pog-decision-top,
+      .pog-slot-row {
+        grid-template-columns: 1fr;
+      }
+
+      .pog-slot-clear {
+        width: 100%;
+      }
+
       .bfp-impact-sticky,
       .bfp-side-sticky {
         position: static;
@@ -6267,10 +6461,22 @@
                   <textarea class="bfp-fc" id="bf_WhyList" placeholder="Business rationale / shopper need" oninput="App.bfChange('WhyList',this.value)"></textarea>
                 </div>
               </div>
+              <div class="bfc full" id="bfc_OtherIncome">
+                <div class="bfc-lbl">Other Income + Listing Fee</div>
+                <div class="bfc-inp">
+                  <textarea class="bfp-fc" id="bf_OtherIncome" placeholder="Commercial support, listing fee, or other income logic" oninput="App.bfChange('OtherIncome',this.value)"></textarea>
+                </div>
+              </div>
               <div class="bfc" id="bfc_RetailT6">
                 <div class="bfc-lbl">Retail Price Tier 6 <span class="required">*</span></div>
                 <div class="bfc-inp"><input type="number" class="bfp-fc" id="bf_RetailT6" placeholder="Nhập giá..."
                     min="0" step="1000" oninput="App.bfChange('RetailT6',this.value)"></div>
+              </div>
+              <div class="bfc" id="bfc_PricingStrategy">
+                <div class="bfc-lbl">Pricing Strategy</div>
+                <div class="bfc-inp"><select class="bfp-fc" id="bf_PricingStrategy" onchange="App.bfChange('PricingStrategy',this.value)">
+                    <option value="">— Chọn —</option>
+                  </select></div>
               </div>
               <div class="bfc" id="bfc_FCUPSD">
                  <div class="bfc-lbl">FC UPSD <span class="required">*</span></div>
@@ -6786,6 +6992,10 @@
                   <div class="mc-char-hint" id="cnt_desc">0/250</div>
                 </div>
               </div>
+              <div class="mc full dw-strategic" id="mc_otherincome">
+                <div class="mc-label">Other Income + Listing Fee<div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
+                <div class="mc-body"><textarea id="mf_Other_Income_Listing_Fee" placeholder="Commercial support, listing fee, or other income logic"></textarea></div>
+              </div>
             </div>
           </div>
 
@@ -6931,7 +7141,7 @@
           <div class="s2-pane-head">
             <div class="s2-pane-head-main">
               <div class="s2-pane-title">Operations &amp; Execution</div>
-              <div class="s2-pane-sub">Configure display, inventory, logistics routing, packaging and operating notes in one place.</div>
+              <div class="s2-pane-sub">Configure display, logistics, pricing strategy, facing decision, packaging and operating notes in one place.</div>
             </div>
             <div class="s2-pane-status-card">
               <div class="s2-pane-status-top">
@@ -6939,7 +7149,7 @@
                 <div class="s2-pane-status-chip state-idle" id="s2PaneState3">Not started</div>
               </div>
               <div class="s2-pane-status-meta" id="s2PaneMeta3">No edits yet in Operations.</div>
-              <div class="s2-pane-status-hint" id="s2PaneHint3">Finish display area, logistics, UOM and execution notes in-context.</div>
+              <div class="s2-pane-status-hint" id="s2PaneHint3">Finish display area, logistics, pricing strategy, POG decisions, UOM and execution notes in-context.</div>
             </div>
           </div>
           <div class="s2-pane-alerts" id="s2PaneAlerts3"></div>
@@ -6992,6 +7202,44 @@
               <div class="mc full dw-strategic" id="mc_ssvnote">
                 <div class="mc-label">SSV Note Product<div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
                 <div class="mc-body"><textarea id="mf_ssv_note" placeholder="Operational note"></textarea></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="dw-cluster">
+            <div class="dw-cluster-head">
+              <div>
+                <div class="dw-cluster-title">Pricing Strategy &amp; POG Facing Decision</div>
+                <div class="dw-cluster-sub">Lock the pricing tier focus, then decide which reference products should be cut or reduced. The workflow expands only when the current slot is valid.</div>
+              </div>
+            </div>
+
+            <div class="pog-decision-top">
+              <div class="mc" id="mc_pricingstrategy">
+                <div class="mc-label">Pricing Strategy<div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
+                <div class="mc-body"><div class="sdrop ef" id="sd_Pricing_Strategy"></div></div>
+              </div>
+              <div class="pog-decision-note">
+                <div class="pog-decision-note-title">Decision Flow</div>
+                <div class="pog-decision-note-copy">Choose the pricing strategy first, then add only the products that need a cut or a facing reduction. Each slot stays paired and reindexes automatically after deletion, so the saved sheet values stay continuous and safe.</div>
+              </div>
+            </div>
+
+            <div class="mc full pog-module-card" id="mc_pogmodule">
+              <div class="mc-label">POG Reduce Product Facing<div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
+              <div class="mc-body">
+                <input type="hidden" id="mf_POG_Choose_Reduce_product_facing">
+                <input type="hidden" id="mf_POG_Choose_type_Reduce_product_facing">
+                <div class="pog-module">
+                  <div class="pog-module-meta">
+                    <div class="pog-helper">Start with Product 1. Action is unlocked only after the product is chosen, and a new slot appears only after the current decision is complete.</div>
+                    <div class="pog-helper muted" id="pogModuleMeta">No POG reduce product selected yet.</div>
+                  </div>
+                  <div class="pog-slot-list" id="pogSlotList"></div>
+                  <div class="pog-module-actions">
+                    <button type="button" class="pog-add-btn" id="pogAddBtn" onclick="App.modalAddPogSlot()">Add another product</button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -7237,10 +7485,37 @@
       var LOGISTICS_FIELD_SOUTH = 'Logistics Group South';
       var LOGISTICS_FIELD_NORTH = 'Logistics Group North';
       var PATTERN_OPTIONS = ['Miền Nam', 'Miền Bắc', 'Hai miền'];
+      var OTHER_INCOME_FIELD = 'Other Income + Listing Fee';
+      var PRICING_STRATEGY_FIELD = 'Pricing Strategy';
+      var PRICING_STRATEGY_OPTIONS = ['Tier 7', 'Tier 8', 'Tier 9'];
+      var POG_PRODUCT_FIELD = 'POG_Choose Reduce product facing';
+      var POG_ACTION_FIELD = 'POG_Choose type Reduce product facing';
+      var POG_MAX_SLOTS = 5;
       var MULTI_VALUE_FIELDS = {
         'TARGET STORE TYPES': true,
         'TARGET CUSTOMER STORE TYPES': true
       };
+
+      function _isErrorLikeDisplayValue(value) {
+        var txt = String(value == null ? '' : value).replace(/\u00a0/g, ' ').trim();
+        if (!txt) return false;
+        var compact = txt.toLowerCase().replace(/\s+/g, '');
+        return compact === '#n/a'
+          || compact === 'n/a'
+          || compact === 'na'
+          || compact === '#error!'
+          || compact === '#error'
+          || compact === 'error'
+          || compact === 'null'
+          || compact === 'undefined';
+      }
+
+      function _cleanDisplayValue(value) {
+        if (value === null || value === undefined) return '';
+        var txt = String(value).replace(/\u00a0/g, ' ').trim();
+        if (!txt || _isErrorLikeDisplayValue(txt)) return '';
+        return txt;
+      }
 
       function _isMultiValueField(field) {
         return !!MULTI_VALUE_FIELDS[field];
@@ -7274,6 +7549,214 @@
         if (!items.length) return '';
         if (!compact || items.length <= 2) return items.join(', ');
         return items.slice(0, 2).join(', ') + ' +' + (items.length - 2);
+      }
+
+      function _splitCsvListPreserve(raw) {
+        var source = Array.isArray(raw) ? raw.slice() : String(raw == null ? '' : raw).split(',');
+        return source.map(function (item) { return String(item == null ? '' : item).trim(); });
+      }
+
+      function _trimTrailingEmptyTokens(list) {
+        var out = Array.isArray(list) ? list.slice() : [];
+        while (out.length && !String(out[out.length - 1] || '').trim()) out.pop();
+        return out;
+      }
+
+      function _serializeCsvListPreserve(list) {
+        return _trimTrailingEmptyTokens((list || []).map(function (item) {
+          return String(item == null ? '' : item).trim();
+        })).join(', ');
+      }
+
+      function _normalizePogSerializedValue(value) {
+        return _serializeCsvListPreserve(_splitCsvListPreserve(value));
+      }
+
+      function _getPogActionIntent(raw) {
+        var txt = _stripVietnameseTone(raw).replace(/\s+/g, ' ').trim();
+        if (!txt) return '';
+        if (txt.indexOf('cut product') >= 0 || txt === 'cut') return 'cut';
+        if (txt.indexOf('reduce facing') >= 0 || txt.indexOf('reduce product facing') >= 0 || txt === 'reduce') return 'reduce';
+        return '';
+      }
+
+      function _buildPogActionForSlot(intent, slotNumber) {
+        var idx = parseInt(slotNumber, 10);
+        if (!idx || idx < 1) return '';
+        if (intent === 'cut') return 'Cut Product ' + idx;
+        if (intent === 'reduce') return 'Reduce facing product ' + idx;
+        return '';
+      }
+
+      function _getPogActionOptions(slotNumber) {
+        return [
+          _buildPogActionForSlot('cut', slotNumber),
+          _buildPogActionForSlot('reduce', slotNumber)
+        ];
+      }
+
+      function _normalizePogActionForSlot(value, slotNumber) {
+        var txt = String(value == null ? '' : value).trim();
+        if (!txt) return '';
+        var options = _getPogActionOptions(slotNumber);
+        for (var i = 0; i < options.length; i++) {
+          if (_stripVietnameseTone(options[i]) === _stripVietnameseTone(txt)) return options[i];
+        }
+        var intent = _getPogActionIntent(txt);
+        return intent ? _buildPogActionForSlot(intent, slotNumber) : '';
+      }
+
+      function _newPogSlot(index) {
+        return {
+          idx: parseInt(index, 10) || 0,
+          product: '',
+          action: ''
+        };
+      }
+
+      function _getPogDisplayValue(raw) {
+        var txt = String(raw == null ? '' : raw).trim();
+        if (!txt) return '';
+        var key = _getPogProductKey(txt);
+        var list = (S.mdProductOptions && S.mdProductOptions.length) ? S.mdProductOptions : (S.mdProductIds || []);
+        for (var i = 0; i < list.length; i++) {
+          var item = _toDropdownOption(list[i]);
+          var label = String(item.label || item.value || '').trim();
+          if (label && _getPogProductKey(item.value || label) === key) return label;
+        }
+        return txt;
+      }
+
+      function _hasPogBlankTail(slots) {
+        if (!Array.isArray(slots) || !slots.length) return false;
+        var last = slots[slots.length - 1] || {};
+        return !String(last.product || '').trim() && !String(last.action || '').trim();
+      }
+
+      function _normalizePogSlotsForUi(slots, keepBlankTail) {
+        var raw = Array.isArray(slots) ? slots.slice(0, POG_MAX_SLOTS) : [];
+        var normalized = [];
+        raw.forEach(function (slot) {
+          if (normalized.length >= POG_MAX_SLOTS) return;
+          var product = String(slot && slot.product == null ? '' : slot && slot.product).trim();
+          var action = String(slot && slot.action == null ? '' : slot && slot.action).trim();
+          if (!product) return;
+          var slotNumber = normalized.length + 1;
+          normalized.push({
+            idx: normalized.length,
+            product: product,
+            action: action ? (_normalizePogActionForSlot(action, slotNumber) || '') : ''
+          });
+        });
+        var hasFilledSlots = normalized.length > 0;
+        if (!normalized.length) normalized.push(_newPogSlot(0));
+        if (keepBlankTail && hasFilledSlots && normalized.length < POG_MAX_SLOTS) normalized.push(_newPogSlot(normalized.length));
+        return normalized.map(function (slot, idx) {
+          return {
+            idx: idx,
+            product: String(slot.product || '').trim(),
+            action: String(slot.action || '').trim()
+          };
+        });
+      }
+
+      function _getFilledPogSlots(slots) {
+        return _normalizePogSlotsForUi(slots, false).filter(function (slot) {
+          return !!String(slot.product || '').trim();
+        });
+      }
+
+      function _getPogProductKey(value) {
+        var txt = String(value == null ? '' : value).trim();
+        if (!txt) return '';
+        var ref = _extractRefProductId(txt);
+        return String(ref || txt).trim().toUpperCase();
+      }
+
+      function _parsePogSlots(productValue, actionValue) {
+        var products = _trimTrailingEmptyTokens(_splitCsvListPreserve(productValue));
+        var actions = _trimTrailingEmptyTokens(_splitCsvListPreserve(actionValue));
+        var max = Math.min(POG_MAX_SLOTS, Math.max(products.length, actions.length));
+        var slots = [];
+        for (var i = 0; i < max; i++) {
+          var product = String(products[i] || '').trim();
+          var action = String(actions[i] || '').trim();
+          if (!product) continue;
+          slots.push({
+            idx: slots.length,
+            product: product,
+            action: action ? (_normalizePogActionForSlot(action, slots.length + 1) || '') : ''
+          });
+        }
+        return _normalizePogSlotsForUi(slots, false);
+      }
+
+      function _compactPogSlots(slots) {
+        return _normalizePogSlotsForUi(slots, false);
+      }
+
+      function _serializePogSlots(slots) {
+        var normalized = _getFilledPogSlots(slots);
+        if (!normalized.length) return { products: '', actions: '' };
+        var products = normalized.map(function (slot) {
+          return String(slot.product || '').trim();
+        });
+        var actions = normalized.map(function (slot, idx) {
+          return String(_normalizePogActionForSlot(slot.action, idx + 1) || '').trim();
+        });
+        return {
+          products: _serializeCsvListPreserve(products),
+          actions: _serializeCsvListPreserve(actions)
+        };
+      }
+
+      function _formatPogListText(raw, kind) {
+        var items = _trimTrailingEmptyTokens(_splitCsvListPreserve(raw));
+        if (!items.length) return '';
+        return items.map(function (item, idx) {
+          var fallback = kind === 'action' ? 'Pending action' : 'Pending product';
+          var value = String(item || '').trim();
+          if (kind === 'product' && value) value = _getPogDisplayValue(value);
+          return (idx + 1) + '. ' + (value || fallback);
+        }).join('\n');
+      }
+
+      function _formatPogDecisionSummary(productValue, actionValue) {
+        var products = _trimTrailingEmptyTokens(_splitCsvListPreserve(productValue));
+        var actions = _trimTrailingEmptyTokens(_splitCsvListPreserve(actionValue));
+        var max = Math.max(products.length, actions.length);
+        if (!max) return '';
+        var lines = [];
+        for (var i = 0; i < max; i++) {
+          var product = _getPogDisplayValue(products[i] || '') || 'Pending product';
+          var intent = _getPogActionIntent(actions[i] || '');
+          var actionLabel = intent === 'cut'
+            ? 'Cut'
+            : (intent === 'reduce' ? 'Reduce facing' : 'Pending action');
+          lines.push('Product ' + (i + 1) + ': ' + product + ' \u2192 ' + actionLabel);
+        }
+        return lines.join('\n');
+      }
+
+      function _getPogValidationWarnings(productValue, actionValue) {
+        var products = _trimTrailingEmptyTokens(_splitCsvListPreserve(productValue));
+        var actions = _trimTrailingEmptyTokens(_splitCsvListPreserve(actionValue));
+        var warnings = [];
+        var seenProducts = {};
+        for (var i = 0; i < products.length; i++) {
+          var product = String(products[i] || '').trim();
+          var action = String(actions[i] || '').trim();
+          if (!product) continue;
+          var key = _getPogProductKey(product);
+          if (key && seenProducts[key]) warnings.push('POG reduce product slot cannot repeat the same product.');
+          if (key) seenProducts[key] = true;
+          if (!action) warnings.push('POG action is missing for Product ' + (i + 1) + '.');
+          else if (!_normalizePogActionForSlot(action, i + 1)) warnings.push('POG action for Product ' + (i + 1) + ' must match the same slot.');
+        }
+        for (var j = products.length; j < actions.length; j++) {
+          if (String(actions[j] || '').trim()) warnings.push('POG action cannot exist without a selected product.');
+        }
+        return _dedupeMessages(warnings);
       }
 
       function _stripVietnameseTone(value) {
@@ -7334,6 +7817,7 @@
       function _normalizeFieldValue(field, value) {
         var v = value === null || value === undefined ? '' : String(value);
         if (_isMultiValueField(field)) return normalizeMultiValue(v);
+        if (field === POG_PRODUCT_FIELD || field === POG_ACTION_FIELD) return _normalizePogSerializedValue(v);
         if (field === 'Retail Price (+VAT) in Tier 6') {
           v = v.replace(/,/g, '').trim();
         } else {
@@ -7865,6 +8349,8 @@
         'RefID': 'REFERENCE PRODUCT ID (Nếu không có điền NO)',
         'SamePrice': 'SAME PRICE PRODUCT',
         'Desc': 'Product description (Dưới 250 Kí tự)',
+        'OtherIncome': OTHER_INCOME_FIELD,
+        'PricingStrategy': PRICING_STRATEGY_FIELD,
         'Comp': 'Competitors (Retail Price) <Tên đối thủ: Giá tiền>',
         'FCUPSD': 'FC UPSD of NEW SKU',
         'Pattern': 'Pattern',
@@ -7879,7 +8365,7 @@
           'RetailT6': 'Price T6', 'DisplayArea': 'Display Aera',
           'LogisticS': 'Logistics S', 'LogisticN': 'Logistics N',
           'WhyList': 'Why List', 'PICName': 'PIC Name', 'RefID': 'Ref ID', 'SamePrice': 'Same Price',
-            'Desc': 'Desc', 'Comp': 'Competitors', 'FCUPSD': 'FC UPSD', 'Pattern': 'Pattern', 'SSVNote': 'SSV Note'
+            'Desc': 'Desc', 'OtherIncome': 'Other Income', 'PricingStrategy': 'Pricing Strategy', 'Comp': 'Competitors', 'FCUPSD': 'FC UPSD', 'Pattern': 'Pattern', 'SSVNote': 'SSV Note'
       };
 
       var REQUIRED_PRODUCT_FIELDS = [
@@ -7922,12 +8408,16 @@
         'PIC input Product Name (Dưới 40 kí tự)': 'PIC Product Name',
         'REFERENCE PRODUCT ID (Nếu không có điền NO)': 'Reference Product ID',
         'Retail Price (+VAT) in Tier 6': 'Retail Price Tier 6',
+        'Pricing Strategy': 'Pricing Strategy',
         'Present Date': 'Present Date',
         'Status': 'Status',
         'New product type': 'New Product Type',
         'Why Do We List This Product?': 'Why Do We List This Product?',
+        'Other Income + Listing Fee': 'Other Income + Listing Fee',
         'Premium products': 'Premium Products',
-        'Branded': 'Branded'
+        'Branded': 'Branded',
+        'POG_Choose Reduce product facing': 'POG Reduce Product Facing',
+        'POG_Choose type Reduce product facing': 'POG Reduce Facing Action'
       };
 
       function _isRequiredProductField(field) {
@@ -8539,6 +9029,198 @@
         if (hidden) hidden.value = String(rawText == null ? '' : rawText);
       }
 
+      var MODAL_POG_STATE = _normalizePogSlotsForUi([], false);
+
+      function _getPogProductOptions(slotIndex) {
+        var slot = parseInt(slotIndex, 10) || 0;
+        var currentProduct = MODAL_POG_STATE[slot] ? String(MODAL_POG_STATE[slot].product || '').trim() : '';
+        var taken = {};
+        MODAL_POG_STATE.forEach(function (item, idx) {
+          if (idx === slot) return;
+          var key = _getPogProductKey(item && item.product);
+          if (key) taken[key] = true;
+        });
+        var rawList = (S.mdProductOptions && S.mdProductOptions.length) ? S.mdProductOptions.slice() : (S.mdProductIds || []).slice();
+        var seen = {};
+        var out = [];
+        rawList.forEach(function (raw) {
+          var item = _toDropdownOption(raw);
+          var label = String(item.label || item.value || '').trim();
+          if (!label) return;
+          var key = _getPogProductKey(item.value || label);
+          if (!key || seen[key]) return;
+          seen[key] = true;
+          if (taken[key] && key !== _getPogProductKey(currentProduct)) return;
+          out.push({ value: label, label: label });
+        });
+        if (currentProduct) {
+          var curKey = _getPogProductKey(currentProduct);
+          if (curKey && !seen[curKey]) out.unshift({ value: currentProduct, label: currentProduct });
+        }
+        return out;
+      }
+
+      function _setModalPogMeta() {
+        var meta = document.getElementById('pogModuleMeta');
+        if (!meta) return;
+        var selectedCount = 0;
+        var pendingAction = 0;
+        MODAL_POG_STATE.forEach(function (slot) {
+          if (String(slot.product || '').trim()) {
+            selectedCount++;
+            if (!String(slot.action || '').trim()) pendingAction++;
+          }
+        });
+        if (!selectedCount) {
+          meta.textContent = 'No POG decision yet. Start with Product 1, then add more only when the current decision is complete.';
+          return;
+        }
+        meta.textContent = selectedCount + ' product decision(s) selected'
+          + (pendingAction
+            ? (' · ' + pendingAction + ' action(s) still pending before you can add the next slot')
+            : (selectedCount >= POG_MAX_SLOTS ? ' · maximum 5 products reached' : ' · current decisions are aligned and ready for another slot if needed'));
+      }
+
+      function _syncModalPogHiddenFields() {
+        var serialized = _serializePogSlots(MODAL_POG_STATE);
+        var productInput = document.getElementById('mf_POG_Choose_Reduce_product_facing');
+        var actionInput = document.getElementById('mf_POG_Choose_type_Reduce_product_facing');
+        if (productInput) productInput.value = serialized.products;
+        if (actionInput) actionInput.value = serialized.actions;
+      }
+
+      function _renderModalPogSlots() {
+        var list = document.getElementById('pogSlotList');
+        if (!list) return;
+        MODAL_POG_STATE = _normalizePogSlotsForUi(MODAL_POG_STATE, _hasPogBlankTail(MODAL_POG_STATE));
+        var html = '';
+        for (var i = 0; i < MODAL_POG_STATE.length; i++) {
+          var slot = MODAL_POG_STATE[i] || _newPogSlot(i);
+          var hasProduct = !!String(slot.product || '').trim();
+          var canRemove = MODAL_POG_STATE.length > 1 || hasProduct || String(slot.action || '').trim();
+          html += '<div class="pog-slot-row">'
+            + '<div class="pog-slot-index">Product ' + (i + 1) + '</div>'
+            + '<div class="pog-slot-main">'
+            + '<div class="pog-slot-field">'
+            + '<div class="pog-slot-label">Select product</div>'
+            + '<div class="sdrop searchable ef" id="pog_product_' + i + '"></div>'
+            + '</div>'
+            + (hasProduct
+                ? ('<div class="pog-slot-field is-action">'
+                  + '<div class="pog-slot-label">Action for Product ' + (i + 1) + '</div>'
+                  + '<select class="bfp-fc pog-slot-action" id="pog_action_' + i + '">'
+                  + '<option value="">Choose action</option>'
+                  + _getPogActionOptions(i + 1).map(function (action) {
+                      return '<option value="' + esc(action) + '"' + (action === _normalizePogActionForSlot(slot.action, i + 1) ? ' selected' : '') + '>' + esc(action) + '</option>';
+                    }).join('')
+                  + '</select>'
+                  + '</div>')
+                : '<div class="pog-slot-hint">Select the product first to unlock the matching cut / reduce-facing action for this slot.</div>')
+            + '</div>'
+            + '<button type="button" class="pog-slot-clear" title="Remove product slot" aria-label="Remove product slot" onclick="App.modalClearPogSlot(' + i + ')"' + (canRemove ? '' : ' disabled') + '>×</button>'
+            + '</div>';
+        }
+        list.innerHTML = html;
+
+        for (var idx = 0; idx < MODAL_POG_STATE.length; idx++) {
+          var dropdownId = 'pog_product_' + idx;
+          var dropdownEl = document.getElementById(dropdownId);
+          if (dropdownEl) {
+            dropdownEl.innerHTML = createDropdownHTML(POG_PRODUCT_FIELD, _getPogProductOptions(idx), true, { searchable: true });
+            initDropdown(dropdownId, POG_PRODUCT_FIELD, MODAL_POG_STATE[idx] ? MODAL_POG_STATE[idx].product : '', {
+              matchNormalizer: _getPogProductKey,
+              valueNormalizer: function (rawValue) {
+                return String(rawValue == null ? '' : rawValue).trim();
+              }
+            });
+            dropdownEl.addEventListener('change', (function (slotIndex, idRef) {
+              return function () {
+                App.modalPogSlotChange(slotIndex, 'product', getDropdownValue(idRef));
+              };
+            })(idx, dropdownId));
+          }
+          var actionEl = document.getElementById('pog_action_' + idx);
+          if (actionEl) {
+            actionEl.addEventListener('change', (function (slotIndex, selectRef) {
+              return function () {
+                App.modalPogSlotChange(slotIndex, 'action', selectRef.value);
+              };
+            })(idx, actionEl));
+          }
+        }
+        var addBtn = document.getElementById('pogAddBtn');
+        if (addBtn) addBtn.style.display = _canAddAnotherPogSlot() ? 'inline-flex' : 'none';
+        _setModalPogMeta();
+      }
+
+      function _loadModalPogField(productRaw, actionRaw) {
+        MODAL_POG_STATE = _parsePogSlots(productRaw || '', actionRaw || '');
+        _renderModalPogSlots();
+        _syncModalPogHiddenFields();
+      }
+
+      function modalPogSlotChange(index, part, value) {
+        var idx = parseInt(index, 10);
+        if (isNaN(idx) || idx < 0 || idx >= MODAL_POG_STATE.length) return;
+        if (part === 'product') {
+          MODAL_POG_STATE[idx].product = String(value == null ? '' : value).trim();
+          if (!MODAL_POG_STATE[idx].product) {
+            MODAL_POG_STATE[idx].action = '';
+            MODAL_POG_STATE.splice(idx, 1);
+          } else if (MODAL_POG_STATE[idx].action) {
+            MODAL_POG_STATE[idx].action = _normalizePogActionForSlot(MODAL_POG_STATE[idx].action, idx + 1);
+          }
+        } else {
+          if (!String(MODAL_POG_STATE[idx].product || '').trim()) {
+            MODAL_POG_STATE[idx].action = '';
+          } else {
+            MODAL_POG_STATE[idx].action = _normalizePogActionForSlot(value, idx + 1);
+          }
+        }
+        MODAL_POG_STATE = _normalizePogSlotsForUi(MODAL_POG_STATE, _hasPogBlankTail(MODAL_POG_STATE));
+        _renderModalPogSlots();
+        _syncModalPogHiddenFields();
+        if (!S.modalRow) return;
+        var row = _findAnyRowByRn(S.modalRow);
+        if (row) refreshDirtyState(row);
+      }
+
+      function _canAddAnotherPogSlot() {
+        var filled = 0;
+        for (var i = 0; i < MODAL_POG_STATE.length; i++) {
+          var slot = MODAL_POG_STATE[i] || _newPogSlot(i);
+          var product = String(slot.product || '').trim();
+          var action = String(slot.action || '').trim();
+          if (!product || !action) return false;
+          filled++;
+        }
+        return filled > 0 && filled < POG_MAX_SLOTS;
+      }
+
+      function modalAddPogSlot() {
+        if (!_canAddAnotherPogSlot()) return;
+        MODAL_POG_STATE = _getFilledPogSlots(MODAL_POG_STATE);
+        if (MODAL_POG_STATE.length >= POG_MAX_SLOTS) return;
+        MODAL_POG_STATE.push(_newPogSlot(MODAL_POG_STATE.length));
+        _renderModalPogSlots();
+        _syncModalPogHiddenFields();
+        if (!S.modalRow) return;
+        var row = _findAnyRowByRn(S.modalRow);
+        if (row) refreshDirtyState(row);
+      }
+
+      function modalClearPogSlot(index) {
+        var idx = parseInt(index, 10);
+        if (isNaN(idx) || idx < 0 || idx >= MODAL_POG_STATE.length) return;
+        MODAL_POG_STATE.splice(idx, 1);
+        MODAL_POG_STATE = _normalizePogSlotsForUi(MODAL_POG_STATE, _hasPogBlankTail(MODAL_POG_STATE));
+        _renderModalPogSlots();
+        _syncModalPogHiddenFields();
+        if (!S.modalRow) return;
+        var row = _findAnyRowByRn(S.modalRow);
+        if (row) refreshDirtyState(row);
+      }
+
       function modalUomInput() {
         MODAL_UOM_DIRTY = true;
         _syncModalUomField();
@@ -8728,6 +9410,7 @@
           'bf_LogisticS': { field: 'Logistics Group South' },
           'bf_LogisticN': { field: 'Logistics Group North' },
           'bf_Pattern': { field: 'Pattern' },
+          'bf_PricingStrategy': { field: PRICING_STRATEGY_FIELD },
           'bf_RefID': { field: 'REFERENCE PRODUCT ID (Nếu không có điền NO)' },
           'bf_SamePrice': { field: 'SAME PRICE PRODUCT' }
         };
@@ -8735,7 +9418,9 @@
           var cfg = ddMap[id];
           var el = document.getElementById(id); if (!el) return;
           var curVal = cfg.multiple ? getDropdownValue(id) : (el.value || '');
-          var opts = cfg.field === PATTERN_FIELD ? PATTERN_OPTIONS.slice() : getBfOpts(cfg.field);
+          var opts = cfg.field === PATTERN_FIELD
+            ? PATTERN_OPTIONS.slice()
+            : (cfg.field === PRICING_STRATEGY_FIELD ? PRICING_STRATEGY_OPTIONS.slice() : getBfOpts(cfg.field));
           if (id === 'bf_RefID' && (!opts || !opts.length) && S.mdProductIds.length) opts = S.mdProductIds;
           if (id === 'bf_SamePrice' && (!opts || !opts.length)) opts = ['TRUE', 'FALSE'];
           if (cfg.multiple) {
@@ -9040,6 +9725,7 @@
         'Preservation temperature', 'Retail Price (+VAT) in Tier 6',
         'Display area (POG CONCEPT) Bắt Buộc', 'Logistics Group South',
         'Logistics Group North', 'Why Do We List This Product?',
+        'Other Income + Listing Fee', 'Pricing Strategy',
         'FC UPSD of NEW SKU', 'SAME PRICE PRODUCT', 'Pattern', 'SSV Note Product'
       ];
 
@@ -9118,14 +9804,18 @@
         'PIC input Product Name (Dưới 40 kí tự)': 'PIC_name',
         'REFERENCE PRODUCT ID (Nếu không có điền NO)': 'Ref_ID',
         'Retail Price (+VAT) in Tier 6': 'Retail_Price',
+        'Pricing Strategy': 'Pricing_Strategy',
         'Competitors (Retail Price) <Tên đối thủ: Giá tiền>': 'comp',
         'Product description (Dưới 250 Kí tự)': 'desc',
+        'Other Income + Listing Fee': 'Other_Income_Listing_Fee',
         'Pattern': 'Pattern',
         'SAME PRICE PRODUCT': 'Same_Price_Product',
         'SSV Note Product': 'ssv_note',
         'Logistics Group South': 'Logistics_South', 'Logistics Group North': 'Logistics_North',
         'FC UPSD of NEW SKU': 'FC_UPSD', 'Display area (POG CONCEPT) Bắt Buộc': 'Display_area',
         'Inventory Type': 'Inventory_Type',
+        'POG_Choose Reduce product facing': 'POG_Choose_Reduce_product_facing',
+        'POG_Choose type Reduce product facing': 'POG_Choose_type_Reduce_product_facing',
         'UOM Information': 'UOMInfo'
       };
 
@@ -9146,6 +9836,7 @@
         'SAME PRICE PRODUCT': 'sd_Same_Price_Product',
         'REFERENCE PRODUCT ID (Nếu không có điền NO)': 'sd_Ref_ID'
       };
+      DETAIL_DROPDOWN_FIELD_IDS[PRICING_STRATEGY_FIELD] = 'sd_Pricing_Strategy';
 
       function _getDetailFieldValueFromUi_(field) {
         var ddId = DETAIL_DROPDOWN_FIELD_IDS[field];
@@ -9198,6 +9889,7 @@
           'New product type': 'Select New Product Type',
           'Premium products': 'Select Premium Products',
           'Branded': 'Select Branded Type',
+          'Pricing Strategy': 'Select Pricing Strategy',
           'Sub Category': 'Select Sub Category',
           'PRIMARY USAGE SEGMENT': 'Select Primary Usage Segment',
           'TARGET STORE TYPES': 'Select Store Type (Supermarket, Convenience, etc.)',
@@ -9207,6 +9899,7 @@
           'Logistics Group South': 'Select Logistics Group South',
           'Logistics Group North': 'Select Logistics Group North',
           'Pattern': 'Select Pattern',
+          'POG_Choose Reduce product facing': 'Select product for POG reduce / cut decision',
           'SAME PRICE PRODUCT': 'Select Same Price Option',
           'REFERENCE PRODUCT ID (Nếu không có điền NO)': 'Select Reference Product ID (or NO)'
         };
@@ -9292,6 +9985,12 @@
         var c = document.getElementById(cid); if (!c) return;
         var cfg = config || {};
         var multiple = !!cfg.multiple || _isMultiValueField(fieldName);
+        var normalizeStoredValue = typeof cfg.valueNormalizer === 'function'
+          ? cfg.valueNormalizer
+          : function (rawValue) { return _normalizeDropdownOptionValue(fieldName, rawValue); };
+        var normalizeMatchValue = typeof cfg.matchNormalizer === 'function'
+          ? cfg.matchNormalizer
+          : normalizeStoredValue;
         c.classList.toggle('is-multi', multiple);
         c.dataset.multiple = multiple ? '1' : '0';
         var inp = c.querySelector('.sdrop-input'), srch = c.querySelector('.sdrop-search input'), clearBtn = c.querySelector('.sdrop-clear');
@@ -9302,20 +10001,20 @@
           return Array.prototype.slice.call(c.querySelectorAll('.sdrop-opt'));
         }
         function findOptionByValue(rawValue) {
-          var target = _normalizeDropdownOptionValue(fieldName, rawValue);
+          var target = normalizeMatchValue(rawValue);
           if (!target) return null;
           var opts = listOptions();
           for (var i = 0; i < opts.length; i++) {
             var opt = opts[i];
             if (opt.classList.contains('sdrop-opt-clear')) continue;
-            if (_normalizeDropdownOptionValue(fieldName, opt.dataset.value) === target) return opt;
+            if (normalizeMatchValue(opt.dataset.value) === target) return opt;
           }
           return null;
         }
         function ensureOption(rawValue, rawLabel) {
-          var val = _normalizeDropdownOptionValue(fieldName, rawValue);
+          var val = normalizeStoredValue(rawValue);
           if (!val || !optionsWrap) return null;
-          var found = findOptionByValue(val);
+          var found = findOptionByValue(rawValue);
           if (found) return found;
           var opt = document.createElement('li');
           opt.className = 'sdrop-opt';
@@ -9330,29 +10029,32 @@
           return multiple ? parseMultiValue(inp.dataset.value || '') : [inp.dataset.value || ''].filter(Boolean);
         }
         function syncSelectedState() {
-          var selected = getSelectedValues();
+          var selected = getSelectedValues().map(normalizeMatchValue).filter(Boolean);
           listOptions().forEach(function (o) {
             if (o.classList.contains('sdrop-opt-clear')) {
               o.classList.remove('selected');
               return;
             }
-            var isSelected = selected.indexOf(_normalizeDropdownOptionValue(fieldName, o.dataset.value)) >= 0;
+            var isSelected = selected.indexOf(normalizeMatchValue(o.dataset.value)) >= 0;
             o.classList.toggle('selected', isSelected);
           });
         }
         function applyValue(rawValue, silent) {
           if (multiple) {
-            var values = parseMultiValue(rawValue);
-            values.forEach(function (val) { ensureOption(val, val); });
-            var labels = values.map(function (val) {
-              var matched = findOptionByValue(val);
-              return matched ? (matched.dataset.label || matched.textContent || val) : val;
+            var values = [];
+            var labels = [];
+            parseMultiValue(rawValue).forEach(function (rawItem) {
+              var stored = normalizeStoredValue(rawItem);
+              if (!stored) return;
+              var matched = ensureOption(rawItem, rawItem);
+              values.push(stored);
+              labels.push(matched ? (matched.dataset.label || matched.textContent || stored) : stored);
             });
             _setDropdownDisplay(c, serializeMultiValue(values), formatMultiValueForDisplay(labels, false));
           } else {
-            var normalized = _normalizeDropdownOptionValue(fieldName, rawValue);
+            var normalized = normalizeStoredValue(rawValue);
             if (normalized) {
-              var matched = ensureOption(normalized, rawValue);
+              var matched = ensureOption(rawValue, rawValue);
               _setDropdownDisplay(c, normalized, matched ? (matched.dataset.label || matched.textContent || normalized) : normalized);
             } else {
               _setDropdownDisplay(c, '', '');
@@ -9390,7 +10092,7 @@
             clearSelection(false, multiple);
             return;
           }
-          var rawVal = _normalizeDropdownOptionValue(fieldName, opt.dataset.value);
+          var rawVal = normalizeStoredValue(opt.dataset.value);
           if (multiple) {
             var selected = getSelectedValues();
             var idx = selected.indexOf(rawVal);
@@ -9472,7 +10174,9 @@
 
       function setText(id, value) {
         var el = document.getElementById(id);
-        if (el) el.textContent = value || '—';
+        if (!el) return;
+        var clean = _cleanDisplayValue(value);
+        el.textContent = clean !== '' ? clean : '—';
       }
 
       function setRefDropdownLabel(productId, productName) {
@@ -9633,11 +10337,17 @@
             return false;
           });
         }
-        var group = map && map.group ? String(map.group).trim() : '';
-        var category = map && map.category ? String(map.category).trim() : '';
-        if ((!group || !category) && fallbackRow) {
-          if (!group) group = String(fallbackRow['Group'] || fallbackRow['GROUP'] || '').trim();
-          if (!category) category = String(fallbackRow['Category'] || '').trim();
+        var fallbackSub = fallbackRow ? _cleanDisplayValue(fallbackRow['Sub Category'] || fallbackRow['SUB CATEGORY'] || '') : '';
+        var sameSub = !!fallbackSub && fallbackSub.replace(/\s+/g, ' ').trim().toLowerCase() === sc.toLowerCase();
+        var group = sameSub ? _cleanDisplayValue(fallbackRow['Group'] || fallbackRow['GROUP'] || '') : '';
+        var category = sameSub ? _cleanDisplayValue(fallbackRow['Category'] || fallbackRow['CATEGORY'] || '') : '';
+        var mapGroup = map && map.group ? _cleanDisplayValue(map.group) : '';
+        var mapCategory = map && map.category ? _cleanDisplayValue(map.category) : '';
+        if (!group) group = mapGroup;
+        if (!category) category = mapCategory;
+        if ((!group || !category) && fallbackRow && !sameSub) {
+          if (!group) group = _cleanDisplayValue(fallbackRow['Group'] || fallbackRow['GROUP'] || '');
+          if (!category) category = _cleanDisplayValue(fallbackRow['Category'] || fallbackRow['CATEGORY'] || '');
         }
         return { group: group, category: category };
       }
@@ -9657,18 +10367,18 @@
           });
         }
         var out = {
-          gpu: map && map.gpu ? String(map.gpu).trim() : '',
-          gpsc: map && map.gpsc ? String(map.gpsc).trim() : '',
-          upsd: map && map.upsd ? String(map.upsd).trim() : '',
-          sku: map && map.sku ? String(map.sku).trim() : '',
-          sp: map && map.sp ? String(map.sp).trim() : ''
+          gpu: map && map.gpu ? _cleanDisplayValue(map.gpu) : '',
+          gpsc: map && map.gpsc ? _cleanDisplayValue(map.gpsc) : '',
+          upsd: map && map.upsd ? _cleanDisplayValue(map.upsd) : '',
+          sku: map && map.sku ? _cleanDisplayValue(map.sku) : '',
+          sp: map && map.sp ? _cleanDisplayValue(map.sp) : ''
         };
         if (fallbackRow) {
-          if (!out.gpu) out.gpu = String(fallbackRow['GP/Unit by Subcategory'] || fallbackRow['GP/UNIT BY SUBCATEGORY'] || '').trim();
-          if (!out.gpsc) out.gpsc = String(fallbackRow['%GP by Subcategory'] || fallbackRow['%GP BY SUBCATEGORY'] || '').trim();
-          if (!out.upsd) out.upsd = String(fallbackRow['UPSD per SKU by Subcategory'] || fallbackRow['UPSD PER SKU BY SUBCATEGORY'] || '').trim();
-          if (!out.sku) out.sku = String(fallbackRow['#SKU by subcategory'] || fallbackRow['#SKU BY SUBCATEGORY'] || '').trim();
-          if (!out.sp) out.sp = String(fallbackRow['%SP by Subcategory'] || fallbackRow['%SP BY SUBCATEGORY'] || '').trim();
+          if (!out.gpu) out.gpu = _cleanDisplayValue(fallbackRow['GP/Unit by Subcategory'] || fallbackRow['GP/UNIT BY SUBCATEGORY'] || '');
+          if (!out.gpsc) out.gpsc = _cleanDisplayValue(fallbackRow['%GP by Subcategory'] || fallbackRow['%GP BY SUBCATEGORY'] || '');
+          if (!out.upsd) out.upsd = _cleanDisplayValue(fallbackRow['UPSD per SKU by Subcategory'] || fallbackRow['UPSD PER SKU BY SUBCATEGORY'] || '');
+          if (!out.sku) out.sku = _cleanDisplayValue(fallbackRow['#SKU by subcategory'] || fallbackRow['#SKU BY SUBCATEGORY'] || '');
+          if (!out.sp) out.sp = _cleanDisplayValue(fallbackRow['%SP by Subcategory'] || fallbackRow['%SP BY SUBCATEGORY'] || '');
         }
         return out;
       }
@@ -9699,19 +10409,22 @@
           { id: 'sd_Logistics_North', field: 'Logistics Group North', s: true },
           { id: 'sd_Pattern', field: 'Pattern', s: false },
           { id: 'sd_Inventory_Type', field: 'Inventory Type', s: false },
+          { id: 'sd_Pricing_Strategy', field: PRICING_STRATEGY_FIELD, s: false },
           { id: 'sd_Same_Price_Product', field: 'SAME PRICE PRODUCT', s: false },
           { id: 'sd_Ref_ID', field: 'REFERENCE PRODUCT ID (Nếu không có điền NO)', s: true }
         ];
         dds.forEach(function (dd) {
           var c = document.getElementById(dd.id); if (!c) return;
-          var ddOpts = dd.field === PATTERN_FIELD ? PATTERN_OPTIONS.slice() : getDropdownOptions(dd.field);
+          var ddOpts = dd.field === PATTERN_FIELD
+            ? PATTERN_OPTIONS.slice()
+            : (dd.field === PRICING_STRATEGY_FIELD ? PRICING_STRATEGY_OPTIONS.slice() : getDropdownOptions(dd.field));
           if ((!ddOpts || !ddOpts.length) && (dd.id === 'sd_Premium_products' || dd.id === 'sd_Branded')) {
             ddOpts = getBfOpts(dd.field);
           }
           if (dd.id === 'sd_Same_Price_Product' && (!ddOpts || !ddOpts.length)) ddOpts = ['TRUE', 'FALSE'];
           // Reference Product ID: ưu tiên Dropdown_Master (cột L dạng ID-Tên), fallback sang MD list nếu trống
           if (dd.id === 'sd_Ref_ID' && (!ddOpts || !ddOpts.length) && S.mdProductOptions.length) ddOpts = S.mdProductOptions;
-          var cv = pending[dd.field] !== undefined ? pending[dd.field] : (row[dd.field] || '');
+          var cv = pending[dd.field] !== undefined ? pending[dd.field] : _cleanDisplayValue(row[dd.field]);
           if (dd.field === PATTERN_FIELD) cv = _normalizeFieldValue(PATTERN_FIELD, cv);
           if (dd.id === 'sd_Same_Price_Product' && !cv) cv = row['Same Price Product'] || '';
           c.innerHTML = createDropdownHTML(dd.field, ddOpts, dd.s, { multiple: !!dd.m });
@@ -9738,7 +10451,7 @@
               updateSubcateBench(sc);
             });
           }
-          var curSc = getDropdownValue('sd_Sub_Category') || row['Sub Category'] || '';
+          var curSc = getDropdownValue('sd_Sub_Category') || _cleanDisplayValue(row['Sub Category']) || '';
           _applySubcateAutoFields(curSc, row);
           updateSubcateBench(curSc);
         }
@@ -9747,9 +10460,23 @@
       }
       function updateSubcateBench(sc) {
         var b = _resolveSubcateBench(sc, null);
-        var fmtN = function(v) { if (!v) return '—'; var n = parseFloat(String(v).replace(/[^0-9.-]/g,'')); return isNaN(n) ? String(v) : new Intl.NumberFormat('vi-VN').format(Math.round(n)); };
-        var fmtP = function(v) { if (!v) return '—'; var s=String(v); var n=parseFloat(s.replace(/[^0-9.-]/g,'')); if (isNaN(n)) return s; return (n<1?(n*100).toFixed(1):n.toFixed(1))+'%'; };
-        var set = function(id,v) { var el=document.getElementById(id); if (el) el.textContent = v||'—'; };
+        var fmtN = function(v) {
+          var clean = _cleanDisplayValue(v);
+          if (!clean) return '—';
+          var n = parseFloat(String(clean).replace(/[^0-9.-]/g, ''));
+          return isNaN(n) ? clean : new Intl.NumberFormat('vi-VN').format(Math.round(n));
+        };
+        var fmtP = function(v) {
+          var clean = _cleanDisplayValue(v);
+          if (!clean) return '—';
+          var n = parseFloat(String(clean).replace(/[^0-9.-]/g, ''));
+          if (isNaN(n)) return clean;
+          return (n < 1 ? (n * 100).toFixed(1) : n.toFixed(1)) + '%';
+        };
+        var set = function(id, v) {
+          var el = document.getElementById(id);
+          if (el) el.textContent = _cleanDisplayValue(v) || '—';
+        };
         set('gpKpiGpu',  fmtN(b.gpu));
         set('gpKpiGpsc', fmtP(b.gpsc));
         set('gpKpiUpsd', fmtN(b.upsd));
@@ -9997,6 +10724,7 @@
 
       function _collectCurrentDetailValues() {
         var values = {};
+        _syncModalPogHiddenFields();
         for (var field in FIELD_MAP) {
           values[field] = _normalizeFieldValue(field, _getFieldInputValue(field));
         }
@@ -10050,9 +10778,19 @@
         return { diffs: diffs, values: values };
       }
 
-      function _fmtReviewValue(v) {
-        var txt = String(v == null ? '' : v).trim();
-        return txt ? esc(txt) : '—';
+      function _getFieldDisplayFormat(field) {
+        if (field === 'Retail Price (+VAT) in Tier 6') return 'money';
+        if (field === POG_PRODUCT_FIELD) return 'pog-products';
+        if (field === POG_ACTION_FIELD) return 'pog-actions';
+        return '';
+      }
+
+      function _fmtReviewValue(v, field) {
+        var format = _getFieldDisplayFormat(field);
+        var txt = _getOverviewDisplayValue(v, format);
+        txt = String(txt == null ? '' : txt).trim();
+        if (!txt) return '—';
+        return esc(txt).replace(/\n/g, '<br>');
       }
 
       function _reviewGroupSortKey(label) {
@@ -10061,6 +10799,7 @@
           'Positioning & Listing Reason',
           'Store & Customer Targeting',
           'Commercial & Pricing',
+          'Pricing & POG Decision',
           'Operations & Logistics',
           'UOM / Packaging / Barcode / Image',
           'Review'
@@ -10076,7 +10815,7 @@
       }
 
       function _compactReviewText(value) {
-        return String(value == null ? '' : value).replace(/\s+/g, ' ').trim();
+        return _cleanDisplayValue(value).replace(/\s+/g, ' ').trim();
       }
 
       function _truncateReviewText(value, maxLen) {
@@ -10092,7 +10831,7 @@
       }
 
       function _fmtOverviewMoney(text) {
-        var raw = String(text == null ? '' : text).trim();
+        var raw = _cleanDisplayValue(text);
         if (!raw) return '';
         var num = parseFloat(raw.replace(/[^0-9.-]/g, ''));
         if (isNaN(num)) return raw;
@@ -10100,7 +10839,7 @@
       }
 
       function _fmtOverviewVat(text) {
-        var raw = String(text == null ? '' : text).trim();
+        var raw = _cleanDisplayValue(text);
         if (!raw) return '';
         if (raw.indexOf('%') >= 0) return raw;
         var num = parseFloat(raw.replace(/[^0-9.-]/g, ''));
@@ -10150,6 +10889,7 @@
           wide: true,
           fields: [
             { field: 'Why Do We List This Product?', multiline: true },
+            { field: OTHER_INCOME_FIELD, multiline: true },
             { field: 'Premium products' },
             { field: 'Branded' },
             { field: 'Product description (Dưới 250 Kí tự)', multiline: true },
@@ -10159,6 +10899,15 @@
             { field: 'Retail Price (+VAT) in Tier 6', format: 'money' },
             { field: 'FC UPSD of NEW SKU' },
             { field: 'Competitors (Retail Price) <Tên đối thủ: Giá tiền>', multiline: true }
+          ]
+        },
+        {
+          title: 'Pricing & POG Decision',
+          subtitle: 'The pricing focus and facing reduction choices that are currently being managed together in the workspace.',
+          wide: true,
+          fields: [
+            { field: PRICING_STRATEGY_FIELD },
+            { label: 'POG Reduce / Facing Decision', field: POG_PRODUCT_FIELD, compareFields: [POG_PRODUCT_FIELD, POG_ACTION_FIELD], multiline: true, format: 'pog-decisions' }
           ]
         },
         {
@@ -10193,9 +10942,9 @@
 
       function _getOverviewContextValue(values, row, field, rowKeys) {
         if (values && Object.prototype.hasOwnProperty.call(values, field)) {
-          return String(values[field] == null ? '' : values[field]).trim();
+          return _cleanDisplayValue(values[field]);
         }
-        return String(_pickRowValue(row, rowKeys || [field]) || '').trim();
+        return _pickRowValue(row, rowKeys || [field]) || '';
       }
 
       function _renderOverviewContext(row, values) {
@@ -10221,6 +10970,9 @@
         var desc = String(values['Product description (Dưới 250 Kí tự)'] || '');
         if (picName.length > 40) warnings.push('PIC Product Name exceeds 40 characters.');
         if (desc.length > 250) warnings.push('Product Description exceeds 250 characters.');
+        var pricing = String(values[PRICING_STRATEGY_FIELD] || '').trim();
+        if (pricing && PRICING_STRATEGY_OPTIONS.indexOf(pricing) < 0) warnings.push('Pricing Strategy must be Tier 7, Tier 8, or Tier 9.');
+        warnings = warnings.concat(_getPogValidationWarnings(values[POG_PRODUCT_FIELD], values[POG_ACTION_FIELD]));
         if (Object.prototype.hasOwnProperty.call(values, 'UOM Information')) {
           var uomErr = _validateUomInfoText(values['UOM Information']);
           if (uomErr) warnings.push(uomErr);
@@ -10261,7 +11013,8 @@
         if (['Status', 'Present Date', 'New product type', 'PIC input Product Name (Dưới 40 kí tự)', 'REFERENCE PRODUCT ID (Nếu không có điền NO)', 'SAME PRICE PRODUCT', 'Sub Category'].indexOf(field) >= 0) return 'Product Identity';
         if (['Why Do We List This Product?', 'Product description (Dưới 250 Kí tự)', 'Premium products', 'Branded'].indexOf(field) >= 0) return 'Positioning & Listing Reason';
         if (['PRIMARY USAGE SEGMENT', 'TARGET STORE TYPES', 'TARGET CUSTOMER STORE TYPES'].indexOf(field) >= 0) return 'Store & Customer Targeting';
-        if (['Retail Price (+VAT) in Tier 6', 'FC UPSD of NEW SKU', 'Competitors (Retail Price) <Tên đối thủ: Giá tiền>'].indexOf(field) >= 0) return 'Commercial & Pricing';
+        if (['Retail Price (+VAT) in Tier 6', 'FC UPSD of NEW SKU', 'Competitors (Retail Price) <Tên đối thủ: Giá tiền>', OTHER_INCOME_FIELD].indexOf(field) >= 0) return 'Commercial & Pricing';
+        if ([PRICING_STRATEGY_FIELD, POG_PRODUCT_FIELD, POG_ACTION_FIELD].indexOf(field) >= 0) return 'Pricing & POG Decision';
         if (['Display area (POG CONCEPT) Bắt Buộc', 'Inventory Type', 'Preservation temperature', 'Logistics Group South', 'Logistics Group North', 'Pattern', 'SSV Note Product'].indexOf(field) >= 0) return 'Operations & Logistics';
         if (field === 'UOM Information') return 'UOM / Packaging / Barcode / Image';
         return 'Review';
@@ -10295,6 +11048,13 @@
           var desc = String(values['Product description (Dưới 250 Kí tự)'] || '');
           if (desc.length > 250) warnings.push('Product Description exceeds 250 characters.');
         }
+        if (fields.indexOf(PRICING_STRATEGY_FIELD) >= 0) {
+          var pricing = String(values[PRICING_STRATEGY_FIELD] || '').trim();
+          if (pricing && PRICING_STRATEGY_OPTIONS.indexOf(pricing) < 0) warnings.push('Pricing Strategy must be Tier 7, Tier 8, or Tier 9.');
+        }
+        if (fields.indexOf(POG_PRODUCT_FIELD) >= 0 || fields.indexOf(POG_ACTION_FIELD) >= 0) {
+          warnings = warnings.concat(_getPogValidationWarnings(values[POG_PRODUCT_FIELD], values[POG_ACTION_FIELD]));
+        }
         if (fields.indexOf('UOM Information') >= 0) {
           if (Object.prototype.hasOwnProperty.call(values, 'UOM Information')) {
             var uomErr = _validateUomInfoText(values['UOM Information']);
@@ -10307,17 +11067,19 @@
       function _getOverviewDisplayValue(raw, format) {
         if (format === 'money') return _fmtOverviewMoney(raw);
         if (format === 'vat') return _fmtOverviewVat(raw);
-        return String(raw == null ? '' : raw).trim();
+        if (format === 'pog-products') return _formatPogListText(raw, 'product');
+        if (format === 'pog-actions') return _formatPogListText(raw, 'action');
+        return _cleanDisplayValue(raw);
       }
 
       function _formatOverviewFullValueHtml(value, multiline, blankLabel) {
-        var txt = String(value == null ? '' : value).trim();
+        var txt = _cleanDisplayValue(value);
         if (!txt) return '<span class="blank">' + esc(blankLabel || 'Blank') + '</span>';
         return multiline ? esc(txt).replace(/\n/g, '<br>') : esc(txt);
       }
 
       function _formatOverviewCompareHtml(value, multiline) {
-        var txt = String(value == null ? '' : value).trim();
+        var txt = _cleanDisplayValue(value);
         if (!txt) return '<span class="blank">No source value</span>';
         if (!multiline) txt = _truncateReviewText(txt, 88);
         return multiline ? esc(txt).replace(/\n/g, '<br>') : esc(txt);
@@ -10329,6 +11091,9 @@
           'Product description (Dưới 250 Kí tự)',
           'Competitors (Retail Price) <Tên đối thủ: Giá tiền>',
           'Display area (POG CONCEPT) Bắt Buộc',
+          OTHER_INCOME_FIELD,
+          POG_PRODUCT_FIELD,
+          POG_ACTION_FIELD,
           'UOM Information',
           'SSV Note Product'
         ].indexOf(field) >= 0;
@@ -10344,11 +11109,17 @@
             var label = def.label || _fieldUiLabel(field);
             var raw = '';
             var baseRaw = '';
+            var compareFields = Array.isArray(def.compareFields) && def.compareFields.length ? def.compareFields.slice() : [field];
             if (mode === 'supplier') {
               raw = _pickRowValue(row, def.keys || [field]);
             } else {
-              raw = values && field ? values[field] : '';
-              baseRaw = _getRowFieldValue(row, field);
+              if (def.format === 'pog-decisions') {
+                raw = _formatPogDecisionSummary(values && values[POG_PRODUCT_FIELD], values && values[POG_ACTION_FIELD]);
+                baseRaw = _formatPogDecisionSummary(_getRowFieldValue(row, POG_PRODUCT_FIELD), _getRowFieldValue(row, POG_ACTION_FIELD));
+              } else {
+                raw = values && field ? values[field] : '';
+                baseRaw = _getRowFieldValue(row, field);
+              }
             }
             var val = _getOverviewDisplayValue(raw, def.format);
             var multiline = !!def.multiline;
@@ -10359,8 +11130,12 @@
             var tagsHtml = '';
 
             if (mode === 'filled') {
-              var currentNorm = _normalizeFieldValue(field, raw);
-              var baseNorm = _normalizeFieldValue(field, baseRaw);
+              var currentNorm = compareFields.map(function (name) {
+                return _normalizeFieldValue(name, values && values[name]);
+              }).join(' || ');
+              var baseNorm = compareFields.map(function (name) {
+                return _normalizeFieldValue(name, _getRowFieldValue(row, name));
+              }).join(' || ');
               var isEmpty = !String(currentNorm || '').trim();
               var isEdited = currentNorm !== baseNorm;
               var isKey = multiline || _isOverviewKeyField(field);
@@ -10641,9 +11416,13 @@
           'Sub Category',
           'Display area (POG CONCEPT) Bắt Buộc',
           'Why Do We List This Product?',
+          OTHER_INCOME_FIELD,
           'Retail Price (+VAT) in Tier 6',
+          PRICING_STRATEGY_FIELD,
           'FC UPSD of NEW SKU',
           'Competitors (Retail Price) <Tên đối thủ: Giá tiền>',
+          POG_PRODUCT_FIELD,
+          POG_ACTION_FIELD,
           'Inventory Type',
           'Preservation temperature',
           'Logistics Group South',
@@ -10697,8 +11476,8 @@
               + '<div class="k s2-review-group-title">' + esc(group) + '</div>'
               + grouped[group].map(function (d) {
                   return '<div class="s2-review-row s2-review-change">'
-                    + '<div class="k">' + esc(d.field) + '</div>'
-                    + '<div class="v"><span class="s2-review-before">Current: ' + _fmtReviewValue(d.before) + '</span><span class="s2-review-after">New: ' + _fmtReviewValue(d.after) + '</span></div>'
+                    + '<div class="k">' + esc(_fieldUiLabel(d.field)) + '</div>'
+                    + '<div class="v"><span class="s2-review-before">Current: ' + _fmtReviewValue(d.before, d.field) + '</span><span class="s2-review-after">New: ' + _fmtReviewValue(d.after, d.field) + '</span></div>'
                     + '</div>';
                 }).join('')
               + '</div>';
@@ -10792,8 +11571,8 @@
         for (var i = 0; i < keys.length; i++) {
           var key = keys[i];
           if (!key) continue;
-          var val = row[key];
-          if (val !== null && val !== undefined && String(val).trim() !== '') return String(val);
+          var val = _cleanDisplayValue(row[key]);
+          if (val !== '') return val;
         }
         return '';
       }
@@ -10881,22 +11660,22 @@
           title: 'Commercial',
           buttonLabel: 'Open Commercial',
           emptyHint: 'Set why-list, description, targeting, price and competitor context here.',
-          readyHint: 'Commercial inputs are ready. Continue to Operations for execution setup.',
+          readyHint: 'Commercial inputs are ready. Continue to Operations for logistics and POG decisions.',
           doneHint: 'Commercial and positioning fields are already complete.'
         },
         3: {
           title: 'Operations',
           buttonLabel: 'Open Operations',
-          emptyHint: 'Complete display area, logistics, UOM and operational notes here.',
-          readyHint: 'Operations inputs look stable. Save should be straightforward once warnings are clear.',
+          emptyHint: 'Complete display area, logistics, pricing strategy, POG decisions and operational notes here.',
+          readyHint: 'Operations, pricing strategy and POG inputs look stable. Save should be straightforward once warnings are clear.',
           doneHint: 'Operational fields are already complete.'
         }
       };
 
       var MG_FIELDS = {
         1: ['Status', 'Present Date', 'New product type', 'Sub Category', 'PIC input Product Name (Dưới 40 kí tự)', 'REFERENCE PRODUCT ID (Nếu không có điền NO)', 'SAME PRICE PRODUCT'],
-        2: ['Premium products', 'Branded', 'Why Do We List This Product?', 'Product description (Dưới 250 Kí tự)', 'PRIMARY USAGE SEGMENT', 'TARGET STORE TYPES', 'TARGET CUSTOMER STORE TYPES', 'Retail Price (+VAT) in Tier 6', 'FC UPSD of NEW SKU', 'Competitors (Retail Price) <Tên đối thủ: Giá tiền>'],
-        3: ['Display area (POG CONCEPT) Bắt Buộc', 'Inventory Type', 'Preservation temperature', 'Logistics Group South', 'Logistics Group North', 'Pattern', 'UOM Information', 'SSV Note Product']
+        2: ['Premium products', 'Branded', 'Why Do We List This Product?', 'Product description (Dưới 250 Kí tự)', OTHER_INCOME_FIELD, 'PRIMARY USAGE SEGMENT', 'TARGET STORE TYPES', 'TARGET CUSTOMER STORE TYPES', 'Retail Price (+VAT) in Tier 6', 'FC UPSD of NEW SKU', 'Competitors (Retail Price) <Tên đối thủ: Giá tiền>'],
+        3: ['Display area (POG CONCEPT) Bắt Buộc', 'Inventory Type', 'Preservation temperature', 'Logistics Group South', 'Logistics Group North', 'Pattern', PRICING_STRATEGY_FIELD, POG_PRODUCT_FIELD, POG_ACTION_FIELD, 'UOM Information', 'SSV Note Product']
       };
       /* MC id map for dirty marking */
       var MC_FIELD_MAP = {
@@ -10911,8 +11690,10 @@
         'Product description (Dưới 250 Kí tự)': 'mc_desc',
         'Why Do We List This Product?': 'mc_whylist',
         'Retail Price (+VAT) in Tier 6': 'mc_retailt6',
+        'Pricing Strategy': 'mc_pricingstrategy',
         'FC UPSD of NEW SKU': 'mc_upsd',
         'Competitors (Retail Price) <Tên đối thủ: Giá tiền>': 'mc_comp',
+        'Other Income + Listing Fee': 'mc_otherincome',
         'UOM Information': 'mc_uominfo',
         'Premium products': 'mc_premium',
         'Branded': 'mc_branded',
@@ -10924,12 +11705,15 @@
         'Logistics Group South': 'mc_logs',
         'Logistics Group North': 'mc_logn',
         'Pattern': 'mc_pattern',
+        'POG_Choose Reduce product facing': 'mc_pogmodule',
+        'POG_Choose type Reduce product facing': 'mc_pogmodule',
         'SSV Note Product': 'mc_ssvnote'
       };
 
       function refreshDirtyState(row) {
         var total = 0;
         var currentValues = _syncDetailPatternDependencies(_collectCurrentDetailValues());
+        var dirtyByCard = {};
         for (var field in FIELD_MAP) {
           var isActive = _isFieldActiveForPattern(field, currentValues);
           var isDirty = false;
@@ -10940,12 +11724,30 @@
           }
           if (isDirty) total++;
           var mcId = MC_FIELD_MAP[field];
-          if (mcId) { var mc = document.getElementById(mcId); if (mc) mc.classList.toggle('dirty', isDirty); }
+          if (mcId) dirtyByCard[mcId] = !!dirtyByCard[mcId] || isDirty;
         }
+        Object.keys(dirtyByCard).forEach(function (mcId) {
+          var mc = document.getElementById(mcId);
+          if (mc) mc.classList.toggle('dirty', !!dirtyByCard[mcId]);
+        });
+        Object.keys(MC_FIELD_MAP).forEach(function (field) {
+          var mcId = MC_FIELD_MAP[field];
+          if (!mcId || Object.prototype.hasOwnProperty.call(dirtyByCard, mcId)) return;
+          var mc = document.getElementById(mcId);
+          if (mc) mc.classList.remove('dirty');
+        });
+        _setModalPogMeta();
         // Group badges
         for (var g = 1; g <= 3; g++) {
           var cnt = 0;
-          MG_FIELDS[g].forEach(function (f) { var mcId = MC_FIELD_MAP[f]; if (mcId) { var mc = document.getElementById(mcId); if (mc && mc.classList.contains('dirty')) cnt++; } });
+          var seenCards = {};
+          MG_FIELDS[g].forEach(function (f) {
+            var mcId = MC_FIELD_MAP[f];
+            if (!mcId || seenCards[mcId]) return;
+            seenCards[mcId] = true;
+            var mc = document.getElementById(mcId);
+            if (mc && mc.classList.contains('dirty')) cnt++;
+          });
           var badge = document.getElementById('mg' + g + 'badge');
           if (badge) { badge.textContent = String(cnt); badge.classList.toggle('on', cnt > 0); }
         }
@@ -10995,22 +11797,23 @@
         }
 
         var heroMeta = [];
-        if (row['Brand Name']) heroMeta.push('Brand: ' + row['Brand Name']);
-        if (row['Supplier Name']) heroMeta.push('Supplier: ' + row['Supplier Name']);
-        if (row['Zone']) heroMeta.push('Zone: ' + row['Zone']);
-        if (row['Present Date']) heroMeta.push('Present: ' + row['Present Date']);
+        if (_cleanDisplayValue(row['Brand Name'])) heroMeta.push('Brand: ' + _cleanDisplayValue(row['Brand Name']));
+        if (_cleanDisplayValue(row['Supplier Name'])) heroMeta.push('Supplier: ' + _cleanDisplayValue(row['Supplier Name']));
+        if (_cleanDisplayValue(row['Zone'])) heroMeta.push('Zone: ' + _cleanDisplayValue(row['Zone']));
+        if (_cleanDisplayValue(row['Present Date'])) heroMeta.push('Present: ' + _cleanDisplayValue(row['Present Date']));
         document.getElementById('mTick').textContent = heroMeta.join('  ·  ') || ('Dòng ' + rn);
-        document.getElementById('mName').textContent = row['Product Name'] || row['PIC input Product Name (Dưới 40 kí tự)'] || 'Chi tiết SP';
+        document.getElementById('mName').textContent = _cleanDisplayValue(row['Product Name']) || _cleanDisplayValue(row['PIC input Product Name (Dưới 40 kí tự)']) || 'Chi tiết SP';
         var chips = '';
-        if (row['Status']) {
-          chips += pill(row['Status']) + ' ';
+        var statusLabel = _cleanDisplayValue(row['Status']);
+        if (statusLabel) {
+          chips += pill(statusLabel) + ' ';
           // Show Director-set badge when status has been decided
-          if (row['Status'] === 'Approved') chips += '<span style="display:inline-flex;align-items:center;gap:4px;background:#dcfce7;color:#166534;border:1px solid #86efac;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:700">🔒 Approved by Director</span> ';
-          else if (row['Status'] === 'Rejected') chips += '<span style="display:inline-flex;align-items:center;gap:4px;background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:700">🔒 Rejected by Director</span> ';
+          if (statusLabel === 'Approved') chips += '<span style="display:inline-flex;align-items:center;gap:4px;background:#dcfce7;color:#166534;border:1px solid #86efac;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:700">🔒 Approved by Director</span> ';
+          else if (statusLabel === 'Rejected') chips += '<span style="display:inline-flex;align-items:center;gap:4px;background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:700">🔒 Rejected by Director</span> ';
         }
-        if (row['Product Group']) chips += '<span class="sp sp-vl">' + esc(row['Product Group']) + '</span> ';
-        if (row['Category']) chips += '<span class="sp sp-vl">' + esc(row['Category']) + '</span> ';
-        if (row['Sub Category']) chips += '<span class="sp sp-sky">' + esc(row['Sub Category']) + '</span> ';
+        if (_cleanDisplayValue(row['Product Group'])) chips += '<span class="sp sp-vl">' + esc(_cleanDisplayValue(row['Product Group'])) + '</span> ';
+        if (_cleanDisplayValue(row['Category'])) chips += '<span class="sp sp-vl">' + esc(_cleanDisplayValue(row['Category'])) + '</span> ';
+        if (_cleanDisplayValue(row['Sub Category'])) chips += '<span class="sp sp-sky">' + esc(_cleanDisplayValue(row['Sub Category'])) + '</span> ';
         if (S.pending[rn]) chips += '<span class="sp sp-or">✏ Pending</span>';
         document.getElementById('mChips').innerHTML = chips;
         fillPresetSummary(row);
@@ -11018,7 +11821,15 @@
         setDetailStep(1);
         bindStep2TabKeyboard();
         // READ_MAP fills
-        S.headers.forEach(function (h) { if (!h) return; var elId = READ_MAP[h]; if (elId) { var el = document.getElementById(elId); if (!el) return; var val = row[h] == null ? '' : String(row[h]); el.textContent = val || '—'; } });
+        S.headers.forEach(function (h) {
+          if (!h) return;
+          var elId = READ_MAP[h];
+          if (!elId) return;
+          var el = document.getElementById(elId);
+          if (!el) return;
+          var val = _cleanDisplayValue(row[h]);
+          el.textContent = val !== '' ? val : '—';
+        });
         // Editable fields
         var pending = S.pending[rn] || {};
         for (var field in FIELD_MAP) {
@@ -11036,6 +11847,10 @@
         requestAnimationFrame(function () { ov.style.transition = 'opacity .18s'; ov.style.opacity = '1'; });
         // Init dropdowns, toggles, GP, counters, dirty
         initModalDropdowns(row);
+        _loadModalPogField(
+          document.getElementById('mf_POG_Choose_Reduce_product_facing') ? document.getElementById('mf_POG_Choose_Reduce_product_facing').value : '',
+          document.getElementById('mf_POG_Choose_type_Reduce_product_facing') ? document.getElementById('mf_POG_Choose_type_Reduce_product_facing').value : ''
+        );
         setupGPPreview(row);
         fillGPSheetGrid(row);
         setupCounters();
@@ -11098,6 +11913,10 @@
         }
         _loadModalUomField(document.getElementById('mf_UOMInfo') ? document.getElementById('mf_UOMInfo').value : '');
         initModalDropdowns(row);
+        _loadModalPogField(
+          document.getElementById('mf_POG_Choose_Reduce_product_facing') ? document.getElementById('mf_POG_Choose_Reduce_product_facing').value : '',
+          document.getElementById('mf_POG_Choose_type_Reduce_product_facing') ? document.getElementById('mf_POG_Choose_type_Reduce_product_facing').value : ''
+        );
         setupCounters();
         refreshDirtyState(row);
         toast('Đã reset về dữ liệu gốc', 'info');
@@ -11107,6 +11926,7 @@
         var rn = S.modalRow; if (!rn) return;
         var row = _findAnyRowByRn(rn); if (!row) return;
         if (MODAL_UOM_DIRTY) _syncModalUomField();
+        _syncModalPogHiddenFields();
         var currentValues = _syncDetailPatternDependencies(_collectCurrentDetailValues());
         var ch = {}, has = false;
         for (var field in FIELD_MAP) {
@@ -11188,6 +12008,10 @@
           var price = parseFloat(raw);
           if (!raw || isNaN(price) || price < 0) return _fieldUiLabel('Retail Price (+VAT) in Tier 6') + ' phải là số >= 0';
         }
+        var pricing = String(values[PRICING_STRATEGY_FIELD] || '').trim();
+        if (pricing && PRICING_STRATEGY_OPTIONS.indexOf(pricing) < 0) return 'Pricing Strategy chỉ được chọn Tier 7, Tier 8 hoặc Tier 9';
+        var pogWarnings = _getPogValidationWarnings(values[POG_PRODUCT_FIELD], values[POG_ACTION_FIELD]);
+        if (pogWarnings.length) return pogWarnings[0];
         if (Object.prototype.hasOwnProperty.call(ch, 'UOM Information')) {
           var uomErr = _validateUomInfoText(ch['UOM Information']);
           if (uomErr) return uomErr;
@@ -11494,6 +12318,7 @@
         bfReset: bfReset, applyBatchFill: applyBatchFill,
         bfCopyFrom: bfCopyFrom, bfClearCopy: bfClearCopy,
         modalUomInput: modalUomInput, modalAddUom: modalAddUom, modalRemoveUom: modalRemoveUom, modalUomFileChange: modalUomFileChange,
+        modalPogSlotChange: modalPogSlotChange, modalAddPogSlot: modalAddPogSlot, modalClearPogSlot: modalClearPogSlot,
         setToggle: setToggle,
         goSection: goSection, clearActiveProduct: clearActiveProduct,
         selectBatchPreviewProduct: selectBatchPreviewProduct,
