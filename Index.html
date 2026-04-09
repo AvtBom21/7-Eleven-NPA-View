@@ -5380,20 +5380,38 @@
     }
 
     .bfp-form {
-      grid-template-columns: minmax(0, 1.15fr) minmax(340px, 400px);
+      grid-template-columns: minmax(360px, 1.02fr) minmax(520px, 1.34fr) minmax(320px, .84fr);
       gap: 18px;
       padding: 0;
       background: transparent;
       align-items: start;
     }
 
+    .bfp-impact-pane,
     .bfp-editor-pane,
     .bfp-side-pane {
+      min-width: 0;
+    }
+
+    .bfp-editor-pane {
       display: flex;
       flex-direction: column;
       gap: 16px;
     }
 
+    .bfp-impact-sticky,
+    .bfp-side-sticky {
+      position: sticky;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-height: calc(100vh - 140px);
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .bfp-impact-panel,
     .bfp-workbench-card,
     .bfp-side-card {
       padding: 18px;
@@ -5403,9 +5421,10 @@
       box-shadow: var(--sh);
     }
 
-    .bfp-readiness-block,
+    .bfp-impact-ready,
+    .bfp-impact-count,
     .bfp-copy-block,
-    .bfp-review-card {
+    .bfp-template-block {
       min-width: 0;
       padding: 14px;
       border-radius: 18px;
@@ -5418,7 +5437,11 @@
       margin-bottom: 10px;
     }
 
-    .bfp-review-grid {
+    .bfp-editor-topline {
+      display: grid;
+      grid-template-columns: minmax(0, .84fr) minmax(0, 1.16fr);
+      gap: 14px;
+      align-items: start;
       margin-top: 16px;
     }
 
@@ -5426,8 +5449,189 @@
       margin-bottom: 12px;
     }
 
+    .bfp-impact-state-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 132px;
+      gap: 12px;
+      align-items: stretch;
+      margin-top: 16px;
+    }
+
+    .bfp-impact-count {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .bfp-impact-count .lbl {
+      display: block;
+      font: 700 9px var(--mono);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--text4);
+    }
+
+    .bfp-impact-count strong {
+      display: block;
+      font: 700 28px/1.05 var(--font);
+      color: #0f172a;
+    }
+
+    .bfp-impact-metrics {
+      margin-top: 14px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .bfp-impact-explainer {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+    }
+
+    .bfp-impact-panel .prev-empty {
+      margin-top: 16px;
+      padding: 14px;
+      text-align: left;
+    }
+
+    .bf-impact-list {
+      margin-top: 16px;
+    }
+
+    .bf-impact-row {
+      padding: 14px;
+      border-radius: 16px;
+      margin-bottom: 12px;
+      gap: 10px;
+    }
+
+    .bf-impact-row.same {
+      background: #f8fafc;
+    }
+
+    .bf-impact-row.change {
+      border-color: #93c5fd;
+      background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+      box-shadow: 0 10px 22px rgba(37, 99, 235, .08);
+    }
+
+    .bf-impact-values {
+      gap: 12px;
+    }
+
+    .bf-impact-col {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .bf-impact-cap {
+      font: 700 9px var(--mono);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--text4);
+    }
+
+    .bf-impact-row.change .bf-impact-col.before .bf-impact-val {
+      border-style: dashed;
+    }
+
+    .bf-impact-row.change .bf-impact-col.after .bf-impact-val {
+      border-color: #bfdbfe;
+      background: #eff6ff;
+      color: #1e3a8a;
+    }
+
     #bfPrevList {
       margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .prev-item {
+      margin-bottom: 0;
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid #dbe3ee;
+      background: #fff;
+    }
+
+    .prev-item-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .prev-state {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 0 10px;
+      border-radius: 999px;
+      font: 700 9px var(--mono);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      border: 1px solid #dbe3ee;
+      background: #f8fafc;
+      color: var(--text3);
+    }
+
+    .prev-item.will-change .prev-state {
+      border-color: #bfdbfe;
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+
+    .prev-item.no-change .prev-state {
+      border-color: #e2e8f0;
+      background: #f8fafc;
+      color: #475569;
+    }
+
+    .prev-meta-grid {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .prev-meta {
+      min-width: 0;
+      padding: 8px 10px;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+    }
+
+    .prev-meta span,
+    .prev-foot {
+      display: block;
+      font: 700 9px var(--mono);
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: var(--text4);
+    }
+
+    .prev-meta strong {
+      display: block;
+      margin-top: 5px;
+      font: 600 12px/1.4 var(--font);
+      color: #0f172a;
+      word-break: break-word;
+    }
+
+    .prev-foot {
+      margin-top: 10px;
+      font-size: 10px;
+      line-height: 1.45;
+      color: var(--text3);
     }
 
     .prev-item .prev-tick:last-child {
@@ -5440,10 +5644,7 @@
       .bfw-top-grid,
       .bfw-grid,
       .bfp-scope-stack,
-      .s2-main-grid,
-      .bfp-form,
-      .bfp-workbench-top,
-      .bfp-review-grid {
+      .s2-main-grid {
         grid-template-columns: 1fr;
       }
 
@@ -5456,11 +5657,29 @@
       .s2-check-topline,
       .s2-check-card-head,
       .s2-check-review-head,
-      .bfp-workbench-top,
-      .bfp-impact-head,
       .bfp-side-head {
         flex-direction: column;
         align-items: flex-start;
+      }
+
+      .bfp-form {
+        grid-template-columns: minmax(320px, 1fr) minmax(0, 1.22fr);
+      }
+
+      .bfp-side-pane {
+        grid-column: 1 / -1;
+      }
+
+      .bfp-side-sticky {
+        position: static;
+        max-height: none;
+        overflow: visible;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .bfp-editor-topline {
+        grid-template-columns: 1fr;
       }
     }
 
@@ -5480,7 +5699,24 @@
 
       .s2-check-context-grid,
       .s2-check-metrics,
-      .bfp-review-grid {
+      .bfp-impact-metrics,
+      .prev-meta-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .bfp-form {
+        grid-template-columns: 1fr;
+      }
+
+      .bfp-impact-sticky,
+      .bfp-side-sticky {
+        position: static;
+        max-height: none;
+        overflow: visible;
+        display: flex;
+      }
+
+      .bfp-impact-state-row {
         grid-template-columns: 1fr;
       }
     }
@@ -5506,6 +5742,10 @@
       .s2-pane-status-top {
         flex-direction: column;
         align-items: flex-start;
+      }
+
+      .prev-item-head {
+        flex-direction: column;
       }
 
       .mc.wide,
@@ -5659,12 +5899,67 @@
 
       <div class="bfp-body">
         <div class="bfp-form">
+          <aside class="bfp-impact-pane">
+            <div class="bfp-impact-sticky">
+              <section class="bfp-impact-panel">
+                <div class="bfp-zone-kicker">Impact Preview</div>
+                <div class="bfp-zone-title" id="bfImpactPreviewTitle">Select one product to preview</div>
+                <div class="bfp-zone-sub" id="bfImpactMeta">No batch changes selected yet.</div>
+
+                <div class="bfp-impact-state-row">
+                  <div class="bfp-impact-ready">
+                    <div class="dwov-ready-label">Apply readiness</div>
+                    <div class="bfw-ready-state state-idle" id="bfReadyState">Ready to start</div>
+                    <div class="bfw-sub" id="bfReadyNote">Choose fields, then confirm impact before apply.</div>
+                  </div>
+                  <div class="bfp-impact-count">
+                    <span class="lbl">Fields in preview</span>
+                    <strong id="bfImpactDirty">0</strong>
+                  </div>
+                </div>
+
+                <div class="bfw-metrics bfp-impact-metrics">
+                  <div class="bfw-metric">
+                    <span class="lbl">Selected products</span>
+                    <strong id="bfHeadSelected">0</strong>
+                  </div>
+                  <div class="bfw-metric">
+                    <span class="lbl">Fields to update</span>
+                    <strong id="bfHeadDirty">0</strong>
+                  </div>
+                  <div class="bfw-metric">
+                    <span class="lbl">Products impacted</span>
+                    <strong id="bfHeadAffected">0</strong>
+                  </div>
+                  <div class="bfw-metric">
+                    <span class="lbl">Warnings</span>
+                    <strong id="bfHeadWarnings">0</strong>
+                  </div>
+                </div>
+
+                <div class="bfp-impact-explainer">
+                  <div class="bfp-mini-title">Overwrite analysis</div>
+                  <div class="bfp-mini-sub">Compare current/original values against the batch template before you apply anything.</div>
+                </div>
+
+                <div class="prev-empty" id="bfImpactEmpty">Edit one or more fields in the template to preview the overwrite impact.</div>
+                <div class="bf-impact-list" id="bfImpactList"></div>
+              </section>
+
+              <section class="bfp-impact-panel bfp-impact-support">
+                <div class="bfp-mini-title">Warnings before apply</div>
+                <div class="bfp-mini-sub">Anything unsafe or incomplete stays pinned here while you configure the batch template.</div>
+                <div class="bfw-warning-list" id="bfWarningList"></div>
+              </section>
+            </div>
+          </aside>
+
           <div class="bfp-editor-pane">
-            <section class="bfp-workbench-card">
-              <div class="bfp-zone-kicker">Bulk Editor</div>
-              <div class="bfp-zone-title">Build the batch change template</div>
-              <div class="bfp-zone-sub">Left side defines what will change. Only touched fields will be applied to the selected products.</div>
-              <div class="bfp-workbench-top">
+            <section class="bfp-workbench-card bfp-editor-intro">
+              <div class="bfp-zone-kicker">Batch Change Template</div>
+              <div class="bfp-zone-title">Configure what will be overwritten</div>
+              <div class="bfp-zone-sub">Center panel is the main working area. Touched fields become the bulk template; untouched fields stay out of scope.</div>
+              <div class="bfp-editor-topline">
                 <div class="bfp-copy-block">
                   <div class="bfp-mini-title">Template Base</div>
                   <div class="bfp-mini-sub">Optional. Copy one selected product, then keep only the fields you truly want to overwrite.</div>
@@ -5676,60 +5971,15 @@
                     <div class="bf-copy-preview-tags" id="bfCopyTags"></div>
                   </div>
                 </div>
-                <div class="bfp-readiness-block">
-                  <div class="dwov-ready-label">Apply readiness</div>
-                  <div class="bfw-ready-state state-idle" id="bfReadyState">Ready to start</div>
-                  <div class="bfw-sub" id="bfReadyNote">Choose fields, then confirm impact before apply.</div>
-                </div>
-              </div>
-
-              <div class="bfw-metrics">
-                <div class="bfw-metric">
-                  <span class="lbl">Selected products</span>
-                  <strong id="bfHeadSelected">0</strong>
-                </div>
-                <div class="bfw-metric">
-                  <span class="lbl">Fields to update</span>
-                  <strong id="bfHeadDirty">0</strong>
-                </div>
-                <div class="bfw-metric">
-                  <span class="lbl">Products impacted</span>
-                  <strong id="bfHeadAffected">0</strong>
-                </div>
-                <div class="bfw-metric">
-                  <span class="lbl">Warnings</span>
-                  <strong id="bfHeadWarnings">0</strong>
-                </div>
-              </div>
-
-              <div class="bfp-review-grid">
-                <div class="bfp-review-card">
+                <div class="bfp-template-block">
                   <div class="bfp-mini-title">Template fields</div>
-                  <div class="bfp-mini-sub">Field groups and values that will be pushed in bulk.</div>
+                  <div class="bfp-mini-sub">Only the fields shown here will be pushed when you apply the batch template.</div>
                   <div class="bfw-chip-list" id="bfTouchedSections"></div>
                   <div class="bfp-active-strip" id="bfActiveStrip">
                     <span class="bfp-empty-strip">No template fields selected yet.</span>
                   </div>
                 </div>
-                <div class="bfp-review-card">
-                  <div class="bfp-mini-title">Warnings before apply</div>
-                  <div class="bfp-mini-sub">Anything unsafe or incomplete stays visible here while editing the template.</div>
-                  <div class="bfw-warning-list" id="bfWarningList"></div>
-                </div>
               </div>
-            </section>
-
-            <section class="bfp-workbench-card">
-              <div class="bfp-impact-head">
-                <div>
-                  <div class="bfp-zone-kicker">Impact Preview</div>
-                  <div class="bfp-zone-title" id="bfImpactPreviewTitle">Select one product to preview</div>
-                  <div class="bfp-zone-sub" id="bfImpactMeta">No batch changes selected yet.</div>
-                </div>
-                <span class="cnt" id="bfImpactDirty">0</span>
-              </div>
-              <div class="prev-empty" id="bfImpactEmpty">Edit one or more fields in the template to preview the overwrite impact.</div>
-              <div class="bf-impact-list" id="bfImpactList"></div>
             </section>
 
             <div class="bfp-editor-stack">
@@ -5923,24 +6173,25 @@
           </div><!-- /bfp-editor-pane -->
 
           <aside class="bfp-side-pane">
-            <section class="bfp-side-card">
-              <div class="bfp-side-head">
-                <div>
-                  <div class="bfp-zone-kicker">Batch Scope</div>
-                  <div class="bfp-zone-title">Selected products</div>
-                  <div class="bfp-zone-sub">Right side answers who will receive the batch template. Click one product to inspect the source data before apply.</div>
+            <div class="bfp-side-sticky">
+              <section class="bfp-side-card">
+                <div class="bfp-side-head">
+                  <div>
+                    <div class="bfp-zone-kicker">Selected Products</div>
+                    <div class="bfp-zone-title">Batch scope</div>
+                    <div class="bfp-zone-sub">Right side answers who will receive the batch template. Click one product to inspect the original data before apply.</div>
+                  </div>
+                  <span class="cnt" id="bfPrevCnt">0</span>
                 </div>
-                <span class="cnt" id="bfPrevCnt">0</span>
-              </div>
-              <div class="bfp-chips" id="bfChips"></div>
-              <div id="bfPrevList"></div>
-            </section>
+                <div class="bfp-chips" id="bfChips"></div>
+                <div id="bfPrevList"></div>
+              </section>
 
-            <section class="bfp-side-card">
-              <div class="bfp-zone-kicker">Supplier Snapshot</div>
-              <div class="bfp-zone-title">Original data for selected product</div>
-              <div class="bfp-zone-sub">Comparison only. Use this area to confirm the supplier-submitted baseline before applying bulk changes.</div>
-              <div class="quick-panel" id="quickPanel" aria-live="polite">
+              <section class="bfp-side-card">
+                <div class="bfp-zone-kicker">Supplier Snapshot</div>
+                <div class="bfp-zone-title">Original data for selected product</div>
+                <div class="bfp-zone-sub">Comparison only. Use this area to confirm the supplier-submitted baseline before applying bulk changes.</div>
+                <div class="quick-panel" id="quickPanel" aria-live="polite">
                 <div class="qp-head">
                   <div class="qp-eyebrow">Supplier Snapshot</div>
                   <div class="qp-name" id="qpName">No product selected</div>
@@ -6006,8 +6257,9 @@
                     </table>
                   </details>
                 </div>
-              </div>
-            </section>
+                </div>
+              </section>
+            </div>
           </aside>
         </div><!-- /bfp-form -->
       </div><!-- /bfp-body -->
@@ -7825,11 +8077,17 @@
           var newVal = state.template[field];
           var changed = oldVal !== newVal;
           return '<div class="bf-impact-row ' + (changed ? 'change' : 'same') + '">'
-            + '<div class="bf-impact-field">' + esc(field) + '</div>'
+            + '<div class="bf-impact-field">' + esc(_fieldUiLabel(field)) + '</div>'
             + '<div class="bf-impact-values">'
+            + '<div class="bf-impact-col before">'
+            + '<div class="bf-impact-cap">Current</div>'
             + '<div class="bf-impact-val">' + _formatBatchImpactValueHtml(oldVal) + '</div>'
+            + '</div>'
             + '<div class="bf-impact-arrow">→</div>'
+            + '<div class="bf-impact-col after">'
+            + '<div class="bf-impact-cap">Apply</div>'
             + '<div class="bf-impact-val">' + _formatBatchImpactValueHtml(newVal) + '</div>'
+            + '</div>'
             + '</div>'
             + '<div class="bf-impact-badge">' + (changed ? 'Overwrite' : 'Same value') + '</div>'
             + '</div>';
@@ -8428,12 +8686,20 @@
           var supplier = row['Supplier Name'] || 'No supplier';
           var brand = row['Brand Name'] || 'No brand';
           var statusShort = aCnt ? (willChange ? 'Will update' : 'Already same') : 'Waiting for template';
+          var currentStatus = row['Status'] || 'No status';
+          var subCategory = row['Sub Category'] || 'No sub category';
           html += '<div class="prev-item' + (aCnt ? ' has-fields' : '') + (willChange ? ' will-change' : ' no-change') + (isActive ? ' active-preview' : '') + '" data-rn="' + rnInt + '" onclick="App.selectBatchPreviewProduct(' + rnInt + ')">';
-          html += '<div class="prev-name">' + esc(productName.slice(0, 48)) + '</div>';
-          html += '<div class="prev-tick">Ticket: ' + esc(ticket) + '</div>';
-          html += '<div class="prev-tick">Supplier: ' + esc(supplier.slice(0, 44)) + '</div>';
-          html += '<div class="prev-tick">Brand: ' + esc(brand.slice(0, 32)) + '</div>';
-          html += '<div class="prev-tick">' + esc(statusShort + ' · ' + (row['Status'] || 'No status')) + '</div>';
+          html += '<div class="prev-item-head">';
+          html += '<div class="prev-name">' + esc(productName.slice(0, 56)) + '</div>';
+          html += '<div class="prev-state">' + esc(statusShort) + '</div>';
+          html += '</div>';
+          html += '<div class="prev-meta-grid">';
+          html += '<div class="prev-meta"><span>Ticket</span><strong>' + esc(ticket) + '</strong></div>';
+          html += '<div class="prev-meta"><span>Supplier</span><strong>' + esc(supplier.slice(0, 52)) + '</strong></div>';
+          html += '<div class="prev-meta"><span>Brand</span><strong>' + esc(brand.slice(0, 40)) + '</strong></div>';
+          html += '<div class="prev-meta"><span>Status</span><strong>' + esc(currentStatus) + '</strong></div>';
+          html += '</div>';
+          html += '<div class="prev-foot">' + esc('Sub Category · ' + subCategory) + '</div>';
           html += '</div>';
           shown++;
         });
