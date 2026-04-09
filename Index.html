@@ -3736,22 +3736,6 @@
       background: #f3f6fb;
     }
 
-    .dw-shell {
-      flex: 1;
-      min-height: 0;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 320px;
-      gap: 18px;
-    }
-
-    .dw-main {
-      min-width: 0;
-      min-height: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
     .s2-tab-nav {
       padding: 8px;
       border: 1px solid var(--border);
@@ -4003,9 +3987,6 @@
         min-width: 320px;
       }
 
-      .dw-shell {
-        grid-template-columns: minmax(0, 1fr) 290px;
-      }
     }
 
     @media (max-width: 1240px) {
@@ -4024,7 +4005,6 @@
         min-width: 0;
       }
 
-      .dw-shell,
       .dw-uom-shell,
       .s2-live-block {
         grid-template-columns: 1fr;
@@ -4036,7 +4016,6 @@
     }
 
     /* ── Live Overview Command Center ── */
-    .dwov-kicker,
     .bfw-kicker {
       font: 700 10px var(--mono);
       letter-spacing: .14em;
@@ -4044,7 +4023,6 @@
       color: var(--text4);
     }
 
-    .dwov-ready-state,
     .bfw-ready-state {
       display: inline-flex;
       align-items: center;
@@ -4076,101 +4054,6 @@
       color: #c2410c;
     }
 
-    .dw-shell {
-      grid-template-columns: 1fr;
-      gap: 16px;
-    }
-
-    .dw-main {
-      gap: 14px;
-    }
-
-    .dw-live-overview {
-      padding: 18px;
-      border-radius: 22px;
-      border: 1px solid var(--border);
-      background: #fff;
-      box-shadow: var(--sh);
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .dwov-head {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .dwov-title-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 16px;
-    }
-
-    .dwov-title-wrap {
-      min-width: 0;
-      flex: 1;
-    }
-
-    .dwov-title {
-      font: 700 28px/1.06 var(--font);
-      color: #0f172a;
-      word-break: break-word;
-    }
-
-    .dwov-primary-meta {
-      margin-top: 12px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .dwov-status {
-      min-height: 26px;
-      display: inline-flex;
-      align-items: center;
-    }
-
-    .dwov-inline-fact {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      min-width: 0;
-      padding: 5px 10px;
-      border-radius: 999px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      font-size: 12px;
-      line-height: 1.4;
-      color: var(--text2);
-    }
-
-    .dwov-inline-fact span {
-      color: var(--text3);
-      white-space: nowrap;
-    }
-
-    .dwov-inline-fact strong {
-      color: var(--text);
-      font-weight: 700;
-      word-break: break-word;
-    }
-
-    .dwov-ready-panel {
-      min-width: 260px;
-      max-width: 320px;
-      padding: 14px 16px;
-      border-radius: 18px;
-      border: 1px solid #dbe3ee;
-      background: linear-gradient(180deg, #f8fbff 0%, #fff 100%);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
     .dwov-ready-label {
       font: 700 10px var(--mono);
       letter-spacing: .12em;
@@ -4178,49 +4061,6 @@
       color: var(--text4);
     }
 
-    .dwov-ready-note {
-      font-size: 12px;
-      line-height: 1.5;
-      color: var(--text3);
-    }
-
-    .dwov-metrics {
-      display: grid;
-      grid-template-columns: repeat(6, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .dwov-metric {
-      padding: 12px 14px;
-      border-radius: 16px;
-      border: 1px solid #e2e8f0;
-      background: #f8fafc;
-      min-width: 0;
-    }
-
-    .dwov-metric .lbl {
-      display: block;
-      font: 700 9px var(--mono);
-      letter-spacing: .09em;
-      text-transform: uppercase;
-      color: var(--text4);
-    }
-
-    .dwov-metric strong {
-      display: block;
-      margin-top: 7px;
-      font: 700 18px/1.12 var(--font);
-      color: var(--text);
-      word-break: break-word;
-    }
-
-    .dwov-grid {
-      display: grid;
-      grid-template-columns: minmax(0, .95fr) minmax(0, 1.15fr) minmax(0, .9fr);
-      gap: 14px;
-    }
-
-    .dwov-card,
     .bfw-card {
       padding: 16px;
       border-radius: 18px;
@@ -4229,7 +4069,6 @@
       min-width: 0;
     }
 
-    .dwov-card-head,
     .bfw-card-head {
       display: flex;
       justify-content: space-between;
@@ -4238,20 +4077,11 @@
       margin-bottom: 12px;
     }
 
-    .dwov-card-title,
     .bfw-card-title {
       font: 700 12px/1.3 var(--font);
       color: #0f172a;
     }
 
-    .dwov-card-sub {
-      margin-top: 4px;
-      font-size: 11px;
-      line-height: 1.45;
-      color: var(--text3);
-    }
-
-    .dwov-chip-list,
     .bfw-chip-list {
       display: flex;
       flex-wrap: wrap;
@@ -4260,7 +4090,6 @@
       align-items: flex-start;
     }
 
-    .dwov-chip,
     .bfw-chip {
       display: inline-flex;
       align-items: center;
@@ -4274,7 +4103,6 @@
       max-width: 100%;
     }
 
-    .dwov-chip.is-neutral,
     .bfw-chip.is-neutral {
       background: #f8fafc;
       border-color: #cbd5e1;
@@ -4282,7 +4110,6 @@
     }
 
     .dwov-summary-list,
-    .dwov-warning-list,
     .bfw-warning-list {
       display: flex;
       flex-direction: column;
@@ -4291,7 +4118,6 @@
     }
 
     .dwov-summary-item,
-    .dwov-warning-item,
     .bfw-warning-item {
       padding: 10px 12px;
       border-radius: 14px;
@@ -4314,7 +4140,6 @@
       word-break: break-word;
     }
 
-    .dwov-warning-item,
     .bfw-warning-item {
       border-color: #fed7aa;
       background: #fff7ed;
@@ -4484,18 +4309,12 @@
     }
 
     @media (max-width: 1480px) {
-      .dwov-metrics {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-
-      .dwov-grid,
       .bfw-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
 
     @media (max-width: 1180px) {
-      .dwov-title-row,
       .bfw-title-row,
       .bfw-head,
       .bfp-form {
@@ -4503,13 +4322,6 @@
         flex-direction: column;
       }
 
-      .dwov-ready-panel {
-        min-width: 0;
-        max-width: none;
-        width: 100%;
-      }
-
-      .dwov-grid,
       .bfw-grid,
       .dw-uom-shell,
       .s2-live-block {
@@ -4518,10 +4330,6 @@
     }
 
     @media (max-width: 900px) {
-      .dwov-metrics {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
       .bfp-body,
       .s2-workflow {
         padding: 12px;
@@ -4529,16 +4337,8 @@
     }
 
     @media (max-width: 640px) {
-      .dwov-title {
-        font-size: 22px;
-      }
-
       .bfw-title {
         font-size: 20px;
-      }
-
-      .dwov-metrics {
-        grid-template-columns: 1fr;
       }
     }
 
@@ -4549,7 +4349,6 @@
       color: #4338ca;
     }
 
-    .dw-live-overview,
     .bfw-overview {
       padding: 20px;
       border-radius: 24px;
@@ -4559,7 +4358,6 @@
       gap: 18px;
     }
 
-    .dwov-top-grid,
     .bfw-top-grid {
       display: grid;
       grid-template-columns: minmax(0, 1.35fr) minmax(280px, .95fr);
@@ -4567,8 +4365,6 @@
       align-items: stretch;
     }
 
-    .dwov-primary-panel,
-    .dwov-readiness-panel,
     .bfw-primary-panel,
     .bfw-readiness-panel {
       min-width: 0;
@@ -4578,81 +4374,19 @@
       background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
     }
 
-    .dwov-primary-panel,
-    .dwov-readiness-panel,
     .bfw-primary-panel,
-    .bfw-readiness-panel,
-    .dwov-side-stack {
+    .bfw-readiness-panel {
       display: flex;
       flex-direction: column;
       gap: 14px;
     }
 
-    .dwov-title-wrap {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      min-width: 0;
-    }
-
-    .dwov-primary-meta {
-      margin-top: 0;
-      gap: 8px;
-    }
-
-    .dwov-section-strip {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      padding-top: 2px;
-    }
-
-    .dwov-section-strip-label,
-    .dwov-next-focus-label,
     .s2-pane-status-label {
       font: 700 10px var(--mono);
       letter-spacing: .12em;
       text-transform: uppercase;
       color: var(--text4);
     }
-
-    .dwov-next-focus {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      padding-top: 4px;
-    }
-
-    .dwov-focus-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: fit-content;
-      min-height: 40px;
-      padding: 0 14px;
-      border-radius: 12px;
-      border: 1px solid #bfdbfe;
-      background: #eff6ff;
-      color: #1d4ed8;
-      font: 700 12px var(--font);
-      cursor: pointer;
-      transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
-    }
-
-    .dwov-focus-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 18px rgba(37, 99, 235, .14);
-      border-color: #93c5fd;
-    }
-
-    .dwov-summary-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1.08fr) minmax(320px, .92fr);
-      gap: 16px;
-      align-items: start;
-    }
-
-    .dwov-panel,
     .bfw-card {
       min-width: 0;
       padding: 16px;
@@ -4661,86 +4395,9 @@
       background: #f8fafc;
     }
 
-    .dwov-card-head,
     .bfw-card-head {
       margin-bottom: 12px;
     }
-
-    .dwov-step-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .dwov-step-row {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-      width: 100%;
-      padding: 12px 14px;
-      border-radius: 16px;
-      border: 1px solid #dbe3ee;
-      background: #fff;
-      color: inherit;
-      text-align: left;
-      cursor: pointer;
-      transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease, background .16s ease;
-    }
-
-    .dwov-step-row:hover {
-      transform: translateY(-1px);
-      border-color: #bfdbfe;
-      box-shadow: 0 10px 20px rgba(15, 23, 42, .06);
-    }
-
-    .dwov-step-row.is-active {
-      border-color: #93c5fd;
-      background: #eff6ff;
-      box-shadow: 0 0 0 1px rgba(37, 99, 235, .12);
-    }
-
-    .dwov-step-row-main {
-      display: flex;
-      gap: 12px;
-      min-width: 0;
-      flex: 1;
-    }
-
-    .dwov-step-row-index {
-      width: 30px;
-      height: 30px;
-      border-radius: 999px;
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      color: #1d4ed8;
-      font: 700 11px var(--mono);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .dwov-step-row-copy {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      min-width: 0;
-    }
-
-    .dwov-step-row-title {
-      font: 700 13px/1.35 var(--font);
-      color: #0f172a;
-    }
-
-    .dwov-step-row-meta,
-    .dwov-step-row-note {
-      font-size: 12px;
-      line-height: 1.45;
-      color: var(--text3);
-    }
-
-    .dwov-step-row-state,
     .s2-tab-status,
     .s2-pane-status-chip {
       display: inline-flex;
@@ -5214,7 +4871,6 @@
       margin-top: 0;
     }
 
-    .dwov-warning-list,
     .dwov-summary-list,
     .bfw-warning-list {
       min-height: 0;
@@ -5639,8 +5295,6 @@
     }
 
     @media (max-width: 1360px) {
-      .dwov-top-grid,
-      .dwov-summary-grid,
       .bfw-top-grid,
       .bfw-grid,
       .bfp-scope-stack,
@@ -5684,7 +5338,6 @@
     }
 
     @media (max-width: 1120px) {
-      .dwov-metrics,
       .bfw-metrics,
       .s2-tab-nav,
       .s2-form-grid.cols-3,
@@ -5722,7 +5375,6 @@
     }
 
     @media (max-width: 760px) {
-      .dwov-metrics,
       .bfw-metrics,
       .s2-tab-nav,
       .s2-form-grid,
@@ -5738,7 +5390,6 @@
         min-height: 0;
       }
 
-      .dwov-step-row,
       .s2-pane-status-top {
         flex-direction: column;
         align-items: flex-start;
@@ -6128,22 +5779,6 @@
                 <div class="bfc-inp"><input type="text" class="bfp-fc" id="bf_DisplayArea" placeholder="POG / display area"
                     oninput="App.bfChange('DisplayArea',this.value)"></div>
               </div>
-              <div class="bfc" id="bfc_LogisticS">
-                <div class="bfc-lbl">Logistics Group South <span class="required">*</span></div>
-                <div class="bfc-inp">
-                  <select class="bfp-fc" id="bf_LogisticS" onchange="App.bfChange('LogisticS',this.value)">
-                    <option value="">— Trống —</option>
-                  </select>
-                </div>
-              </div>
-              <div class="bfc" id="bfc_LogisticN">
-                <div class="bfc-lbl">Logistics Group North <span class="required">*</span></div>
-                <div class="bfc-inp">
-                  <select class="bfp-fc" id="bf_LogisticN" onchange="App.bfChange('LogisticN',this.value)">
-                    <option value="">— Trống —</option>
-                  </select>
-                </div>
-              </div>
               <div class="bfc" id="bfc_InventoryType">
                 <div class="bfc-lbl">Inventory Type <span class="required">*</span></div>
                 <div class="bfc-inp"><select class="bfp-fc" id="bf_InventoryType"
@@ -6160,7 +5795,27 @@
               </div>
               <div class="bfc" id="bfc_Pattern">
                  <div class="bfc-lbl">Pattern <span class="required">*</span></div>
-                 <div class="bfc-inp"><input type="text" class="bfp-fc" id="bf_Pattern" placeholder="Handling pattern" oninput="App.bfChange('Pattern',this.value)"></div>
+                 <div class="bfc-inp">
+                   <select class="bfp-fc" id="bf_Pattern" onchange="App.bfChange('Pattern',this.value)">
+                     <option value="">— Chọn —</option>
+                   </select>
+                 </div>
+              </div>
+              <div class="bfc" id="bfc_LogisticS" hidden>
+                <div class="bfc-lbl">Logistics Group South <span class="required">*</span></div>
+                <div class="bfc-inp">
+                  <select class="bfp-fc" id="bf_LogisticS" onchange="App.bfChange('LogisticS',this.value)">
+                    <option value="">— Trống —</option>
+                  </select>
+                </div>
+              </div>
+              <div class="bfc" id="bfc_LogisticN" hidden>
+                <div class="bfc-lbl">Logistics Group North <span class="required">*</span></div>
+                <div class="bfc-inp">
+                  <select class="bfp-fc" id="bf_LogisticN" onchange="App.bfChange('LogisticN',this.value)">
+                    <option value="">— Trống —</option>
+                  </select>
+                </div>
               </div>
               <div class="bfc full" id="bfc_SSVNote">
                   <div class="bfc-lbl">SSV Note Product</div>
@@ -6773,17 +6428,17 @@
             </div>
 
             <div class="s2-form-grid cols-3">
-              <div class="mc" id="mc_logs">
+              <div class="mc" id="mc_pattern">
+                <div class="mc-label">Pattern <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
+                <div class="mc-body"><div class="sdrop ef" id="sd_Pattern"></div></div>
+              </div>
+              <div class="mc" id="mc_logs" hidden>
                 <div class="mc-label">Logistics Group South <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
                 <div class="mc-body"><div class="sdrop searchable ef" id="sd_Logistics_South"></div></div>
               </div>
-              <div class="mc" id="mc_logn">
+              <div class="mc" id="mc_logn" hidden>
                 <div class="mc-label">Logistics Group North <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
                 <div class="mc-body"><div class="sdrop searchable ef" id="sd_Logistics_North"></div></div>
-              </div>
-              <div class="mc" id="mc_pattern">
-                <div class="mc-label">Pattern <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
-                <div class="mc-body"><input type="text" id="mf_Pattern" placeholder="Handling pattern"></div>
               </div>
             </div>
 
@@ -6887,69 +6542,6 @@
 
     <aside class="s2-check-pane" aria-label="Live check panel">
       <div class="s2-check-sticky">
-        <section class="s2-check-card s2-check-context">
-          <div class="s2-check-kicker">Live QA Rail</div>
-          <div class="s2-check-name" id="dwCtxName">—</div>
-          <div class="s2-check-topline">
-            <div class="dwov-status" id="dwCtxStatus">—</div>
-            <div class="s2-check-fact"><span>Ticket</span><strong id="dwCtxTicket">—</strong></div>
-          </div>
-          <div class="s2-check-context-grid">
-            <div class="s2-check-fact"><span>Supplier</span><strong id="dwCtxSupplier">—</strong></div>
-            <div class="s2-check-fact"><span>Brand</span><strong id="dwCtxBrand">—</strong></div>
-            <div class="s2-check-fact"><span>Zone</span><strong id="dwCtxZone">—</strong></div>
-            <div class="s2-check-fact"><span>Sub Category</span><strong id="dwCtxSubcat">—</strong></div>
-            <div class="s2-check-fact"><span>Present Date</span><strong id="dwCtxPresent">—</strong></div>
-          </div>
-          <div class="s2-check-readiness">
-            <div class="dwov-ready-label">Save readiness</div>
-            <div class="dwov-ready-state state-idle" id="dwSaveState">Ready to start</div>
-            <div class="dwov-ready-note" id="dwReadyNote">Open a section and begin editing.</div>
-          </div>
-          <div class="s2-check-metrics">
-            <div class="s2-check-metric">
-              <span>Pending changes</span>
-              <strong id="dwPendingCount">0</strong>
-            </div>
-            <div class="s2-check-metric">
-              <span>Required complete</span>
-              <strong id="dwRequiredCount">0/0</strong>
-            </div>
-            <div class="s2-check-metric">
-              <span>Warnings</span>
-              <strong id="dwWarningCount">0</strong>
-            </div>
-          </div>
-          <div class="s2-check-section-strip">
-            <div class="s2-check-section-label">Touched sections</div>
-            <div class="dwov-chip-list" id="dwTouchedSections"></div>
-          </div>
-          <div class="dwov-next-focus">
-            <span class="dwov-next-focus-label">Next focus</span>
-            <button type="button" class="dwov-focus-btn" id="dwNextFocusBtn" onclick="App.focusNextDetailStep()">Open Identity</button>
-          </div>
-        </section>
-
-        <section class="s2-check-card">
-          <div class="s2-check-card-head">
-            <div>
-              <div class="s2-check-card-title">Step workflow</div>
-              <div class="s2-check-card-sub">See immediately which step is clean, which step is blocked, and where to go next.</div>
-            </div>
-          </div>
-          <div class="dwov-step-list" id="dwStepSummaryList"></div>
-        </section>
-
-        <section class="s2-check-card">
-          <div class="s2-check-card-head">
-            <div>
-              <div class="s2-check-card-title">Missing fields &amp; warnings</div>
-              <div class="s2-check-card-sub">Anything that weakens save confidence stays visible while you edit.</div>
-            </div>
-          </div>
-          <div class="dwov-warning-list" id="dwWarningList"></div>
-        </section>
-
         <section class="s2-check-card">
           <div class="s2-check-card-head">
             <div>
@@ -7095,6 +6687,66 @@
         if (m2 && m2[1]) return m2[1].trim();
         return s;
       }
+      var PATTERN_FIELD = 'Pattern';
+      var LOGISTICS_FIELD_SOUTH = 'Logistics Group South';
+      var LOGISTICS_FIELD_NORTH = 'Logistics Group North';
+      var PATTERN_OPTIONS = ['Miền Nam', 'Miền Bắc', 'Hai miền'];
+
+      function _stripVietnameseTone(value) {
+        var txt = String(value == null ? '' : value).toLowerCase().trim();
+        if (txt && txt.normalize) txt = txt.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        return txt.replace(/đ/g, 'd');
+      }
+
+      function _normalizePatternToken(value) {
+        var raw = _stripVietnameseTone(value).replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
+        if (!raw) return '';
+        var hasSouth = raw.indexOf('mien nam') >= 0 || raw.indexOf('south') >= 0 || /(^| )nam( |$)/.test(raw);
+        var hasNorth = raw.indexOf('mien bac') >= 0 || raw.indexOf('north') >= 0 || /(^| )bac( |$)/.test(raw);
+        if (raw.indexOf('hai mien') >= 0 || raw.indexOf('ca hai') >= 0 || raw.indexOf('ca 2') >= 0 || raw.indexOf('2 mien') >= 0 || raw.indexOf('both') >= 0 || (hasSouth && hasNorth)) return 'both';
+        if (hasSouth) return 'south';
+        if (hasNorth) return 'north';
+        return '';
+      }
+
+      function _getCanonicalPatternValue(value) {
+        var token = _normalizePatternToken(value);
+        if (token === 'south') return 'Miền Nam';
+        if (token === 'north') return 'Miền Bắc';
+        if (token === 'both') return 'Hai miền';
+        var raw = String(value == null ? '' : value).trim();
+        return raw || '';
+      }
+
+      function _getPatternLogisticsRequirement(patternValue) {
+        var token = _normalizePatternToken(patternValue);
+        return {
+          token: token,
+          south: token === 'south' || token === 'both',
+          north: token === 'north' || token === 'both'
+        };
+      }
+
+      function _isConditionalLogisticsField(field) {
+        return field === LOGISTICS_FIELD_SOUTH || field === LOGISTICS_FIELD_NORTH;
+      }
+
+      function _isFieldActiveForPattern(field, values) {
+        if (!_isConditionalLogisticsField(field)) return true;
+        var req = _getPatternLogisticsRequirement(values && values[PATTERN_FIELD]);
+        if (field === LOGISTICS_FIELD_SOUTH) return req.south;
+        if (field === LOGISTICS_FIELD_NORTH) return req.north;
+        return true;
+      }
+
+      function _getRequiredProductFieldsForValues(values) {
+        var fields = REQUIRED_PRODUCT_FIELDS.slice();
+        var req = _getPatternLogisticsRequirement(values && values[PATTERN_FIELD]);
+        if (req.south) fields.push(LOGISTICS_FIELD_SOUTH);
+        if (req.north) fields.push(LOGISTICS_FIELD_NORTH);
+        return fields;
+      }
+
       function _normalizeFieldValue(field, value) {
         var v = value === null || value === undefined ? '' : String(value);
         if (field === 'Retail Price (+VAT) in Tier 6') {
@@ -7108,6 +6760,9 @@
         }
         if (field === 'SAME PRICE PRODUCT') {
           v = v.toUpperCase();
+        }
+        if (field === PATTERN_FIELD) {
+          v = _getCanonicalPatternValue(v);
         }
         return v;
       }
@@ -7388,7 +7043,7 @@
         if (!rn) return;
         openModal(rn);
         setDetailStep(2);
-        setStep2Tab(parseInt(S.nextFocusStep2, 10) || 1);
+        setStep2Tab(parseInt(S.step2Tab, 10) || 1);
       }
 
       function goSection(section) {
@@ -7647,8 +7302,6 @@
         'Competitors (Retail Price) <Tên đối thủ: Giá tiền>',
         'Product description (Dưới 250 Kí tự)',
         'Pattern',
-        'Logistics Group South',
-        'Logistics Group North',
         'FC UPSD of NEW SKU',
         'Display area (POG CONCEPT) Bắt Buộc',
         'Inventory Type',
@@ -7926,6 +7579,7 @@
 
       function _setBatchFieldValue(key, value, markDirty) {
         var el = document.getElementById('bf_' + key);
+        if (key === 'Pattern') value = _normalizeFieldValue(PATTERN_FIELD, value);
         if (el) el.value = value || '';
         _setBfCardVisual(key, !!markDirty);
       }
@@ -7947,7 +7601,37 @@
       }
 
       function _getBatchDirtyKeys() {
-        return Object.keys(BF_DIRTY).filter(function (k) { return BF_DIRTY[k]; });
+        var values = _collectCurrentBatchValues();
+        return Object.keys(BF_DIRTY).filter(function (k) {
+          if (!BF_DIRTY[k]) return false;
+          var field = BF_MAP[k];
+          return _isFieldActiveForPattern(field, values);
+        });
+      }
+
+      function _collectCurrentBatchValues() {
+        var values = {};
+        Object.keys(BF_MAP).forEach(function (key) {
+          var field = BF_MAP[key];
+          values[field] = _normalizeFieldValue(field, _batchPreviewValue(key));
+        });
+        return values;
+      }
+
+      function _setBatchConditionalFieldState(key, visible, required) {
+        var card = document.getElementById('bfc_' + key);
+        if (!card) return;
+        card.hidden = !visible;
+        var mark = card.querySelector('.required');
+        if (mark) mark.style.display = required ? '' : 'none';
+      }
+
+      function _syncBatchPatternDependencies(values) {
+        var current = values || _collectCurrentBatchValues();
+        var req = _getPatternLogisticsRequirement(current[PATTERN_FIELD]);
+        _setBatchConditionalFieldState('LogisticS', req.south, req.south);
+        _setBatchConditionalFieldState('LogisticN', req.north, req.north);
+        return current;
       }
 
       function _buildBatchTemplate(dirtyKeys) {
@@ -7974,6 +7658,7 @@
         var dirtyKeys = _getBatchDirtyKeys();
         var selRns = Object.keys(S.selected);
         var template = _buildBatchTemplate(dirtyKeys);
+        var currentValues = _collectCurrentBatchValues();
         var touchedSections = _sortReviewGroups(dirtyKeys.map(function (key) {
           return _getReviewGroupLabel(BF_MAP[key]);
         }).filter(function (value, idx, arr) {
@@ -7992,6 +7677,13 @@
           var field = BF_MAP[key];
           var val = template[field];
           if (_isRequiredProductField(field) && !_isFieldCompleteForReview(field, val)) {
+            warnings.push(_fieldUiLabel(field) + ' is required and cannot be blank.');
+          }
+        });
+        _getRequiredProductFieldsForValues(currentValues).forEach(function (field) {
+          if (!_isConditionalLogisticsField(field)) return;
+          if (dirtyKeys.indexOf('Pattern') < 0 && dirtyKeys.indexOf(BF_MAP_REV[field]) < 0) return;
+          if (!_isFieldCompleteForReview(field, currentValues[field])) {
             warnings.push(_fieldUiLabel(field) + ' is required and cannot be blank.');
           }
         });
@@ -8422,6 +8114,7 @@
           'bf_UsageSeg': 'PRIMARY USAGE SEGMENT', 'bf_StoreType': 'TARGET STORE TYPES',
           'bf_CustType': 'TARGET CUSTOMER STORE TYPES', 'bf_PreserveTemp': 'Preservation temperature',
           'bf_LogisticS': 'Logistics Group South', 'bf_LogisticN': 'Logistics Group North',
+          'bf_Pattern': 'Pattern',
           'bf_RefID': 'REFERENCE PRODUCT ID (Nếu không có điền NO)',
           'bf_SamePrice': 'SAME PRICE PRODUCT'
         };
@@ -8433,7 +8126,7 @@
             sel.options[0].textContent = 'Leave unchanged';
           }
           while (sel.options.length > 1) sel.remove(1);
-          var opts = getBfOpts(ddMap[id]);
+          var opts = ddMap[id] === PATTERN_FIELD ? PATTERN_OPTIONS.slice() : getBfOpts(ddMap[id]);
           if (id === 'bf_RefID' && (!opts || !opts.length) && S.mdProductIds.length) opts = S.mdProductIds;
           if (id === 'bf_SamePrice' && (!opts || !opts.length)) opts = ['TRUE', 'FALSE'];
           _prepareDropdownOptions(ddMap[id], opts).forEach(function (o) {
@@ -8443,6 +8136,7 @@
             opt.textContent = item.label;
             sel.appendChild(opt); 
           });
+          if (id === 'bf_Pattern') curVal = _normalizeFieldValue(PATTERN_FIELD, curVal);
           if(curVal) sel.value = curVal;
         });
       }
@@ -8532,7 +8226,7 @@
 
       function applyBatchFill() {
         if (!_ensureEditableAction()) return;
-        var dirtyKeys = Object.keys(BF_DIRTY).filter(function(k){ return BF_DIRTY[k]; });
+        var dirtyKeys = _getBatchDirtyKeys();
         if (dirtyKeys.length === 0) { toast('Bạn chưa thay đổi trường nào', 'warning'); return; }
         
         var selRns = Object.keys(S.selected);
@@ -8545,7 +8239,7 @@
           if (!el) return;
           template[field] = _normalizeFieldValue(field, el.value);
         });
-        var err = validate(template);
+        var err = validate(template, { values: _collectCurrentBatchValues(), changedFields: Object.keys(template) });
         if (err) { toast(err, 'error'); return; }
 
         var applied = 0, unchanged = 0;
@@ -8584,6 +8278,7 @@
       // Removed bfState, bfGetActive, bfToggleAcc as they are no longer needed or replaced
 
       function bfRefresh() {
+        _syncBatchPatternDependencies();
         var state = _collectBatchWorkspaceState();
         var dirtyKeys = state.dirtyKeys;
         var aCnt = dirtyKeys.length;
@@ -8823,6 +8518,7 @@
         'Preservation temperature': 'sd_Preservation_temperature',
         'Logistics Group South': 'sd_Logistics_South',
         'Logistics Group North': 'sd_Logistics_North',
+        'Pattern': 'sd_Pattern',
         'Inventory Type': 'sd_Inventory_Type',
         'SAME PRICE PRODUCT': 'sd_Same_Price_Product',
         'REFERENCE PRODUCT ID (Nếu không có điền NO)': 'sd_Ref_ID'
@@ -8887,6 +8583,7 @@
           'Inventory Type': 'Select Inventory Type',
           'Logistics Group South': 'Select Logistics Group South',
           'Logistics Group North': 'Select Logistics Group North',
+          'Pattern': 'Select Pattern',
           'SAME PRICE PRODUCT': 'Select Same Price Option',
           'REFERENCE PRODUCT ID (Nếu không có điền NO)': 'Select Reference Product ID (or NO)'
         };
@@ -9253,13 +8950,14 @@
           { id: 'sd_Preservation_temperature', field: 'Preservation temperature', s: false },
           { id: 'sd_Logistics_South', field: 'Logistics Group South', s: true },
           { id: 'sd_Logistics_North', field: 'Logistics Group North', s: true },
+          { id: 'sd_Pattern', field: 'Pattern', s: false },
           { id: 'sd_Inventory_Type', field: 'Inventory Type', s: false },
           { id: 'sd_Same_Price_Product', field: 'SAME PRICE PRODUCT', s: false },
           { id: 'sd_Ref_ID', field: 'REFERENCE PRODUCT ID (Nếu không có điền NO)', s: true }
         ];
         dds.forEach(function (dd) {
           var c = document.getElementById(dd.id); if (!c) return;
-          var ddOpts = getDropdownOptions(dd.field);
+          var ddOpts = dd.field === PATTERN_FIELD ? PATTERN_OPTIONS.slice() : getDropdownOptions(dd.field);
           if ((!ddOpts || !ddOpts.length) && (dd.id === 'sd_Premium_products' || dd.id === 'sd_Branded')) {
             ddOpts = getBfOpts(dd.field);
           }
@@ -9268,6 +8966,7 @@
           if (dd.id === 'sd_Ref_ID' && (!ddOpts || !ddOpts.length) && S.mdProductOptions.length) ddOpts = S.mdProductOptions;
           c.innerHTML = createDropdownHTML(dd.field, ddOpts, dd.s);
           var cv = pending[dd.field] !== undefined ? pending[dd.field] : (row[dd.field] || '');
+          if (dd.field === PATTERN_FIELD) cv = _normalizeFieldValue(PATTERN_FIELD, cv);
           if (dd.id === 'sd_Same_Price_Product' && !cv) cv = row['Same Price Product'] || '';
           initDropdown(dd.id, dd.field, cv);
           if (dd.id === 'sd_Ref_ID' && c.dataset.refBound !== '1') {
@@ -9275,6 +8974,13 @@
             c.addEventListener('change', function () { loadReferenceProductDetail(getDropdownValue('sd_Ref_ID')); });
           }
         });
+        var patternC = document.getElementById('sd_Pattern');
+        if (patternC && patternC.dataset.patternBound !== '1') {
+          patternC.dataset.patternBound = '1';
+          patternC.addEventListener('change', function () {
+            _syncDetailPatternDependencies();
+          });
+        }
         var scC = document.getElementById('sd_Sub_Category');
         if (scC) {
           if (scC.dataset.subcateBound !== '1') {
@@ -9290,6 +8996,7 @@
           updateSubcateBench(curSc);
         }
         loadReferenceProductDetail(getDropdownValue('sd_Ref_ID'));
+        _syncDetailPatternDependencies();
       }
       function updateSubcateBench(sc) {
         var b = _resolveSubcateBench(sc, null);
@@ -9541,6 +9248,30 @@
         return _getDetailFieldValueFromUi_(field);
       }
 
+      function _collectCurrentDetailValues() {
+        var values = {};
+        for (var field in FIELD_MAP) {
+          values[field] = _normalizeFieldValue(field, _getFieldInputValue(field));
+        }
+        return values;
+      }
+
+      function _setDetailConditionalFieldState(cardId, visible, required) {
+        var card = document.getElementById(cardId);
+        if (!card) return;
+        card.hidden = !visible;
+        var mark = card.querySelector('.mc-rq');
+        if (mark) mark.style.display = required ? '' : 'none';
+      }
+
+      function _syncDetailPatternDependencies(values) {
+        var current = values || _collectCurrentDetailValues();
+        var req = _getPatternLogisticsRequirement(current[PATTERN_FIELD]);
+        _setDetailConditionalFieldState('mc_logs', req.south, req.south);
+        _setDetailConditionalFieldState('mc_logn', req.north, req.north);
+        return current;
+      }
+
       function _getRowFieldValue(row, field) {
         if (!row) return '';
         if (field === 'UOM Information') {
@@ -9553,12 +9284,12 @@
 
       function _collectStep2Diffs(row) {
         var diffs = [];
-        var values = {};
+        var values = _collectCurrentDetailValues();
         for (var field in FIELD_MAP) {
           var oldNorm = _normalizeFieldValue(field, _getRowFieldValue(row, field));
           var newRaw = _getFieldInputValue(field);
-          var newNorm = _normalizeFieldValue(field, newRaw);
-          values[field] = newNorm;
+          var newNorm = values[field];
+          if (!_isFieldActiveForPattern(field, values)) continue;
           if (newNorm !== oldNorm) {
             diffs.push({ field: field, before: row[field], after: newRaw });
           }
@@ -9635,7 +9366,7 @@
         if (picName.length > 40) warnings.push('PIC Product Name exceeds 40 characters.');
         if (desc.length > 250) warnings.push('Product Description exceeds 250 characters.');
 
-        REQUIRED_PRODUCT_FIELDS.forEach(function (field) {
+        _getRequiredProductFieldsForValues(values).forEach(function (field) {
           if (!_isFieldCompleteForReview(field, values[field])) {
             warnings.push(_fieldUiLabel(field) + ' is missing.');
           }
@@ -9669,8 +9400,10 @@
         return (MG_FIELDS[step] || []).slice();
       }
 
-      function _getStep2RequiredFields(step) {
-        return _getStep2Fields(step).filter(function (field) { return _isRequiredProductField(field); });
+      function _getStep2RequiredFields(step, values) {
+        return _getStep2Fields(step).filter(function (field) {
+          return _getRequiredProductFieldsForValues(values).indexOf(field) >= 0;
+        });
       }
 
       function _getStep2Warnings(step, values) {
@@ -9697,7 +9430,7 @@
         var cfg = STEP2_CONFIG[step] || { title: 'Step ' + step, emptyHint: 'Continue working through this step.' };
         var fields = _getStep2Fields(step);
         var diffList = diffs.filter(function (item) { return fields.indexOf(item.field) >= 0; });
-        var requiredFields = _getStep2RequiredFields(step);
+        var requiredFields = _getStep2RequiredFields(step, values);
         var missingFields = requiredFields.filter(function (field) {
           return !_isFieldCompleteForReview(field, values[field]);
         });
@@ -9755,22 +9488,6 @@
         var states = [];
         for (var i = 1; i <= 3; i++) states.push(_buildStep2State(i, diffs, values));
         return states;
-      }
-
-      function _getStep2NextFocus(stepStates, totalDiffs) {
-        var list = stepStates || [];
-        for (var i = 0; i < list.length; i++) {
-          if (list[i].tone === 'warn') return list[i];
-        }
-        for (var j = 0; j < list.length; j++) {
-          if (list[j].tone === 'idle') return list[j];
-        }
-        if (totalDiffs > 0) {
-          for (var k = 0; k < list.length; k++) {
-            if (list[k].changesCount) return list[k];
-          }
-        }
-        return list.length ? list[0] : null;
       }
 
       function _stepAlertItems(state) {
@@ -9835,62 +9552,7 @@
         });
       }
 
-      function _renderDetailOverview(row, diffs, values, warnings, reqOk, reqTotal, stepStates) {
-        if (!row) return;
-        var name = _compactReviewText(values['PIC input Product Name (Dưới 40 kí tự)'] || row['Product Name'] || row['PIC input Product Name (Dưới 40 kí tự)']) || 'Unnamed Product';
-        setText('dwCtxName', name);
-        setText('dwCtxTicket', row['Ticket ID'] || '');
-        setText('dwCtxSupplier', row['Supplier Name'] || '');
-        setText('dwCtxBrand', row['Brand Name'] || '');
-        setText('dwCtxZone', row['Zone'] || '');
-        setText('dwCtxSubcat', values['Sub Category'] || row['Sub Category'] || '');
-        setText('dwCtxPresent', values['Present Date'] || row['Present Date'] || '');
-
-        var statusWrap = document.getElementById('dwCtxStatus');
-        if (statusWrap) statusWrap.innerHTML = pill(values['Status'] || row['Status'] || '');
-
-        var pendingCt = document.getElementById('dwPendingCount');
-        var reqCt = document.getElementById('dwRequiredCount');
-        var warnCt = document.getElementById('dwWarningCount');
-        if (pendingCt) pendingCt.textContent = String(diffs.length);
-        if (reqCt) reqCt.textContent = reqOk + '/' + reqTotal;
-        if (warnCt) warnCt.textContent = String(warnings.length);
-
-        var grouped = {};
-        diffs.forEach(function (d) {
-          var label = _getReviewGroupLabel(d.field);
-          if (!grouped[label]) grouped[label] = [];
-          grouped[label].push(d);
-        });
-
-        var touched = document.getElementById('dwTouchedSections');
-        if (touched) {
-          var groups = _sortReviewGroups(Object.keys(grouped));
-          touched.innerHTML = groups.length
-            ? groups.map(function (group) {
-                return '<span class="dwov-chip">' + esc(group) + ' · ' + grouped[group].length + '</span>';
-              }).join('')
-            : '<div class="dwov-chip is-neutral">Ready to start</div>';
-        }
-
-        var stepSummary = document.getElementById('dwStepSummaryList');
-        if (stepSummary) {
-          var activeStep = parseInt(S.step2Tab, 10) || 1;
-          stepSummary.innerHTML = (stepStates || []).map(function (state) {
-            return '<button type="button" class="dwov-step-row tone-' + esc(state.badgeTone) + (state.step === activeStep ? ' is-active' : '') + '" onclick="App.setStep2Tab(' + state.step + ')">'
-              + '<span class="dwov-step-row-main">'
-              + '<span class="dwov-step-row-index">' + state.step + '</span>'
-              + '<span class="dwov-step-row-copy">'
-              + '<span class="dwov-step-row-title">' + esc(state.title) + '</span>'
-              + '<span class="dwov-step-row-meta">' + esc(state.meta) + '</span>'
-              + '<span class="dwov-step-row-note">' + esc(state.hint) + '</span>'
-              + '</span>'
-              + '</span>'
-              + '<span class="dwov-step-row-state ' + _stepStateToneClass(state.tone) + '">' + esc(state.label) + '</span>'
-              + '</button>';
-          }).join('');
-        }
-
+      function _renderDetailChangeSummary(diffs) {
         var importantOrder = [
           'Status',
           'Present Date',
@@ -9926,37 +9588,6 @@
               }).join('')
             : '<div class="dwov-empty">No edits yet. Start with identity, positioning, or pricing.</div>';
         }
-
-        var warningBox = document.getElementById('dwWarningList');
-        if (warningBox) {
-          if (!warnings.length) {
-            warningBox.innerHTML = '<div class="dwov-ok">All required fields currently look complete.</div>';
-          } else if (!diffs.length) {
-            warningBox.innerHTML = '<div class="dwov-empty">' + (reqTotal - reqOk) + ' required field(s) still need input before save. The overview will keep tracking them live.</div>';
-          } else {
-            var shownWarnings = warnings.slice(0, 4).map(function (msg) {
-              return '<div class="dwov-warning-item">' + esc(msg) + '</div>';
-            }).join('');
-            if (warnings.length > 4) shownWarnings += '<div class="dwov-empty">+' + (warnings.length - 4) + ' more item(s) still need attention.</div>';
-            warningBox.innerHTML = shownWarnings;
-          }
-        }
-
-        var saveState = document.getElementById('dwSaveState');
-        var readyNote = document.getElementById('dwReadyNote');
-        var nextFocusBtn = document.getElementById('dwNextFocusBtn');
-        var nextFocus = _getStep2NextFocus(stepStates, diffs.length);
-        if (saveState) {
-          saveState.className = 'dwov-ready-state ' + (!diffs.length ? 'state-idle' : (warnings.length ? 'state-warn' : 'state-ready'));
-          saveState.textContent = !diffs.length ? 'Ready to start' : (warnings.length ? 'Needs attention' : 'Ready to save');
-        }
-        if (readyNote) {
-          if (!diffs.length) readyNote.textContent = warnings.length ? ((reqTotal - reqOk) + ' required field(s) still need input.') : 'No changes yet. Start with any section above.';
-          else if (warnings.length) readyNote.textContent = warnings.length + ' warning(s) need resolution before save.';
-          else readyNote.textContent = diffs.length + ' change(s) are ready to save.';
-        }
-        S.nextFocusStep2 = nextFocus ? nextFocus.step : 1;
-        if (nextFocusBtn) nextFocusBtn.textContent = nextFocus ? nextFocus.buttonLabel : 'Open Identity';
       }
 
       function renderStep2Review(row) {
@@ -9993,7 +9624,7 @@
           }).join('');
         }
 
-        var reqFields = REQUIRED_PRODUCT_FIELDS.slice();
+        var reqFields = _getRequiredProductFieldsForValues(values);
         var reqOk = 0;
         boxReq.innerHTML = reqFields.map(function (f) {
           var val = values[f] || '';
@@ -10014,7 +9645,7 @@
 
         var stepStates = _buildAllStep2States(diffs, values);
         _renderStep2WorkflowUi(stepStates);
-        _renderDetailOverview(row, diffs, values, warnings, reqOk, reqFields.length, stepStates);
+        _renderDetailChangeSummary(diffs);
       }
 
       function setStep2Tab(step) {
@@ -10054,13 +9685,6 @@
 
       function prevStep2Tab() { setStep2Tab((S.step2Tab || 1) - 1); }
       function nextStep2Tab() { setStep2Tab((S.step2Tab || 1) + 1); }
-      function focusNextDetailStep() {
-        if (!USER_CAN_EDIT) return;
-        var target = parseInt(S.nextFocusStep2, 10);
-        if (isNaN(target) || target < 1) target = 1;
-        setDetailStep(2);
-        setStep2Tab(target);
-      }
 
       function bindStep2TabKeyboard() {
         var nav = document.getElementById('s2TabNav');
@@ -10119,15 +9743,6 @@
         setText('st_pp', _fmtMoney(_pickRowValue(row, ['Purchase Price Excluded VAT', 'PURCHASE PRICE EXCLUDED VAT'])));
         setText('st_vat', _fmtVat(_pickRowValue(row, ['Inbound VAT', 'INBOUND VAT'])));
         setText('st_ssrp', _fmtMoney(_pickRowValue(row, ["Supplier's Suggested Retail Price", "SUPPLIER'S SUGGESTED RETAIL PRICE", 'Supplier’s Suggested Retail Price'])));
-        setText('dwCtxName', _pickRowValue(row, ['Product Name', 'PIC input Product Name (Dưới 40 kí tự)']));
-        setText('dwCtxTicket', _pickRowValue(row, ['Ticket ID']));
-        setText('dwCtxSupplier', _pickRowValue(row, ['Supplier Name']));
-        setText('dwCtxBrand', _pickRowValue(row, ['Brand Name']));
-        setText('dwCtxZone', _pickRowValue(row, ['Zone']));
-        setText('dwCtxSubcat', _pickRowValue(row, ['Sub Category']));
-        setText('dwCtxPresent', _pickRowValue(row, ['Present Date']));
-        var statusWrap = document.getElementById('dwCtxStatus');
-        if (statusWrap) statusWrap.innerHTML = pill(_pickRowValue(row, ['Status']));
 
         var rawUrl = _pickRowValue(row, ['URL Image', 'Url Image', 'URL IMAGE']);
         var previewUrl = '';
@@ -10259,11 +9874,15 @@
 
       function refreshDirtyState(row) {
         var total = 0;
+        var currentValues = _syncDetailPatternDependencies(_collectCurrentDetailValues());
         for (var field in FIELD_MAP) {
-          var ov = _normalizeFieldValue(field, _getRowFieldValue(row, field));
-          var nv = _getDetailFieldValueFromUi_(field);
-          nv = _normalizeFieldValue(field, nv);
-          var isDirty = nv !== ov;
+          var isActive = _isFieldActiveForPattern(field, currentValues);
+          var isDirty = false;
+          if (isActive) {
+            var ov = _normalizeFieldValue(field, _getRowFieldValue(row, field));
+            var nv = currentValues[field];
+            isDirty = nv !== ov;
+          }
           if (isDirty) total++;
           var mcId = MC_FIELD_MAP[field];
           if (mcId) { var mc = document.getElementById(mcId); if (mc) mc.classList.toggle('dirty', isDirty); }
@@ -10433,15 +10052,16 @@
         var rn = S.modalRow; if (!rn) return;
         var row = _findAnyRowByRn(rn); if (!row) return;
         if (MODAL_UOM_DIRTY) _syncModalUomField();
+        var currentValues = _syncDetailPatternDependencies(_collectCurrentDetailValues());
         var ch = {}, has = false;
         for (var field in FIELD_MAP) {
+          if (!_isFieldActiveForPattern(field, currentValues)) continue;
           var ov = _normalizeFieldValue(field, _getRowFieldValue(row, field));
-          var nv = _getDetailFieldValueFromUi_(field);
-          nv = _normalizeFieldValue(field, nv);
+          var nv = currentValues[field];
           if (nv !== ov) { ch[field] = nv; has = true; }
         }
         if (!has) { toast('Không có thay đổi', 'warning'); return; }
-        var err = validate(ch); if (err) { toast(err, 'error'); return; }
+        var err = validate(ch, { values: currentValues, changedFields: Object.keys(ch) }); if (err) { toast(err, 'error'); return; }
         if (!S.pending[rn]) S.pending[rn] = {};
         Object.assign(S.pending[rn], ch);
         Object.assign(row, ch);
@@ -10486,7 +10106,9 @@
         return null;
       }
 
-      function validate(ch) {
+      function validate(ch, ctx) {
+        var values = ctx && ctx.values ? ctx.values : ch;
+        var changedFields = ctx && Array.isArray(ctx.changedFields) ? ctx.changedFields.slice() : Object.keys(ch || {});
         if (ch['PIC input Product Name (Dưới 40 kí tự)'] !== undefined && String(ch['PIC input Product Name (Dưới 40 kí tự)']).length > 40) return 'Tên SP PIC không được vượt 40 ký tự';
         if (ch['Product description (Dưới 250 Kí tự)'] !== undefined && String(ch['Product description (Dưới 250 Kí tự)']).length > 250) return 'Mô tả không được vượt 250 ký tự';
         for (var i = 0; i < REQUIRED_PRODUCT_FIELDS.length; i++) {
@@ -10494,6 +10116,16 @@
           if (reqField === 'Retail Price (+VAT) in Tier 6') continue;
           if (Object.prototype.hasOwnProperty.call(ch, reqField) && !String(ch[reqField] || '').trim()) {
             return _fieldUiLabel(reqField) + ' là bắt buộc';
+          }
+        }
+        var conditionalFields = _getRequiredProductFieldsForValues(values).filter(function (field) {
+          return _isConditionalLogisticsField(field);
+        });
+        for (var j = 0; j < conditionalFields.length; j++) {
+          var conditionalField = conditionalFields[j];
+          if (changedFields.indexOf(PATTERN_FIELD) < 0 && changedFields.indexOf(conditionalField) < 0) continue;
+          if (!_isFieldCompleteForReview(conditionalField, values[conditionalField])) {
+            return _fieldUiLabel(conditionalField) + ' là bắt buộc';
           }
         }
         if (Object.prototype.hasOwnProperty.call(ch, 'Retail Price (+VAT) in Tier 6')) {
@@ -10800,7 +10432,7 @@
         reload: reload, setView: setView, openModal: openModal, closeModal: closeModal,
         saveModal: saveModal, resetModal: resetModal, saveRow: saveRow, saveAll: saveAll, cancelEdit: cancelEdit,
         clearFilters: clearFilters, goPage: goPage, doSearch: doSearch, switchTab: switchTab, setDetailStep: setDetailStep,
-        setStep2Tab: setStep2Tab, prevStep2Tab: prevStep2Tab, nextStep2Tab: nextStep2Tab, focusNextDetailStep: focusNextDetailStep,
+        setStep2Tab: setStep2Tab, prevStep2Tab: prevStep2Tab, nextStep2Tab: nextStep2Tab,
         toggleSelect: toggleSelect, toggleSelectAll: toggleSelectAll, clearSelection: clearSelection,
         openBatchFill: openBatchFill, closeBatchFill: closeBatchFill,
         bfChange: bfChange, bfToggleAcc: bfToggleAcc,
