@@ -16,6 +16,383 @@ var CONFIG = {
   DATA_START_ROW: 2
 };
 
+var AUTH_CACHE_TTL_SECONDS = 21600;
+
+var VIEW_DEFINITIONS = {
+  DIR: {
+    code: 'DIR',
+    name: 'Director View',
+    page: 'director',
+    htmlFile: 'Director_View',
+    title: 'Director - NPA Dashboard',
+    dataMode: 'director',
+    sheetName: CONFIG.SHEET_NAME_DIRECTOR,
+    legacyRole: 'DIRECTOR',
+    description: 'Director review workspace'
+  },
+  MAN: {
+    code: 'MAN',
+    name: 'Manager View',
+    page: 'index',
+    htmlFile: 'Index',
+    title: 'Manager - NPA Dashboard',
+    dataMode: 'manager',
+    sheetName: CONFIG.SHEET_NAME_MANAGER,
+    legacyRole: 'MANAGER',
+    description: 'Manager workspace'
+  },
+  CAT: {
+    code: 'CAT',
+    name: 'Category View',
+    page: 'index',
+    htmlFile: 'Index',
+    title: 'Category - NPA Dashboard',
+    dataMode: 'category',
+    sheetName: CONFIG.SHEET_NAME_CATEGORY,
+    legacyRole: 'CATEGORY',
+    description: 'Category workspace'
+  }
+};
+
+function _getViewDefinition_(viewCode) {
+  var code = String(viewCode || '').trim().toUpperCase();
+  return VIEW_DEFINITIONS[code] || null;
+}
+
+function _legacyRoleToViewCode_(role) {
+  var normalized = String(role || '').trim().toUpperCase();
+  if (normalized === 'DIRECTOR') return 'DIR';
+  if (normalized === 'MANAGER') return 'MAN';
+  if (normalized === 'CATEGORY') return 'CAT';
+  return '';
+}
+
+function _normalizePermissionCode_(value) {
+  var normalized = String(value == null ? '' : value)
+    .trim()
+    .toUpperCase()
+    .replace(/\s+/g, '_');
+  if (!normalized) return '';
+  if (normalized === 'DIR' || normalized === 'DIRECTOR') return 'DIR';
+  if (normalized === 'MAN' || normalized === 'MANAGER') return 'MAN';
+  if (normalized === 'CAT' || normalized === 'CATEGORY') return 'CAT';
+  return '';
+}
+
+function _splitIndexedAccessList_(raw) {
+  if (raw === null || raw === undefined) return [];
+  var text = String(raw)
+    .replace(/\r\n?/g, '\n')
+    .replace(/[;\n]/g, ',');
+  return text.split(',').map(function(item) {
+    return String(item == null ? '' : item).trim();
+  });
+}
+
+function _parsePermissionSlots_(raw) {
+  var items = _splitIndexedAccessList_(raw);
+  var out = [];
+  for (var i = 0; i < items.length; i++) {
+    var rawToken = items[i];
+    var code = _normalizePermissionCode_(rawToken);
+    out.push({
+      index: i,
+      raw: rawToken,
+      code: code,
+      valid: !!code
+    });
+  }
+  return out;
+}
+
+function _normalizeEditRuleToken_(value) {
+  return String(value == null ? '' : value).trim();
+}
+
+function _normalizeEditRuleKey_(value) {
+  return _normalizeEditRuleToken_(value)
+    .toUpperCase()
+    .replace(/\s+/g, '_');
+}
+
+function _isValidEditRuleToken_(value) {
+  var token = _normalizeEditRuleKey_(value);
+  if (!token) return false;
+  if (token === 'TRUE' || token === 'YES' || token === 'Y' || token === 'EDIT' || token === 'CAN_EDIT') return true;
+  return /(?:^|_)EDIT$/.test(token);
+}
+
+function _parseEditRuleSlots_(raw) {
+  var items = _splitIndexedAccessList_(raw);
+  var out = [];
+  for (var i = 0; i < items.length; i++) {
+    var rawToken = _normalizeEditRuleToken_(items[i]);
+    out.push({
+      index: i,
+      raw: rawToken,
+      normalized: _normalizeEditRuleKey_(rawToken),
+      canEdit: _isValidEditRuleToken_(rawToken)
+    });
+  }
+  return out;
+}
+
+function _buildAllowedViews_(permissionSlots, editRuleSlots) {
+  var out = [];
+  var seen = {};
+  var permissions = Array.isArray(permissionSlots) ? permissionSlots : [];
+  var edits = Array.isArray(editRuleSlots) ? editRuleSlots : [];
+
+  for (var i = 0; i < permissions.length; i++) {
+    var permissionSlot = permissions[i];
+    if (!permissionSlot || !permissionSlot.valid || !permissionSlot.code) continue;
+    if (seen[permissionSlot.code]) continue;
+
+    var viewDef = _getViewDefinition_(permissionSlot.code);
+    if (!viewDef) continue;
+
+    var editSlot = edits[permissionSlot.index] || {
+      index: permissionSlot.index,
+      raw: '',
+      normalized: '',
+      canEdit: false
+    };
+
+    out.push({
+      code: viewDef.code,
+      name: viewDef.name,
+      page: viewDef.page,
+      htmlFile: viewDef.htmlFile,
+      title: viewDef.title,
+      dataMode: viewDef.dataMode,
+      sheetName: viewDef.sheetName,
+      legacyRole: viewDef.legacyRole,
+      description: viewDef.description,
+      permissionIndex: permissionSlot.index,
+      permissionToken: permissionSlot.raw,
+      editRule: editSlot.raw || '',
+      editRuleNormalized: editSlot.normalized || '',
+      canEdit: editSlot.canEdit === true
+    });
+
+    seen[permissionSlot.code] = true;
+  }
+
+  return out;
+}
+
+function _clonePlainObject_(value) {
+  return JSON.parse(JSON.stringify(value || {}));
+}
+
+function _findAllowedView_(access, viewCode) {
+  var code = _normalizePermissionCode_(viewCode);
+  var allowedViews = access && Array.isArray(access.allowedViews) ? access.allowedViews : [];
+  for (var i = 0; i < allowedViews.length; i++) {
+    if (allowedViews[i] && allowedViews[i].code === code) return allowedViews[i];
+  }
+  return null;
+}
+
+function _applySelectedViewToAccess_(access, viewCode) {
+  var selected = _findAllowedView_(access, viewCode);
+  if (!selected) return null;
+
+  var out = _clonePlainObject_(access);
+  out.selectedView = selected.code;
+  out.selectedViewName = selected.name;
+  out.selectedPage = selected.page;
+  out.selectedDataMode = selected.dataMode;
+  out.selectedSheetName = selected.sheetName;
+  out.selectedEditRule = selected.editRule || '';
+  out.selectedEditRuleNormalized = selected.editRuleNormalized || '';
+  out.currentViewCanEdit = selected.canEdit === true;
+  out.canEdit = out.currentViewCanEdit;
+  out.role = selected.legacyRole;
+  out.landingPage = selected.page === 'director' ? 'DIRECTOR_VIEW' : 'INDEX';
+  out.selectionRequired = false;
+  out.scope = selected.code === 'DIR'
+    ? ['ALL']
+    : (Array.isArray(out.categoryScope) ? out.categoryScope.slice() : []);
+  return out;
+}
+
+function _resolveDefaultView_(allowedViews) {
+  return allowedViews && allowedViews.length ? allowedViews[0].code : '';
+}
+
+function _getSelectedViewCode_(access) {
+  if (!access) return '';
+  var direct = _normalizePermissionCode_(access.selectedView || access.viewCode || '');
+  if (direct) return direct;
+  return _legacyRoleToViewCode_(access.role || access.baseRole || '');
+}
+
+function _hasSelectedView_(access) {
+  return !!_getSelectedViewCode_(access);
+}
+
+function _isDirectorViewAccess_(access) {
+  return _getSelectedViewCode_(access) === 'DIR';
+}
+
+function _buildAccessModel_(options) {
+  var opts = options || {};
+  var rawRole = String(opts.role || '').trim().toUpperCase();
+  var permissionsRaw = String(opts.permissionsRaw || '').trim();
+  if (!permissionsRaw) permissionsRaw = _legacyRoleToViewCode_(rawRole);
+
+  var permissionSlots = _parsePermissionSlots_(permissionsRaw);
+  var permissionListNormalized = permissionSlots
+    .filter(function(slot) { return slot && slot.valid && slot.code; })
+    .map(function(slot) { return slot.code; });
+
+  var editRulesRaw = String(opts.editRulesRaw || '').trim();
+  if (!editRulesRaw && opts.legacyCanEdit === true && permissionListNormalized.length === 1) {
+    editRulesRaw = 'TRUE';
+  }
+  var editRuleSlots = _parseEditRuleSlots_(editRulesRaw);
+  var allowedViews = _buildAllowedViews_(permissionSlots, editRuleSlots);
+  var categoryScope = Array.isArray(opts.categoryScope) ? opts.categoryScope.slice() : [];
+
+  var access = {
+    email: _normalizeLoginEmail_(opts.email),
+    fullName: String(opts.fullName || '').trim(),
+    role: rawRole,
+    baseRole: rawRole,
+    status: String(opts.status || '').trim().toUpperCase(),
+    scope: categoryScope.slice(),
+    categoryScope: categoryScope.slice(),
+    permissionsRaw: permissionsRaw,
+    permissionSlots: permissionSlots,
+    permissionListNormalized: permissionListNormalized,
+    editRulesRaw: editRulesRaw,
+    editRuleSlots: editRuleSlots,
+    editRuleListNormalized: editRuleSlots.map(function(slot) { return slot.normalized || ''; }),
+    allowedViews: allowedViews,
+    defaultView: _resolveDefaultView_(allowedViews),
+    selectedView: '',
+    selectedViewName: '',
+    selectedPage: '',
+    selectedDataMode: '',
+    selectedSheetName: '',
+    selectedEditRule: '',
+    selectedEditRuleNormalized: '',
+    currentViewCanEdit: false,
+    canEdit: false,
+    landingPage: '',
+    hasMultipleViews: allowedViews.length > 1,
+    selectionRequired: allowedViews.length > 1
+  };
+
+  if (allowedViews.length === 1) {
+    access = _applySelectedViewToAccess_(access, allowedViews[0].code) || access;
+  } else if (opts.selectedView) {
+    access = _applySelectedViewToAccess_(access, opts.selectedView) || access;
+  }
+
+  return access;
+}
+
+function _normalizeLegacyAccessData_(data) {
+  var source = data || {};
+  var selectedView = _normalizePermissionCode_(source.selectedView || '') || _legacyRoleToViewCode_(source.role || source.baseRole || '');
+  var categoryScope = Array.isArray(source.categoryScope)
+    ? source.categoryScope.slice()
+    : (Array.isArray(source.scope) ? source.scope.slice() : []);
+  var access = _buildAccessModel_({
+    email: source.email,
+    fullName: source.fullName,
+    role: source.baseRole || source.role,
+    status: source.status,
+    permissionsRaw: source.permissionsRaw || selectedView,
+    editRulesRaw: source.editRulesRaw || (source.currentViewCanEdit === true || source.canEdit === true ? 'TRUE' : ''),
+    categoryScope: categoryScope,
+    legacyCanEdit: source.canEdit === true || source.currentViewCanEdit === true,
+    selectedView: source.selectedView || selectedView
+  });
+
+  if (!access.selectedView && selectedView) {
+    access = _applySelectedViewToAccess_(access, selectedView) || access;
+  }
+  if (source.selectedPage && access.selectedView && !access.selectedPage) {
+    access.selectedPage = String(source.selectedPage || '').trim();
+  }
+  return access;
+}
+
+function _normalizeAccessData_(data) {
+  if (!data || typeof data !== 'object') return null;
+  var looksNew = Array.isArray(data.allowedViews)
+    || Array.isArray(data.permissionSlots)
+    || Array.isArray(data.permissionListNormalized)
+    || Array.isArray(data.editRuleSlots)
+    || typeof data.permissionsRaw === 'string'
+    || typeof data.editRulesRaw === 'string';
+  return looksNew ? _normalizeLegacyAccessData_(data) : _normalizeLegacyAccessData_(data);
+}
+
+function _storeAccessByToken_(token, accessData) {
+  CacheService.getScriptCache().put('AUTH_' + token, JSON.stringify(accessData || {}), AUTH_CACHE_TTL_SECONDS);
+}
+
+function _buildAppUrl_(page, token, viewCode) {
+  var parts = ['page=' + encodeURIComponent(page || 'login')];
+  if (token) parts.push('token=' + encodeURIComponent(token));
+  if (viewCode) parts.push('view=' + encodeURIComponent(viewCode));
+  var qs = parts.join('&');
+  var baseUrl = '';
+  try {
+    baseUrl = ScriptApp.getService().getUrl();
+  } catch (err) {
+    baseUrl = '';
+  }
+  return baseUrl ? (baseUrl + '?' + qs) : ('?' + qs);
+}
+
+function _renderClientRedirect_(url) {
+  var rawUrl = String(url || '?page=login');
+  var htmlUrl = rawUrl
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+  var jsUrl = rawUrl
+    .replace(/\\/g, '\\\\')
+    .replace(/"/g, '\\"');
+  var html = HtmlService.createHtmlOutput(
+    '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=' + htmlUrl + '"></head>'
+    + '<body><script>window.top.location.replace("' + jsUrl + '");</script></body></html>'
+  );
+  html.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+  return html;
+}
+
+function _buildLoginBootstrap_(access, token, message) {
+  var allowedViews = access && Array.isArray(access.allowedViews) ? access.allowedViews : [];
+  return {
+    mode: allowedViews.length > 1 ? 'selector' : 'login',
+    message: String(message || ''),
+    email: access && access.email ? access.email : '',
+    fullName: access && access.fullName ? access.fullName : '',
+    token: String(token || ''),
+    defaultView: access && access.defaultView ? access.defaultView : '',
+    selectedView: access && access.selectedView ? access.selectedView : '',
+    availableViews: allowedViews.map(function(view) {
+      return {
+        code: view.code,
+        name: view.name,
+        page: view.page,
+        dataMode: view.dataMode,
+        sheetName: view.sheetName,
+        editRule: view.editRule,
+        canEdit: view.canEdit === true,
+        description: view.description
+      };
+    })
+  };
+}
+
 var PIC_EDITABLE_FIELDS = [
   'Present Date',
   'Status',
@@ -133,11 +510,120 @@ function doGet(e) {
   }
 }
 
+function doGet(e) {
+  try {
+    var page = (e && e.parameter && e.parameter.page)
+      ? String(e.parameter.page || '').toLowerCase() : 'index';
+    var requestedView = e && e.parameter ? _normalizePermissionCode_(e.parameter.view || '') : '';
+    var token = e && e.parameter ? String(e.parameter.token || '').trim() : '';
+
+    if (page !== 'login' && page !== 'index' && page !== 'director') {
+      page = 'index';
+    }
+
+    if (page === 'login') {
+      if (token) {
+        var loginAccessRes = _getAccessByToken_(token);
+        if (loginAccessRes.ok) {
+          var loginAccess = loginAccessRes.data;
+          if (loginAccess.allowedViews && loginAccess.allowedViews.length > 1) {
+            return _renderLoginPage('', loginAccess.email || _resolveRequestEmail_(e) || '', _buildLoginBootstrap_(loginAccess, token, 'Choose a view to continue.'));
+          }
+          if (_hasSelectedView_(loginAccess)) {
+            return _renderClientRedirect_(_buildAppUrl_(loginAccess.selectedPage, token, loginAccess.selectedView));
+          }
+        }
+      }
+      return _renderLoginPage('', _resolveRequestEmail_(e) || '', null);
+    }
+
+    if (!token) {
+      return _renderLoginPage('Please sign in to continue.', _resolveRequestEmail_(e) || '', null);
+    }
+
+    var accessRes = _getAccessByToken_(token);
+    if (!accessRes.ok) {
+      return _renderLoginPage(accessRes.error.message, _resolveRequestEmail_(e) || '', null);
+    }
+
+    var access = accessRes.data;
+    if (!_hasSelectedView_(access) && access.allowedViews && access.allowedViews.length === 1) {
+      var autoSelected = _applySelectedViewToAccess_(access, access.allowedViews[0].code);
+      if (autoSelected) {
+        access = autoSelected;
+        _storeAccessByToken_(token, access);
+      }
+    }
+
+    if (!_hasSelectedView_(access)) {
+      return _renderLoginPage('Choose a view to continue.', access.email || _resolveRequestEmail_(e) || '', _buildLoginBootstrap_(access, token, 'Choose a view to continue.'));
+    }
+
+    if ((requestedView && requestedView !== access.selectedView) || page !== access.selectedPage) {
+      return _renderClientRedirect_(_buildAppUrl_(access.selectedPage, token, access.selectedView));
+    }
+
+    return _renderAppPage_(access, token);
+  } catch (err) {
+    var msg = _safeErrorText_(err, 'Unknown error');
+    return HtmlService.createHtmlOutput(
+      '<h2 style="font-family:sans-serif;color:red">Error: ' + msg + '</h2>'
+    );
+  }
+}
+
+function _renderAppPage_(access, token) {
+  var viewDef = _getViewDefinition_(_getSelectedViewCode_(access)) || _getViewDefinition_('CAT');
+  var tpl = HtmlService.createTemplateFromFile(viewDef.htmlFile);
+  tpl.appUserJson = JSON.stringify({
+    email: access.email,
+    fullName: access.fullName,
+    role: access.role,
+    baseRole: access.baseRole,
+    status: access.status,
+    scope: Array.isArray(access.scope) ? access.scope : [],
+    categoryScope: Array.isArray(access.categoryScope) ? access.categoryScope : [],
+    canEdit: access.currentViewCanEdit === true,
+    currentViewCanEdit: access.currentViewCanEdit === true,
+    permissionsRaw: access.permissionsRaw,
+    permissionListNormalized: access.permissionListNormalized,
+    editRulesRaw: access.editRulesRaw,
+    editRuleListNormalized: access.editRuleListNormalized,
+    allowedViews: access.allowedViews || [],
+    defaultView: access.defaultView || '',
+    selectedView: access.selectedView || '',
+    selectedViewName: access.selectedViewName || '',
+    selectedPage: access.selectedPage || '',
+    selectedDataMode: access.selectedDataMode || '',
+    selectedSheetName: access.selectedSheetName || '',
+    selectedEditRule: access.selectedEditRule || '',
+    authToken: token
+  }).replace(/</g, '\\u003c');
+  var html = tpl.evaluate();
+  html.setTitle(viewDef.title);
+  html.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+  return html;
+}
+
 // ========================================
 // HELPER: Safe sheet access
 // ========================================
 function _openSheet(access) {
   var sheetName = (access && access.role === 'MANAGER') ? CONFIG.SHEET_NAME_MANAGER : CONFIG.SHEET_NAME_CATEGORY;
+  var ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+  var sheet = ss.getSheetByName(sheetName);
+  if (!sheet) {
+    var names = ss.getSheets().map(function(s) { return s.getName(); }).join(', ');
+    throw new Error('Sheet "' + sheetName + '" not found. Available: ' + names);
+  }
+  return sheet;
+}
+
+function _openSheet(access) {
+  var viewCode = _getSelectedViewCode_(access);
+  var sheetName = CONFIG.SHEET_NAME_CATEGORY;
+  if (viewCode === 'DIR') sheetName = CONFIG.SHEET_NAME_DIRECTOR;
+  if (viewCode === 'MAN') sheetName = CONFIG.SHEET_NAME_MANAGER;
   var ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
   var sheet = ss.getSheetByName(sheetName);
   if (!sheet) {
@@ -534,7 +1020,16 @@ function getInitData(params) {
         headers: headers,
         rows: [],
         editableFields: editableFields,
-        meta: { totalRows: 0, currentPage: 1, totalPages: 1, pageSize: CONFIG.PAGE_SIZE }
+        meta: {
+          totalRows: 0,
+          currentPage: 1,
+          totalPages: 1,
+          pageSize: CONFIG.PAGE_SIZE,
+          sheetName: sheet.getName(),
+          selectedView: accessRes.data && accessRes.data.selectedView ? accessRes.data.selectedView : '',
+          selectedDataMode: accessRes.data && accessRes.data.selectedDataMode ? accessRes.data.selectedDataMode : '',
+          currentViewCanEdit: accessRes.data && accessRes.data.currentViewCanEdit === true
+        }
       });
     }
 
@@ -574,7 +1069,16 @@ function getInitData(params) {
       headers: headers,
       rows: allRows,
       editableFields: editableFields,
-      meta: { totalRows: total, currentPage: 1, totalPages: 1, pageSize: total || CONFIG.PAGE_SIZE }
+      meta: {
+        totalRows: total,
+        currentPage: 1,
+        totalPages: 1,
+        pageSize: total || CONFIG.PAGE_SIZE,
+        sheetName: sheet.getName(),
+        selectedView: accessRes.data && accessRes.data.selectedView ? accessRes.data.selectedView : '',
+        selectedDataMode: accessRes.data && accessRes.data.selectedDataMode ? accessRes.data.selectedDataMode : '',
+        currentViewCanEdit: accessRes.data && accessRes.data.currentViewCanEdit === true
+      }
     });
 
   } catch (err) {
@@ -829,6 +1333,72 @@ function _requireWriteAccess_(token) {
   if (!accessRes.ok) return accessRes;
   if (!accessRes.data || accessRes.data.canEdit !== true) {
     return _err('FORBIDDEN', 'Tài khoản hiện không có quyền chỉnh sửa.');
+  }
+  return accessRes;
+}
+
+function _hasRowAccess_(rowObj, access) {
+  if (!rowObj) return false;
+  if (!access) return false;
+  if (_isDirectorViewAccess_(access)) return true;
+  return _applyAccessScopeToRows_([rowObj], access).length > 0;
+}
+
+function _getScopeDisplay_(access) {
+  if (!access) return '';
+  if (_isDirectorViewAccess_(access)) return 'ALL';
+  var scopes = Array.isArray(access.scope) ? access.scope : [];
+  return scopes.length ? scopes.join(', ') : '';
+}
+
+function _resolveAuditSource_(payload, access, fallback) {
+  var source = payload && payload.source ? String(payload.source).trim() : '';
+  if (source) return source;
+  if (fallback) return fallback;
+  return _isDirectorViewAccess_(access) ? 'DIRECTOR_UPDATE' : 'PIC_UPDATE';
+}
+
+function _applyAccessScopeToRows_(rows, access) {
+  if (!Array.isArray(rows)) return [];
+  if (!access) return [];
+  if (_isDirectorViewAccess_(access)) return rows;
+
+  var scopes = Array.isArray(access.scope) ? access.scope : [];
+  if (!scopes.length) return [];
+
+  var scopeFields = _detectCategoryScopeFieldNames_(rows);
+  if (!scopeFields.length) return [];
+
+  var scopeMap = {};
+  for (var i = 0; i < scopes.length; i++) {
+    var scopeKey = _normalizeCategoryKey_(scopes[i]);
+    if (scopeKey) scopeMap[scopeKey] = true;
+  }
+  if (scopeMap['all']) return rows;
+
+  return rows.filter(function(r) {
+    if (!r) return false;
+    for (var f = 0; f < scopeFields.length; f++) {
+      var field = scopeFields[f];
+      var rowCategory = _normalizeCategoryKey_(r[field] || '');
+      if (rowCategory && scopeMap[rowCategory]) return true;
+    }
+    return false;
+  });
+}
+
+function _getEditableFieldsForAccess_(access) {
+  var canEdit = access && (access.currentViewCanEdit === true || access.canEdit === true);
+  if (!canEdit) return [];
+  if (_isDirectorViewAccess_(access)) return DIRECTOR_EDITABLE_FIELDS.slice();
+  return PIC_EDITABLE_FIELDS.slice();
+}
+
+function _requireWriteAccess_(token) {
+  var accessRes = _getAccessByToken_(token);
+  if (!accessRes.ok) return accessRes;
+  if (!accessRes.data || accessRes.data.currentViewCanEdit !== true) {
+    return _err('FORBIDDEN', 'Tai khoan hien tai khong co quyen chinh sua o view da chon.');
   }
   return accessRes;
 }
@@ -1654,6 +2224,227 @@ function _getAccessByToken_(token) {
   }
 }
 
+function _collectScopeFromUserRow_(scopeRaw, category, managed) {
+  var scopeJoined = []
+    .concat(_parseScopeList_(scopeRaw))
+    .concat(_parseScopeList_(category))
+    .concat(_parseScopeList_(managed));
+  var scopeSeen = {};
+  var scope = [];
+
+  for (var i = 0; i < scopeJoined.length; i++) {
+    var raw = scopeJoined[i];
+    var key = _normalizeCategoryKey_(raw);
+    if (!key || scopeSeen[key]) continue;
+    scopeSeen[key] = true;
+    scope.push(raw);
+  }
+
+  return scope;
+}
+
+function _resolveSelectedAccess_(access, viewCode) {
+  var selected = _applySelectedViewToAccess_(access, viewCode);
+  if (!selected) {
+    return _err('FORBIDDEN_VIEW', 'View khong hop le hoac khong nam trong pham vi duoc cap.');
+  }
+  return _ok(selected);
+}
+
+function loginWithEmail(email, password) {
+  try {
+    var access = _getUserAccessByEmail_(email, password, true);
+    if (!access.ok) return access;
+
+    var token = _createAuthToken_(access.data);
+    var requiresViewSelection = access.data.allowedViews && access.data.allowedViews.length > 1 && !access.data.selectedView;
+    var targetUrl = requiresViewSelection
+      ? _buildAppUrl_('login', token, '')
+      : _buildAppUrl_(access.data.selectedPage, token, access.data.selectedView);
+
+    return _ok({
+      email: access.data.email,
+      fullName: access.data.fullName,
+      role: access.data.role || access.data.baseRole || '',
+      token: token,
+      url: targetUrl,
+      page: access.data.selectedPage || '',
+      selectedView: access.data.selectedView || '',
+      requiresViewSelection: requiresViewSelection,
+      availableViews: access.data.allowedViews || [],
+      defaultView: access.data.defaultView || ''
+    });
+  } catch (err) {
+    return _err('LOGIN_ERROR', err.message, err.stack);
+  }
+}
+
+function selectUserView(token, viewCode) {
+  try {
+    var tk = String(token || '').trim();
+    var desiredView = _normalizePermissionCode_(viewCode);
+    if (!tk) return _err('MISSING_TOKEN', 'Vui long dang nhap de tiep tuc.');
+    if (!desiredView) return _err('INVALID_VIEW', 'View khong hop le.');
+
+    var accessRes = _getAccessByToken_(tk);
+    if (!accessRes.ok) return accessRes;
+
+    var selectedRes = _resolveSelectedAccess_(accessRes.data, desiredView);
+    if (!selectedRes.ok) return selectedRes;
+
+    _storeAccessByToken_(tk, selectedRes.data);
+
+    return _ok({
+      token: tk,
+      url: _buildAppUrl_(selectedRes.data.selectedPage, tk, selectedRes.data.selectedView),
+      page: selectedRes.data.selectedPage,
+      selectedView: selectedRes.data.selectedView,
+      selectedDataMode: selectedRes.data.selectedDataMode,
+      selectedEditRule: selectedRes.data.selectedEditRule,
+      currentViewCanEdit: selectedRes.data.currentViewCanEdit === true
+    });
+  } catch (err) {
+    return _err('SELECT_VIEW_ERROR', err.message, err.stack);
+  }
+}
+
+function getCurrentUserAccess(token) {
+  return _getAccessByToken_(token);
+}
+
+function _renderLoginPage(message, prefillEmail, bootstrap) {
+  var tpl = HtmlService.createTemplateFromFile('Login');
+  var initialBootstrap = bootstrap || {};
+  tpl.loginMessage = message || initialBootstrap.message || '';
+  tpl.prefillEmail = prefillEmail || initialBootstrap.email || '';
+  tpl.loginBootstrapJson = JSON.stringify(initialBootstrap).replace(/</g, '\\u003c');
+  var out = tpl.evaluate();
+  out.setTitle('NPA Login');
+  out.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+  return out;
+}
+
+function _getUserAccessByEmail_(email, password, enforcePassword) {
+  try {
+    var em = _normalizeLoginEmail_(email);
+    if (!em) return _err('MISSING_EMAIL', 'Khong tim thay email dang nhap.');
+    var pwd = String(password || '');
+
+    var ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+    var sheet = ss.getSheetByName(CONFIG.USER_MASTER_SHEET);
+    if (!sheet) return _err('USER_MASTER_NOT_FOUND', 'Chua co sheet User_Master.');
+
+    var lastRow = sheet.getLastRow();
+    var lastCol = sheet.getLastColumn();
+    if (lastRow < 2 || lastCol < 1) return _err('USER_NOT_FOUND', 'User_Master chua co du lieu.');
+
+    var headers = sheet.getRange(1, 1, 1, lastCol).getDisplayValues()[0].map(function(h) {
+      return String(h || '').trim();
+    });
+    var data = sheet.getRange(2, 1, lastRow - 1, lastCol).getDisplayValues();
+
+    var hEmail = _findUserMasterHeaderIndex_(headers, ['Email']);
+    var hPassword = _findUserMasterHeaderIndex_(headers, ['Password']);
+    var hName = _findUserMasterHeaderIndex_(headers, ['Full Name', 'FullName']);
+    var hRole = _findUserMasterHeaderIndex_(headers, ['Role']);
+    var hPermission = _findUserMasterHeaderIndex_(headers, ['Permission', 'Permissions']);
+    var hStatus = _findUserMasterHeaderIndex_(headers, ['Status']);
+    var hCategory = _findUserMasterHeaderIndex_(headers, ['Category']);
+    var hManaged = _findUserMasterHeaderIndex_(headers, ['Managed Categories', 'Managed Category']);
+    var hCanEdit = _findUserMasterHeaderIndex_(headers, ['Can Edit']);
+    var hScope = _findUserMasterHeaderIndex_(headers, ['Effective Scope (Auto)', 'Effective Scope']);
+
+    if (hEmail < 0 || hStatus < 0 || (hPermission < 0 && hRole < 0)) {
+      return _err('USER_MASTER_SCHEMA_ERROR', 'Thieu cot Email/Status/Permission trong User_Master.');
+    }
+
+    var found = null;
+    for (var i = 0; i < data.length; i++) {
+      var rowEmail = _normalizeLoginEmail_(data[i][hEmail]);
+      if (rowEmail === em) {
+        found = data[i];
+        break;
+      }
+    }
+    if (!found) {
+      Logger.log('USER_NOT_FOUND lookup=' + em + ' headers=' + headers.join(' | '));
+      return _err('USER_NOT_FOUND', 'Khong tim thay tai khoan trong User_Master cho email: ' + em);
+    }
+
+    var status = String(found[hStatus] || '').trim().toUpperCase();
+    if (status !== 'ACTIVE') return _err('USER_INACTIVE', 'Tai khoan dang bi khoa (INACTIVE).');
+
+    if (enforcePassword) {
+      if (hPassword < 0) return _err('MISSING_PASSWORD_COLUMN', 'Thieu cot Password trong User_Master.');
+      if (!pwd) return _err('MISSING_PASSWORD', 'Vui long nhap mat khau.');
+      var sheetPwd = String(found[hPassword] || '');
+      if (pwd !== sheetPwd) return _err('INVALID_PASSWORD', 'Mat khau khong dung.');
+    }
+
+    var rawRole = hRole >= 0 ? String(found[hRole] || '').trim().toUpperCase() : '';
+    var permissionsRaw = hPermission >= 0 ? String(found[hPermission] || '').trim() : '';
+    if (!permissionsRaw) permissionsRaw = _legacyRoleToViewCode_(rawRole);
+
+    var fullName = hName >= 0 ? String(found[hName] || '').trim() : '';
+    var editRulesRaw = hCanEdit >= 0 ? String(found[hCanEdit] || '').trim() : '';
+    var legacyCanEdit = String(editRulesRaw || '').trim().toLowerCase() === 'true';
+    var scopeRaw = hScope >= 0 ? String(found[hScope] || '').trim() : '';
+    var category = hCategory >= 0 ? String(found[hCategory] || '').trim() : '';
+    var managed = hManaged >= 0 ? String(found[hManaged] || '').trim() : '';
+    var scope = _collectScopeFromUserRow_(scopeRaw, category, managed);
+
+    var access = _buildAccessModel_({
+      email: em,
+      fullName: fullName,
+      role: rawRole,
+      status: status,
+      permissionsRaw: permissionsRaw,
+      editRulesRaw: editRulesRaw,
+      categoryScope: scope,
+      legacyCanEdit: legacyCanEdit
+    });
+
+    if (!access.allowedViews || !access.allowedViews.length) {
+      return _err('INVALID_PERMISSION', 'Permission rong hoac khong hop le. Khong the xac dinh view truy cap.');
+    }
+
+    if (!access.selectedView && access.allowedViews.length === 1) {
+      access = _applySelectedViewToAccess_(access, access.allowedViews[0].code) || access;
+    }
+
+    return _ok(access);
+  } catch (err) {
+    return _err('USER_ACCESS_ERROR', err.message, err.stack);
+  }
+}
+
+function _createAuthToken_(accessData) {
+  var token = Utilities.getUuid().replace(/-/g, '') + Utilities.getUuid().replace(/-/g, '');
+  _storeAccessByToken_(token, _normalizeAccessData_(accessData || {}));
+  return token;
+}
+
+function _getAccessByToken_(token) {
+  try {
+    var tk = String(token || '').trim();
+    if (!tk) return _err('MISSING_TOKEN', 'Phien dang nhap khong hop le. Vui long dang nhap lai.');
+
+    var raw = CacheService.getScriptCache().get('AUTH_' + tk);
+    if (!raw) return _err('TOKEN_EXPIRED', 'Phien dang nhap da het han. Vui long dang nhap lai.');
+
+    var parsed = JSON.parse(raw);
+    if (!parsed || !parsed.email) return _err('INVALID_TOKEN', 'Phien dang nhap khong hop le.');
+
+    var normalized = _normalizeAccessData_(parsed);
+    if (!normalized || !normalized.email) return _err('INVALID_TOKEN', 'Khong the phuc hoi thong tin truy cap.');
+
+    _storeAccessByToken_(tk, normalized);
+    return _ok(normalized);
+  } catch (err) {
+    return _err('TOKEN_READ_ERROR', err.message, err.stack);
+  }
+}
+
 // ========================================
 // ADMIN: Setup User_Master for Role-based Login
 // Roles: DIRECTOR > MANAGER > CATEGORY
@@ -1787,6 +2578,218 @@ function setupUserMasterSheet() {
     // Basic filter
     if (!sheet.getFilter()) {
       sheet.getRange(1, 1, sheet.getMaxRows(), 10).createFilter();
+    }
+
+    return _ok({
+      sheetName: CONFIG.USER_MASTER_SHEET,
+      categoriesLoaded: categories.length,
+      message: 'User_Master is ready'
+    });
+  } catch (err) {
+    return _err('SETUP_USER_MASTER_ERROR', err.message, err.stack);
+  }
+}
+
+function _ensureUserMasterColumn_(sheet, headerName, previousHeaderName) {
+  var lastCol = Math.max(sheet.getLastColumn(), 1);
+  var headers = sheet.getRange(1, 1, 1, lastCol).getDisplayValues()[0].map(function(h) {
+    return String(h || '').trim();
+  });
+  var idx = _findUserMasterHeaderIndex_(headers, [headerName]);
+  if (idx >= 0) return idx;
+
+  var insertAt = headers.length + 1;
+  if (previousHeaderName) {
+    var previousIdx = _findUserMasterHeaderIndex_(headers, [previousHeaderName]);
+    if (previousIdx >= 0) insertAt = previousIdx + 2;
+  }
+
+  sheet.insertColumnBefore(insertAt);
+  sheet.getRange(1, insertAt).setValue(headerName);
+
+  headers = sheet.getRange(1, 1, 1, Math.max(sheet.getLastColumn(), insertAt)).getDisplayValues()[0].map(function(h) {
+    return String(h || '').trim();
+  });
+  return _findUserMasterHeaderIndex_(headers, [headerName]);
+}
+
+function setupUserMasterSheet() {
+  try {
+    var ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+    var sheet = ss.getSheetByName(CONFIG.USER_MASTER_SHEET);
+    if (!sheet) sheet = ss.insertSheet(CONFIG.USER_MASTER_SHEET);
+
+    if (sheet.getMaxRows() < 200) {
+      sheet.insertRowsAfter(sheet.getMaxRows(), 200 - sheet.getMaxRows());
+    }
+
+    var specs = [
+      { header: 'Email', note: 'Login email. Must be unique.', width: 260 },
+      { header: 'Password', note: 'Current login password.', width: 140 },
+      { header: 'Full Name', note: 'Display name.', width: 180 },
+      { header: 'Role', note: 'Legacy single-role label for backward compatibility.', width: 130 },
+      { header: 'Permission', note: 'Allowed views. Use DIR, MAN, CAT. Multiple values keep order.', width: 220 },
+      { header: 'Status', note: 'ACTIVE or INACTIVE.', width: 120 },
+      { header: 'Category', note: 'Category scope for Manager/Category views.', width: 360 },
+      { header: 'Can Edit', note: 'Edit tokens mapped by Permission order. Example: Page1_Edit, Page2_Edit.', width: 220 },
+      { header: 'Notes', note: 'Internal note.', width: 280 },
+      { header: 'Created At', note: 'Created timestamp.', width: 170 },
+      { header: 'Updated At', note: 'Updated timestamp.', width: 170 }
+    ];
+
+    for (var s = 0; s < specs.length; s++) {
+      _ensureUserMasterColumn_(sheet, specs[s].header, s > 0 ? specs[s - 1].header : '');
+    }
+
+    var lastCol = sheet.getLastColumn();
+    var headers = sheet.getRange(1, 1, 1, lastCol).getDisplayValues()[0].map(function(h) {
+      return String(h || '').trim();
+    });
+    var headerNotes = sheet.getRange(1, 1, 1, lastCol).getNotes()[0];
+
+    for (var i = 0; i < specs.length; i++) {
+      var idx = _findUserMasterHeaderIndex_(headers, [specs[i].header]);
+      if (idx < 0) continue;
+      headers[idx] = specs[i].header;
+      headerNotes[idx] = specs[i].note;
+      sheet.setColumnWidth(idx + 1, specs[i].width);
+    }
+
+    sheet.getRange(1, 1, 1, lastCol).setValues([headers]);
+    sheet.getRange(1, 1, 1, lastCol).setNotes([headerNotes]);
+    sheet.setFrozenRows(1);
+    sheet.getRange(1, 1, 1, lastCol)
+      .setFontWeight('bold')
+      .setBackground('#1f4e78')
+      .setFontColor('#ffffff')
+      .setHorizontalAlignment('center');
+
+    var dataRows = Math.max(1, sheet.getMaxRows() - 1);
+    var idxRole = _findUserMasterHeaderIndex_(headers, ['Role']);
+    var idxStatus = _findUserMasterHeaderIndex_(headers, ['Status']);
+    var idxCategory = _findUserMasterHeaderIndex_(headers, ['Category']);
+    var idxNotes = _findUserMasterHeaderIndex_(headers, ['Notes']);
+    var idxCreated = _findUserMasterHeaderIndex_(headers, ['Created At']);
+    var idxUpdated = _findUserMasterHeaderIndex_(headers, ['Updated At']);
+    var idxCanEdit = _findUserMasterHeaderIndex_(headers, ['Can Edit']);
+    var idxPermission = _findUserMasterHeaderIndex_(headers, ['Permission']);
+
+    if (idxRole >= 0) {
+      var roleRule = SpreadsheetApp.newDataValidation()
+        .requireValueInList(['DIRECTOR', 'MANAGER', 'CATEGORY'], true)
+        .setAllowInvalid(true)
+        .build();
+      sheet.getRange(2, idxRole + 1, dataRows, 1).setDataValidation(roleRule);
+    }
+
+    if (idxStatus >= 0) {
+      var statusRule = SpreadsheetApp.newDataValidation()
+        .requireValueInList(['ACTIVE', 'INACTIVE'], true)
+        .setAllowInvalid(false)
+        .build();
+      sheet.getRange(2, idxStatus + 1, dataRows, 1).setDataValidation(statusRule);
+    }
+
+    if (idxCanEdit >= 0) {
+      sheet.getRange(2, idxCanEdit + 1, dataRows, 1).clearDataValidations();
+      sheet.getRange(2, idxCanEdit + 1, dataRows, 1).setWrap(true);
+    }
+
+    if (idxPermission >= 0) {
+      sheet.getRange(2, idxPermission + 1, dataRows, 1).setWrap(true);
+    }
+
+    var categories = _extractCategoriesFromMainSheet_();
+    if (idxCategory >= 0) {
+      if (categories.length > 0) {
+        var catRule = SpreadsheetApp.newDataValidation()
+          .requireValueInList(categories, true)
+          .setAllowInvalid(true)
+          .build();
+        sheet.getRange(2, idxCategory + 1, dataRows, 1).setDataValidation(catRule);
+      } else {
+        sheet.getRange(2, idxCategory + 1, dataRows, 1).clearDataValidations();
+      }
+      sheet.getRange(2, idxCategory + 1, dataRows, 1).setWrap(true);
+    }
+
+    sheet.getRange(2, 1, dataRows, lastCol).setVerticalAlignment('middle');
+    if (idxNotes >= 0) sheet.getRange(2, idxNotes + 1, dataRows, 1).setWrap(true);
+    if (idxCreated >= 0) sheet.getRange(2, idxCreated + 1, dataRows, 1).setNumberFormat('yyyy-mm-dd hh:mm');
+    if (idxUpdated >= 0) sheet.getRange(2, idxUpdated + 1, dataRows, 1).setNumberFormat('yyyy-mm-dd hh:mm');
+
+    var hasAnyUser = false;
+    var idxEmail = _findUserMasterHeaderIndex_(headers, ['Email']);
+    if (idxEmail >= 0 && sheet.getLastRow() >= 2) {
+      var emailVals = sheet.getRange(2, idxEmail + 1, sheet.getLastRow() - 1, 1).getValues();
+      hasAnyUser = emailVals.some(function(r) {
+        return String(r[0] || '').trim() !== '';
+      });
+    }
+
+    if (!hasAnyUser) {
+      var now = new Date();
+      var c1 = categories[0] || 'Non Alcoholic';
+      var seedSpecs = [
+        {
+          email: 'director@yourcompany.com',
+          password: '7-Eleven',
+          fullName: 'Director User',
+          role: 'DIRECTOR',
+          permission: 'DIR',
+          status: 'ACTIVE',
+          category: '',
+          canEdit: 'Page1_Edit',
+          notes: 'Director workspace'
+        },
+        {
+          email: 'manager@yourcompany.com',
+          password: '7-Eleven',
+          fullName: 'Manager User',
+          role: 'MANAGER',
+          permission: 'MAN',
+          status: 'ACTIVE',
+          category: c1,
+          canEdit: 'Page1_Edit',
+          notes: 'Manager workspace'
+        },
+        {
+          email: 'category@yourcompany.com',
+          password: '7-Eleven',
+          fullName: 'Category User',
+          role: 'CATEGORY',
+          permission: 'CAT',
+          status: 'ACTIVE',
+          category: c1,
+          canEdit: 'Page1_Edit',
+          notes: 'Category workspace'
+        }
+      ];
+
+      var seedRows = seedSpecs.map(function(item) {
+        var row = [];
+        for (var col = 0; col < lastCol; col++) row.push('');
+        if (idxEmail >= 0) row[idxEmail] = item.email;
+        var idxPassword = _findUserMasterHeaderIndex_(headers, ['Password']);
+        var idxFullName = _findUserMasterHeaderIndex_(headers, ['Full Name']);
+        if (idxPassword >= 0) row[idxPassword] = item.password;
+        if (idxFullName >= 0) row[idxFullName] = item.fullName;
+        if (idxRole >= 0) row[idxRole] = item.role;
+        if (idxPermission >= 0) row[idxPermission] = item.permission;
+        if (idxStatus >= 0) row[idxStatus] = item.status;
+        if (idxCategory >= 0) row[idxCategory] = item.category;
+        if (idxCanEdit >= 0) row[idxCanEdit] = item.canEdit;
+        if (idxNotes >= 0) row[idxNotes] = item.notes;
+        if (idxCreated >= 0) row[idxCreated] = now;
+        if (idxUpdated >= 0) row[idxUpdated] = now;
+        return row;
+      });
+
+      sheet.getRange(2, 1, seedRows.length, lastCol).setValues(seedRows);
+    }
+
+    if (!sheet.getFilter()) {
+      sheet.getRange(1, 1, sheet.getMaxRows(), lastCol).createFilter();
     }
 
     return _ok({

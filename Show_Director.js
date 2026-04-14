@@ -279,10 +279,19 @@ function _mapDirectorChangesToSheet_(headers, changes) {
 
 function _assertDirectorAccess_(accessRes) {
   if (!accessRes || !accessRes.ok) return accessRes;
-  if (!accessRes.data || accessRes.data.role !== 'DIRECTOR') {
-    return _err('FORBIDDEN', 'Chi co tai khoan Director moi duoc phep truy cap API nay.');
+  if (!accessRes.data || _getSelectedViewCode_(accessRes.data) !== 'DIR') {
+    return _err('FORBIDDEN', 'Chi co Director view moi duoc phep truy cap API nay.');
   }
   return accessRes;
+}
+
+function _requireDirectorAccessOrThrow_(params, requireWrite) {
+  var accessRes = requireWrite ? _requireWriteAccess_(params && params.token) : _resolveAccessForDataApi_(params);
+  accessRes = _assertDirectorAccess_(accessRes);
+  if (!accessRes.ok) {
+    throw new Error((accessRes.error && accessRes.error.message) || 'Access denied');
+  }
+  return accessRes.data;
 }
 
 function getDirectorInitData(params) {
@@ -303,7 +312,15 @@ function getDirectorInitData(params) {
         headers: _directorBuildViewHeaders_([], headers),
         rows: [],
         editableFields: editableFields,
-        meta: { totalRows: 0, currentPage: 1, totalPages: 1, pageSize: CONFIG.PAGE_SIZE }
+        meta: {
+          totalRows: 0,
+          currentPage: 1,
+          totalPages: 1,
+          pageSize: CONFIG.PAGE_SIZE,
+          sheetName: sheet.getName(),
+          selectedView: accessRes.data.selectedView || 'DIR',
+          currentViewCanEdit: accessRes.data.currentViewCanEdit === true
+        }
       });
     }
 
@@ -338,7 +355,15 @@ function getDirectorInitData(params) {
       headers: viewHeaders,
       rows: mappedRows,
       editableFields: editableFields,
-      meta: { totalRows: total, currentPage: 1, totalPages: 1, pageSize: total || CONFIG.PAGE_SIZE }
+      meta: {
+        totalRows: total,
+        currentPage: 1,
+        totalPages: 1,
+        pageSize: total || CONFIG.PAGE_SIZE,
+        sheetName: sheet.getName(),
+        selectedView: accessRes.data.selectedView || 'DIR',
+        currentViewCanEdit: accessRes.data.currentViewCanEdit === true
+      }
     });
   } catch (err) {
     var msg = _directorSafeErrorText_(err, 'Unknown error');
@@ -769,23 +794,24 @@ function authenticateAccount(email, password) {
       return { ok: false, message: 'Email and password are required.' };
     }
 
-    var users = _directorMobileReadUsers_();
-    var user = _directorMobileFindUserByLogin_(users, login);
-    if (!user) return { ok: false, message: 'Invalid email or password.' };
-    if (user.status && user.status !== 'ACTIVE') {
-      return { ok: false, message: 'Account is inactive.' };
-    }
-    if (user.role !== 'DIRECTOR') {
-      return { ok: false, message: 'Only Director accounts can access this page.' };
-    }
-    if (pwd !== user.password) {
-      return { ok: false, message: 'Invalid email or password.' };
+    var accessRes = _getUserAccessByEmail_(login, pwd, true);
+    if (!accessRes.ok) {
+      return { ok: false, message: accessRes.error && accessRes.error.message ? accessRes.error.message : 'Invalid email or password.' };
     }
 
+    var selectedRes = _resolveSelectedAccess_(accessRes.data, 'DIR');
+    if (!selectedRes.ok) {
+      return { ok: false, message: 'Only accounts with DIR permission can access this page.' };
+    }
+
+    var token = _createAuthToken_(selectedRes.data);
     return {
       ok: true,
-      email: user.email,
-      role: DIRECTOR_MOBILE_ROLE_DIRECTOR
+      email: selectedRes.data.email,
+      role: DIRECTOR_MOBILE_ROLE_DIRECTOR,
+      authToken: token,
+      currentViewCanEdit: selectedRes.data.currentViewCanEdit === true,
+      allowedViews: selectedRes.data.allowedViews || []
     };
   } catch (err) {
     throw new Error('authenticateAccount error: ' + _directorSafeErrorText_(err, 'Unknown error'));
@@ -958,8 +984,9 @@ function _directorMobileFindRowByKey_(rows, colMap, targetKey, productName) {
   return -1;
 }
 
-function getProductsAndResults() {
+function getProductsAndResults(params) {
   try {
+    _requireDirectorAccessOrThrow_(params, false);
     var sheet = _openDirectorSheet_();
     var headers = _trimTrailingEmptyHeaders_(_getHeaders(sheet));
     var lastRow = sheet.getLastRow();
@@ -1013,6 +1040,7 @@ function getProductsAndResults() {
 function saveResult(payload) {
   try {
     var data = payload || {};
+    _requireDirectorAccessOrThrow_(data, true);
     var key = _directorMobileSafeString_(data.newProductId || data.productName || '', '').trim();
     if (!key) throw new Error('Missing product identifier');
 
@@ -1055,6 +1083,7 @@ function saveResult(payload) {
 function saveOtherNote(payload) {
   try {
     var data = payload || {};
+    _requireDirectorAccessOrThrow_(data, true);
     var key = _directorMobileSafeString_(data.newProductId || data.productName || '', '').trim();
     var note = _directorMobileSafeString_(data.note || '', '').trim();
 

@@ -395,6 +395,140 @@
       color: #64748b;
       line-height: 1.3;
     }
+    .section {
+      display: grid;
+      gap: 10px;
+    }
+    .section[hidden] {
+      display: none;
+    }
+    .selector-head {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 2px;
+    }
+    .selector-kicker {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: #64748b;
+    }
+    .selector-title {
+      font-family: "Plus Jakarta Sans", "Be Vietnam Pro", sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.15;
+      color: var(--ink);
+    }
+    .selector-sub {
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--ink-soft);
+    }
+    .selector-list {
+      display: grid;
+      gap: 10px;
+    }
+    .selector-card {
+      width: 100%;
+      border: 1px solid rgba(15, 23, 42, .12);
+      border-radius: 12px;
+      background: rgba(255,255,255,.92);
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+      text-align: left;
+      cursor: pointer;
+      transition: border-color .18s, box-shadow .18s, transform .08s;
+    }
+    .selector-card:hover {
+      border-color: rgba(0,122,77,.38);
+      box-shadow: 0 10px 24px rgba(15,23,42,.08);
+    }
+    .selector-card:active {
+      transform: translateY(1px);
+    }
+    .selector-card[disabled] {
+      cursor: wait;
+      opacity: .72;
+    }
+    .selector-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .selector-name {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--ink);
+    }
+    .selector-mode {
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--ink-soft);
+    }
+    .selector-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 92px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .selector-chip.edit {
+      background: rgba(21,128,61,.1);
+      color: var(--ok);
+      border-color: rgba(21,128,61,.22);
+    }
+    .selector-chip.readonly {
+      background: rgba(148,163,184,.12);
+      color: #475569;
+      border-color: rgba(148,163,184,.25);
+    }
+    .selector-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .selector-meta-item {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #475569;
+      background: #f8fafc;
+      border: 1px solid rgba(148,163,184,.18);
+    }
+    .btn-secondary {
+      width: 100%;
+      border: 1px solid rgba(15,23,42,.12);
+      border-radius: 12px;
+      padding: 12px;
+      background: rgba(255,255,255,.86);
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: border-color .18s, background .18s;
+    }
+    .btn-secondary:hover {
+      border-color: rgba(0,122,77,.3);
+      background: #fff;
+    }
+    .btn-secondary[disabled] {
+      opacity: .72;
+      cursor: wait;
+    }
     @media (max-width: 560px) {
       .stage { padding: 12px; }
       .card { border-radius: 18px; }
@@ -421,8 +555,12 @@
         gap: 8px;
       }
       .pkg b { font-size: 19px; }
+      .selector-title { font-size: 20px; }
     }
-  </style>
+</style>
+  <script>
+    window.__LOGIN_BOOTSTRAP__ = <?!= loginBootstrapJson ?>;
+  </script>
 </head>
 <body>
   <div class="stage">
@@ -474,6 +612,7 @@
         <p class="sub">Vui lòng đăng nhập để tiếp tục sử dụng hệ thống.</p>
       </div>
       <div class="body">
+        <div class="section" id="loginSection">
         <label class="lbl" for="email">EMAIL</label>
         <div class="field">
           <input class="inp" id="email" type="email" placeholder="name@7-eleven.vn" value="<?= prefillEmail ?>" autocomplete="username" />
@@ -487,6 +626,16 @@
         <div class="caps" id="capsHint">Caps Lock đang bật</div>
 
         <button class="btn" id="btnLogin" onclick="doLogin()">ĐĂNG NHẬP</button>
+        </div>
+        <div class="section" id="selectorSection" hidden>
+          <div class="selector-head">
+            <div class="selector-kicker">View Access</div>
+            <div class="selector-title" id="selectorTitle">Chon workspace</div>
+            <div class="selector-sub" id="selectorSub">Tai khoan nay co nhieu view. Hay chon dung workspace truoc khi tiep tuc.</div>
+          </div>
+          <div class="selector-list" id="selectorList"></div>
+          <button type="button" class="btn-secondary" id="btnBackToLogin">Dung tai khoan khac</button>
+        </div>
         <div class="progress" id="loginProgress"><div class="progress-bar" id="loginProgressBar"></div></div>
         <div id="msg" class="msg <?= loginMessage ? 'err' : '' ?>"><?= loginMessage ?></div>
       </div>
@@ -502,6 +651,14 @@
     var _progress = document.getElementById('loginProgress');
     var _progressBar = document.getElementById('loginProgressBar');
     var _loadingTimer = null;
+    var _bootstrap = window.__LOGIN_BOOTSTRAP__ || {};
+    var _loginSection = document.getElementById('loginSection');
+    var _selectorSection = document.getElementById('selectorSection');
+    var _selectorList = document.getElementById('selectorList');
+    var _selectorTitle = document.getElementById('selectorTitle');
+    var _selectorSub = document.getElementById('selectorSub');
+    var _btnBackToLogin = document.getElementById('btnBackToLogin');
+    var _selectorState = { token: '', views: [], email: '', fullName: '' };
 
     function _toErrorText(err, fallback) {
       var fb = fallback || 'Unknown';
@@ -675,6 +832,175 @@
     document.addEventListener('mouseleave', function() {
       _card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
     });
+
+    function showLoginSection() {
+      if (_loginSection) _loginSection.hidden = false;
+      if (_selectorSection) _selectorSection.hidden = true;
+    }
+
+    function showSelectorSection() {
+      if (_loginSection) _loginSection.hidden = true;
+      if (_selectorSection) _selectorSection.hidden = false;
+    }
+
+    function setSelectorBusy(flag) {
+      var buttons = _selectorList ? _selectorList.querySelectorAll('button') : [];
+      buttons.forEach(function(btn) {
+        btn.disabled = !!flag;
+      });
+      if (_btnBackToLogin) _btnBackToLogin.disabled = !!flag;
+    }
+
+    function renderSelectorCards() {
+      if (!_selectorList) return;
+      _selectorList.innerHTML = '';
+      (_selectorState.views || []).forEach(function(view) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'selector-card';
+        btn.innerHTML = ''
+          + '<div class="selector-row">'
+          + '  <div class="selector-name">' + view.name + '</div>'
+          + '  <span class="selector-chip ' + (view.canEdit ? 'edit' : 'readonly') + '">' + (view.canEdit ? 'Editable' : 'Read only') + '</span>'
+          + '</div>'
+          + '<div class="selector-mode">' + (view.description || '') + '</div>'
+          + '<div class="selector-meta">'
+          + '  <span class="selector-meta-item">Page: ' + view.page + '</span>'
+          + '  <span class="selector-meta-item">Mode: ' + view.dataMode + '</span>'
+          + '  <span class="selector-meta-item">Sheet: ' + view.sheetName + '</span>'
+          + '  <span class="selector-meta-item">Edit: ' + (view.editRule || 'Read only') + '</span>'
+          + '</div>';
+        btn.addEventListener('click', function() {
+          selectView(view.code);
+        });
+        _selectorList.appendChild(btn);
+      });
+    }
+
+    function beginViewSelection(data) {
+      var payload = data || {};
+      _selectorState.token = String(payload.token || '').trim();
+      _selectorState.views = Array.isArray(payload.availableViews) ? payload.availableViews.slice() : [];
+      _selectorState.email = normalizeLoginEmail(payload.email || _email.value || '');
+      _selectorState.fullName = String(payload.fullName || '').trim();
+
+      if (_selectorTitle) {
+        _selectorTitle.textContent = _selectorState.fullName
+          ? ('Chon workspace cho ' + _selectorState.fullName)
+          : 'Chon workspace';
+      }
+      if (_selectorSub) {
+        _selectorSub.textContent = 'Chi nhung view duoc cap phep moi xuat hien ben duoi. Quyền edit duoc tinh rieng theo view da chon.';
+      }
+
+      renderSelectorCards();
+      showSelectorSection();
+    }
+
+    function resetToLogin() {
+      _selectorState = { token: '', views: [], email: normalizeLoginEmail(_email.value || ''), fullName: '' };
+      showLoginSection();
+      setSelectorBusy(false);
+      setMsg('', '');
+      _pwd.focus();
+    }
+
+    function selectView(viewCode) {
+      if (!_selectorState.token) {
+        setMsg('Session da mat. Vui long dang nhap lai.', 'err');
+        resetToLogin();
+        return;
+      }
+
+      setSelectorBusy(true);
+      setMsg('Dang mo workspace...', '');
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          setSelectorBusy(false);
+          if (!res || !res.ok) {
+            setMsg(_toErrorText(res && res.error ? res.error : res, 'Khong the mo view'), 'err');
+            errorMotion();
+            return;
+          }
+          setMsg('Dang chuyen den workspace da chon...', 'ok');
+          window.location.href = res.data.url;
+        })
+        .withFailureHandler(function(err) {
+          setSelectorBusy(false);
+          setMsg('Loi he thong: ' + _toErrorText(err, 'Unknown'), 'err');
+          errorMotion();
+        })
+        .selectUserView(_selectorState.token, viewCode);
+    }
+
+    function doLogin() {
+      var email = normalizeLoginEmail(_email.value || '');
+      var password = (_pwd.value || '');
+      _email.value = email;
+
+      if (!email) {
+        setMsg('Vui long nhap email.', 'err');
+        _email.focus();
+        return;
+      }
+      if (!password) {
+        setMsg('Vui long nhap mat khau.', 'err');
+        _pwd.focus();
+        return;
+      }
+
+      setLoading(true);
+      setMsg('Dang kiem tra quyen truy cap...', '');
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          setLoading(false);
+          if (!res || !res.ok) {
+            setMsg(_toErrorText(res && res.error ? res.error : res, 'Dang nhap that bai'), 'err');
+            errorMotion();
+            completeProgress();
+            return;
+          }
+          try { localStorage.setItem('npa_last_email', email); } catch (e) {}
+          completeProgress();
+          if (res.data && res.data.requiresViewSelection) {
+            setMsg('Dang nhap thanh cong. Chon workspace de tiep tuc.', 'ok');
+            beginViewSelection({
+              token: res.data.token,
+              email: res.data.email || email,
+              fullName: res.data.fullName || '',
+              availableViews: res.data.availableViews || []
+            });
+            return;
+          }
+          setMsg('Dang nhap thanh cong. Dang chuyen trang...', 'ok');
+          window.location.href = res.data.url;
+        })
+        .withFailureHandler(function(err) {
+          setLoading(false);
+          setMsg('Loi he thong: ' + _toErrorText(err, 'Unknown'), 'err');
+          errorMotion();
+          completeProgress();
+        })
+        .loginWithEmail(email, password);
+    }
+
+    if (_btnBackToLogin) {
+      _btnBackToLogin.addEventListener('click', function() {
+        resetToLogin();
+      });
+    }
+
+    (function bootstrapSelector() {
+      var mode = String((_bootstrap && _bootstrap.mode) || '').trim().toLowerCase();
+      if (mode === 'selector' && Array.isArray(_bootstrap.availableViews) && _bootstrap.availableViews.length) {
+        beginViewSelection(_bootstrap);
+        if (_bootstrap.message) setMsg(_bootstrap.message, '');
+      } else {
+        showLoginSection();
+      }
+    })();
   </script>
 </body>
 </html>

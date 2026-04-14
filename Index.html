@@ -6195,10 +6195,15 @@
       <span style="font-size:14px">👤</span>
       <span id="userBadgeLabel" style="font-size:11px;font-weight:700;color:#1d4ed8">Loading...</span>
     </div>
+    <div id="modeBadge" style="display:flex;align-items:center;gap:6px;padding:4px 10px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;flex-shrink:0">
+      <span style="font-size:14px">🧭</span>
+      <span id="modeBadgeLabel" style="font-size:11px;font-weight:700;color:#334155">Resolving view...</span>
+    </div>
     <div class="topbar-right">
       <div class="conn" id="conn">
         <div class="conn-dot"></div><span id="connTxt">Đang kết nối...</span>
       </div>
+      <button class="btn btn-ghost" id="btnSwitchView" onclick="App.openViewSelector()" style="display:none">↺ Chọn view</button>
       <button class="btn btn-ghost" id="btnRef" onclick="App.reload()">↺ Refresh</button>
       <button class="btn btn-orange" id="btnSaveAll" onclick="App.saveAll()" disabled>💾 Lưu tất cả</button>
     </div>
@@ -7497,7 +7502,13 @@
       };
       var APP_USER = window.__APP_USER__ || {};
       var AUTH_TOKEN = String(APP_USER.authToken || '');
-      var USER_CAN_EDIT = APP_USER.canEdit === true;
+      var SELECTED_VIEW = String(APP_USER.selectedView || '').trim().toUpperCase();
+      var SELECTED_VIEW_NAME = String(APP_USER.selectedViewName || '').trim() || (SELECTED_VIEW === 'MAN' ? 'Manager View' : (SELECTED_VIEW === 'CAT' ? 'Category View' : 'Workspace'));
+      var SELECTED_DATA_MODE = String(APP_USER.selectedDataMode || '').trim().toLowerCase();
+      var SELECTED_SHEET_NAME = String(APP_USER.selectedSheetName || '').trim() || (SELECTED_VIEW === 'MAN' ? 'Manager' : 'Category');
+      var SELECTED_EDIT_RULE = String(APP_USER.selectedEditRule || '').trim();
+      var AVAILABLE_VIEWS = Array.isArray(APP_USER.allowedViews) ? APP_USER.allowedViews.slice() : [];
+      var USER_CAN_EDIT = APP_USER.currentViewCanEdit === true || APP_USER.canEdit === true;
       var USER_SCOPE = Array.isArray(APP_USER.scope) ? APP_USER.scope.slice() : [];
 
       var EMOJIS = {
@@ -7907,7 +7918,7 @@
         document.getElementById('stT').textContent = S.meta.totalRows;
         document.getElementById('stP').textContent = S.meta.currentPage + '/' + S.meta.totalPages;
         document.getElementById('stE').textContent = Object.keys(S.pending).length;
-        document.getElementById('stSh').textContent = S.meta.sheetName || 'Category';
+        document.getElementById('stSh').textContent = S.meta.sheetName || SELECTED_SHEET_NAME || 'Category';
         document.getElementById('tInfo').textContent = 'Hiển thị ' + S.rows.length + '/' + (S.meta.fullTotalRows || S.meta.totalRows) + ' sản phẩm';
         document.getElementById('btnSaveAll').disabled = !USER_CAN_EDIT || !hasPending;
         var s2SaveAll = document.getElementById('s2BtnSaveAll');
@@ -7941,9 +7952,16 @@
       }
       function syncAccessUi() {
         var saveAllBtn = document.getElementById('btnSaveAll');
+        var switchViewBtn = document.getElementById('btnSwitchView');
         var userBadge = document.getElementById('userBadge');
         var userBadgeLabel = document.getElementById('userBadgeLabel');
-        if (saveAllBtn) saveAllBtn.style.display = USER_CAN_EDIT ? '' : 'none';
+        var modeBadge = document.getElementById('modeBadge');
+        var modeBadgeLabel = document.getElementById('modeBadgeLabel');
+        if (saveAllBtn) {
+          saveAllBtn.disabled = !USER_CAN_EDIT || !Object.keys(S.pending).length;
+          saveAllBtn.title = USER_CAN_EDIT ? '' : 'View hiện tại đang ở chế độ chỉ xem';
+        }
+        if (switchViewBtn) switchViewBtn.style.display = AVAILABLE_VIEWS.length > 1 ? '' : 'none';
         if (userBadge && userBadgeLabel) {
           var isTestMode = AUTH_TOKEN && AUTH_TOKEN.startsWith('bypass_token_');
           var visibleScopes = USER_SCOPE.filter(function (s) {
@@ -7959,9 +7977,16 @@
             userBadgeLabel.textContent = 'Test Mode - PIC';
             userBadge.title = 'Bypass login mode for testing';
           } else {
-            userBadgeLabel.textContent = USER_CAN_EDIT ? (APP_USER.fullName + scopeSuffix) : 'View Only';
+            userBadgeLabel.textContent = (APP_USER.fullName || 'User') + scopeSuffix;
             userBadge.title = visibleScopes.length ? ('Scope: ' + visibleScopes.join(', ')) : '';
           }
+        }
+        if (modeBadge && modeBadgeLabel) {
+          modeBadge.style.background = USER_CAN_EDIT ? '#eff6ff' : '#f8fafc';
+          modeBadge.style.borderColor = USER_CAN_EDIT ? '#bfdbfe' : '#cbd5e1';
+          modeBadgeLabel.style.color = USER_CAN_EDIT ? '#1d4ed8' : '#475569';
+          modeBadgeLabel.textContent = SELECTED_VIEW_NAME + ' · ' + (USER_CAN_EDIT ? 'Editable' : 'Read only');
+          modeBadge.title = 'Sheet: ' + (S.meta.sheetName || SELECTED_SHEET_NAME || '-') + (SELECTED_EDIT_RULE ? (' | Edit rule: ' + SELECTED_EDIT_RULE) : ' | Edit rule: read only');
         }
         if (!USER_CAN_EDIT) {
           S.pending = {};
@@ -7973,9 +7998,10 @@
         var step2Btn = document.getElementById('mStepBtn2');
         if (step2Btn) step2Btn.disabled = !USER_CAN_EDIT;
         var ssvCard = document.getElementById('mc_ssvnote');
-        if (ssvCard) ssvCard.style.display = USER_CAN_EDIT ? '' : 'none';
+        if (ssvCard) ssvCard.style.opacity = USER_CAN_EDIT ? '1' : '.65';
         document.querySelectorAll('#overlay button[onclick="App.saveModal()"], #overlay button[onclick="App.saveAll()"], #overlay button[onclick="App.resetModal()"]').forEach(function (btn) {
-          btn.style.display = USER_CAN_EDIT ? '' : 'none';
+          btn.disabled = !USER_CAN_EDIT;
+          btn.title = USER_CAN_EDIT ? '' : 'View hiện tại đang ở chế độ chỉ xem';
         });
         if (!USER_CAN_EDIT && S.detailStep === 2) setDetailStep(1);
       }
@@ -12209,6 +12235,10 @@
         redirectToLogin((payload && payload.error && payload.error.message) || 'Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.');
         return true;
       }
+      function openViewSelector() {
+        if (!AUTH_TOKEN || AVAILABLE_VIEWS.length <= 1) return;
+        window.location.href = '?page=login&token=' + encodeURIComponent(AUTH_TOKEN);
+      }
       function rpcErr(e) {
         if (handleAuthIssue(e)) return;
         setConn('err', 'Lỗi kết nối');
@@ -12396,7 +12426,7 @@
           document.querySelectorAll('.sdrop.open').forEach(function (el) { el.classList.remove('open'); });
         }, true);
         syncAccessUi();
-        if (!AUTH_TOKEN) {
+        if (!AUTH_TOKEN || (SELECTED_VIEW !== 'MAN' && SELECTED_VIEW !== 'CAT')) {
           redirectToLogin('Vui lòng đăng nhập để vào dashboard.');
           return;
         }
@@ -12416,7 +12446,7 @@
         modalUomInput: modalUomInput, modalAddUom: modalAddUom, modalRemoveUom: modalRemoveUom, modalUomFileChange: modalUomFileChange,
         modalPogSlotChange: modalPogSlotChange, modalAddPogSlot: modalAddPogSlot, modalClearPogSlot: modalClearPogSlot,
         setToggle: setToggle,
-        goSection: goSection, clearActiveProduct: clearActiveProduct,
+        goSection: goSection, clearActiveProduct: clearActiveProduct, openViewSelector: openViewSelector,
         selectBatchPreviewProduct: selectBatchPreviewProduct,
         openSelectedModal: openSelectedModal, previewSelected: previewSelected
       };

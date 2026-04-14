@@ -3513,6 +3513,7 @@
           <span id="user-name-badge">—</span>
         </button>
         <div class="user-menu-panel" id="user-menu-panel">
+          <button class="user-menu-item" type="button" id="switch-view-item" onclick="openViewSelector()" style="display:none">Switch View</button>
           <button class="user-menu-item" type="button" onclick="openPasswordModal()">Change Password</button>
           <button class="user-menu-item danger" type="button" onclick="switchUser()">Log Out</button>
         </div>
@@ -3527,6 +3528,7 @@
       <div class="page-header">
         <h2>NPA RATING</h2>
         <p id="date-display"></p>
+        <p id="view-status-display" style="margin-top:6px;font-size:13px;color:var(--text2);font-weight:700"></p>
       </div>
 
       <!-- Filters -->
@@ -3712,6 +3714,7 @@
   <script>
     /* ══ State ══════════════════════════════════════ */
     let currentUser = '', currentEmail = '', allProducts = [], otherProducts = [], existingResults = [], activeTab = 'all', selectedStatus = '';
+    let authToken = '', currentCanEdit = false, availableViews = [];
     const REQUEST_TOKEN = String((new URLSearchParams(window.location.search || '')).get('token') || '').trim();
     function readServerUser() {
       const el = document.getElementById('app-user-json');
@@ -3928,6 +3931,9 @@
           }
           currentEmail = String((res && res.email) || email).trim().toLowerCase();
           currentUser = ROLE_DIRECTOR;
+          authToken = String((res && res.authToken) || '').trim();
+          currentCanEdit = !!(res && res.currentViewCanEdit);
+          availableViews = Array.isArray(res && res.allowedViews) ? res.allowedViews.slice() : [];
           setLoginMessage('Login successful. Opening portal...', 'ok');
           setTimeout(() => {
             setLoginButtonBusy(false);
@@ -3956,8 +3962,14 @@
       av.textContent = roleMeta.initial;
       av.className = 'av ' + roleMeta.cssClass;
       document.getElementById('user-name-badge').textContent = currentEmail || currentUser;
+      const switchItem = document.getElementById('switch-view-item');
+      if (switchItem) switchItem.style.display = availableViews.length > 1 ? '' : 'none';
       document.getElementById('date-display').textContent =
         new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      const viewStatus = document.getElementById('view-status-display');
+      if (viewStatus) {
+        viewStatus.textContent = 'Director View · ' + (currentCanEdit ? 'Editable' : 'Read only');
+      }
 
       loadData();
     }
@@ -3971,20 +3983,29 @@
     }
 
     function bootstrapFromServerSession() {
-      const role = String(SERVER_USER.role || '').trim().toUpperCase();
+      const selectedView = String(SERVER_USER.selectedView || '').trim().toUpperCase();
       const email = String(SERVER_USER.email || '').trim().toLowerCase();
       const token = String(SERVER_USER.authToken || REQUEST_TOKEN || '').trim();
+      const selectedPage = String(SERVER_USER.selectedPage || '').trim().toLowerCase();
 
-      if (role && role !== ROLE_DIRECTOR) {
+      authToken = token;
+      availableViews = Array.isArray(SERVER_USER.allowedViews) ? SERVER_USER.allowedViews.slice() : [];
+      currentCanEdit = SERVER_USER.currentViewCanEdit === true;
+
+      if (!selectedView) {
         if (token) {
-          window.location.href = '?page=index&token=' + encodeURIComponent(token);
+          window.location.href = '?page=login&token=' + encodeURIComponent(token);
           return;
         }
         goToLoginPage(email);
         return;
       }
 
-      if (!role && !token) {
+      if (selectedView !== 'DIR') {
+        if (token) {
+          window.location.href = '?page=' + encodeURIComponent(selectedPage || 'index') + '&token=' + encodeURIComponent(token);
+          return;
+        }
         goToLoginPage(email);
         return;
       }
@@ -4106,19 +4127,32 @@
       closeOtherList();
       currentUser = '';
       currentEmail = '';
+      authToken = '';
+      currentCanEdit = false;
+      availableViews = [];
       const target = emailForPrefill
         ? ('?page=login&email=' + encodeURIComponent(emailForPrefill))
         : '?page=login';
       window.location.href = target;
     }
 
+    function openViewSelector() {
+      if (!authToken || availableViews.length <= 1) return;
+      closeUserMenu();
+      window.location.href = '?page=login&token=' + encodeURIComponent(authToken);
+    }
+
     /* ══ Data ══════════════════════════════════════ */
     function loadData() {
+      if (!authToken) {
+        goToLoginPage(currentEmail);
+        return;
+      }
       document.getElementById('loading').style.display = 'flex';
       document.getElementById('product-grid').style.display = 'none';
       // Single call: get products + results together — ensures key resolution is consistent
       new Promise((ok, er) => google.script.run
-        .withSuccessHandler(ok).withFailureHandler(er).getProductsAndResults())
+        .withSuccessHandler(ok).withFailureHandler(er).getProductsAndResults({ token: authToken }))
         .then(data => {
           const products = (data && data.products) || [];
           otherProducts = products.filter(isOtherProduct).sort((a, b) => otherSortKey(a) - otherSortKey(b));
@@ -4133,6 +4167,7 @@
           document.getElementById('product-grid').style.display = 'grid';
         })
         .catch(err => {
+          if (handleSessionError(err)) return;
           document.getElementById('loading').innerHTML =
             `<div style="color:var(--red);text-align:center;padding:20px">❌ ${escHtml(toErrorText(err, 'Unable to load data'))}</div>`;
         });
@@ -4553,8 +4588,11 @@
     </div>` : '';
 
       const notePrefill = v && v.note ? escHtml(v.note) : '';
-      const dec = otherMode
-        ? `<div class="decision-panel">
+      const readOnlyNotice = `<div class="voted-notice approved-n"><div><strong>Read only</strong></div><div style="font-size:12px;opacity:.85">This Director view does not have edit permission for the current selection.</div></div>`;
+      const dec = !currentCanEdit
+        ? readOnlyNotice
+        : (otherMode
+            ? `<div class="decision-panel">
         <h4>📝 Note by ${currentUser}</h4>
         <div style="margin-bottom:10px">
           <textarea class="form-input" id="modal-note" placeholder="Enter note for this Other product..." oninput="toggleOtherNoteSubmit()">${notePrefill}</textarea>
@@ -4568,12 +4606,12 @@
           Save Note
         </button>
       </div>`
-        : (v
-            ? `<div class="voted-notice ${v.status === 'Approved' ? 'approved-n' : 'rejected-n'}">
+            : (v
+                ? `<div class="voted-notice ${v.status === 'Approved' ? 'approved-n' : 'rejected-n'}">
         <div><strong>${v.status === 'Approved' ? '✅ Approved' : '❌ Rejected'}</strong>${v.result ? ' — ' + v.result : ''}</div>
         ${v.note ? `<div style="font-size:12px;opacity:.8">📝 ${v.note}</div>` : ''}
       </div>`
-            : `<div class="decision-panel">
+                : `<div class="decision-panel">
         <h4>📋 Decision by ${currentUser}</h4>
         <div class="decision-grid">
           <button class="status-btn status-btn-approve" id="modal-btn-approve" onclick="setModalStatus('Approved')">✅ Approved</button>
@@ -4590,7 +4628,7 @@
           </svg>
           Submit Decision
         </button>
-      </div>`);
+      </div>`));
 
       document.getElementById('modal-content').innerHTML = `
 <div class="modal-img-wrap">
@@ -4700,6 +4738,7 @@
     function closeModalOutside(e) { if (e.target === document.getElementById('modal-overlay')) closeModal(); }
 
     function setModalStatus(s) {
+      if (!currentCanEdit) return;
       selectedStatus = s;
       document.getElementById('modal-btn-approve').classList.toggle('active', s === 'Approved');
       document.getElementById('modal-btn-reject').classList.toggle('active', s === 'Rejected');
@@ -4714,6 +4753,10 @@
     }
 
     function submitOtherNote(pkey, pname) {
+      if (!currentCanEdit) {
+        showToast('This view is read only', 'error');
+        return;
+      }
       const noteInput = document.getElementById('modal-note');
       const note = String(noteInput && noteInput.value || '').trim();
       if (!note) {
@@ -4735,16 +4778,21 @@
           refreshResults(true);
         })
         .withFailureHandler(err => {
+          if (handleSessionError(err)) return;
           showToast('❌ ' + toErrorText(err, 'Save failed'), 'error');
           if (btn) {
             btn.disabled = false;
             btn.innerHTML = 'Save Note';
           }
         })
-        .saveOtherNote({ newProductId: pkey, productName: pname, note: note, pic: currentUser });
+        .saveOtherNote({ token: authToken, newProductId: pkey, productName: pname, note: note, pic: currentUser });
     }
 
     function submitDecision(pkey, pname) {
+      if (!currentCanEdit) {
+        showToast('This view is read only', 'error');
+        return;
+      }
       if (!selectedStatus) return;
       // Guard: prevent double submission (case-insensitive)
       const already = existingResults.find(r => normKey(r.newProductId) === normKey(pkey));
@@ -4763,11 +4811,12 @@
           refreshResults(true);
         })
         .withFailureHandler(err => {
+          if (handleSessionError(err)) return;
           showToast('❌ ' + toErrorText(err, 'Save failed'), 'error');
           btn.disabled = false;
           btn.innerHTML = '→ Submit Decision';
         })
-        .saveResult({ newProductId: pkey, productName: pname, status: selectedStatus, note, result, pic: currentUser });
+        .saveResult({ token: authToken, newProductId: pkey, productName: pname, status: selectedStatus, note, result, pic: currentUser });
     }
 
     /* ══ Toast ═════════════════════════════════════ */
@@ -4775,6 +4824,17 @@
       const t = document.getElementById('toast');
       t.textContent = msg; t.className = 'show ' + (type || '');
       setTimeout(() => { t.className = type || ''; }, 3000);
+    }
+
+    function isSessionError(err) {
+      const txt = toErrorText(err, '').toLowerCase();
+      return txt.includes('token') || txt.includes('dang nhap') || txt.includes('sign in') || txt.includes('access denied');
+    }
+
+    function handleSessionError(err) {
+      if (!isSessionError(err)) return false;
+      goToLoginPage(currentEmail);
+      return true;
     }
 
     document.addEventListener('keydown', e => {
@@ -4804,12 +4864,16 @@
     // ── Sync function: manual sync button + post-approve/reject sync ─────
     function refreshResults(silent) {
       if (!currentUser || isSyncing) return;
+      if (!authToken) {
+        goToLoginPage(currentEmail);
+        return;
+      }
       isSyncing = true;
       setSyncButtonBusy(true);
       if (!silent) showSyncOverlay();
 
       new Promise((ok, er) => google.script.run
-        .withSuccessHandler(ok).withFailureHandler(er).getProductsAndResults())
+        .withSuccessHandler(ok).withFailureHandler(er).getProductsAndResults({ token: authToken }))
         .then(data => {
           const products = (data && data.products) || [];
           otherProducts = products.filter(isOtherProduct).sort((a, b) => otherSortKey(a) - otherSortKey(b));
@@ -4825,6 +4889,7 @@
           }
         })
         .catch(err => {
+          if (handleSessionError(err)) return;
           if (!silent) {
             const msg = toErrorText(err, 'Unable to sync data');
             hideSyncOverlay(false, msg);
