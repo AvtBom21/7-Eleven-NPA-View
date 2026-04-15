@@ -6,6 +6,7 @@ var CONFIG = {
   SHEET_NAME_CATEGORY: 'Category',
   SHEET_NAME_MANAGER: 'Manager',
   SHEET_NAME_DIRECTOR: 'Director',
+  SHEET_NAME_PROCESS: 'Process',
   DROPDOWN_SHEET: 'Dropdown_Master',
   USER_MASTER_SHEET: 'User_Master',
   AUDIT_LOG_SHEET: 'Audit_Log',
@@ -1323,6 +1324,1040 @@ function _findHeaderIndexLoose_(headers, fieldName) {
     if (key === target) return i;
   }
   return -1;
+}
+
+// ========================================
+// PROCESS TRACKING API
+// ========================================
+var PROCESS_TRACKING_STAGES = [
+  'Category',
+  'Manager',
+  'Director',
+  'Present List',
+  'Final Information',
+  'Setup Product ID'
+];
+
+var PROCESS_TRACKING_KEY_ALIASES = [
+  'Danh sach chinh',
+  'New Product ID',
+  'New product ID',
+  'Ticket ID'
+];
+
+var PROCESS_TRACKING_CARD_LIMIT_DEFAULT = 80;
+var PROCESS_TRACKING_CARD_LIMIT_MAX = 160;
+
+function _requireProcessTrackingAccess_(params) {
+  var accessRes = _resolveAccessForDataApi_(params);
+  if (!accessRes.ok) return accessRes;
+  var viewCode = _getSelectedViewCode_(accessRes.data);
+  if (viewCode !== 'CAT' && viewCode !== 'MAN') {
+    return _err('FORBIDDEN', 'Chi co Category va Manager moi duoc su dung process tracking.');
+  }
+  return accessRes;
+}
+
+function _normalizeProcessLooseText_(value) {
+  var text = String(value == null ? '' : value);
+  if (text && typeof text.normalize === 'function') {
+    try { text = text.normalize('NFKC'); } catch (err) {}
+  }
+  text = text.replace(/[\u200B-\u200D\uFEFF]/g, '');
+  var basic = text;
+  if (basic && typeof basic.normalize === 'function') {
+    try { basic = basic.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); } catch (err2) {}
+  }
+  return basic
+    .replace(/[_-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+}
+
+function _normalizeProcessExactKey_(value) {
+  var text = String(value == null ? '' : value);
+  if (text && typeof text.normalize === 'function') {
+    try { text = text.normalize('NFKC'); } catch (err) {}
+  }
+  return text
+    .replace(/[\u200B-\u200D\uFEFF]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toUpperCase();
+}
+
+function _normalizeProcessProductGroup_(value) {
+  var raw = String(value == null ? '' : value).trim();
+  if (!raw) return '';
+  return _normalizeProcessLooseText_(raw);
+}
+
+function _getProcessAliasValueFromObject_(obj, aliases) {
+  if (!obj || !aliases || !aliases.length) return '';
+  var aliasMap = {};
+  for (var a = 0; a < aliases.length; a++) {
+    aliasMap[_normalizeProcessLooseText_(aliases[a])] = true;
+  }
+  for (var key in obj) {
+    if (!obj.hasOwnProperty(key)) continue;
+    if (aliasMap[_normalizeProcessLooseText_(key)]) {
+      var value = String(obj[key] == null ? '' : obj[key]).trim();
+      if (value) return value;
+    }
+  }
+  return '';
+}
+
+function _findProcessHeaderIndexes_(headers, aliases) {
+  var out = [];
+  var seen = {};
+  if (!Array.isArray(headers) || !Array.isArray(aliases)) return out;
+
+  var aliasMap = {};
+  for (var a = 0; a < aliases.length; a++) {
+    aliasMap[_normalizeProcessLooseText_(aliases[a])] = true;
+  }
+
+  for (var i = 0; i < headers.length; i++) {
+    if (aliasMap[_normalizeProcessLooseText_(headers[i])] && !seen[i]) {
+      seen[i] = true;
+      out.push(i);
+    }
+  }
+  return out;
+}
+
+function _collectProcessCandidateKeysFromRow_(rowObj) {
+  var groups = [
+    ['Danh sach chinh'],
+    ['New Product ID', 'New product ID'],
+    ['Ticket ID']
+  ];
+  var list = [];
+  var map = {};
+
+  for (var i = 0; i < groups.length; i++) {
+    var raw = _getProcessAliasValueFromObject_(rowObj, groups[i]);
+    var normalized = _normalizeProcessExactKey_(raw);
+    if (!raw || !normalized || map[normalized]) continue;
+    list.push({ raw: raw, normalized: normalized });
+    map[normalized] = { raw: raw, normalized: normalized };
+  }
+
+  return {
+    list: list,
+    map: map,
+    primary: list.length ? list[0].raw : ''
+  };
+}
+
+function _openProcessSheet_() {
+  var ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+  var found = _findSheetByLooseName_(ss, [CONFIG.SHEET_NAME_PROCESS || 'Process', 'Process'], ['process']);
+  if (!found.sheet) {
+    throw new Error('Sheet "' + (CONFIG.SHEET_NAME_PROCESS || 'Process') + '" not found. Available: ' + found.allNames.join(', '));
+  }
+  return found.sheet;
+}
+
+function _normalizeProcessSheetName_(value) {
+  var loose = _normalizeProcessLooseText_(value);
+  var compact = loose.replace(/\s+/g, '');
+  if (!compact) return '';
+  if (compact === 'category') return 'Category';
+  if (compact === 'manager') return 'Manager';
+  if (compact === 'director') return 'Director';
+  if (compact === 'presentlist') return 'Present List';
+  if (compact === 'finalinformation') return 'Final Information';
+  if (compact === 'setupproductid') return 'Setup Product ID';
+  return '';
+}
+
+function _normalizeProcessStatus_(value) {
+  var raw = String(value == null ? '' : value).trim();
+  var loose = _normalizeProcessLooseText_(raw);
+  var compact = loose.replace(/\s+/g, '');
+  if (!compact) return '';
+  if (compact.indexOf('reject') >= 0) return 'Rejected';
+  if (compact === 'processing' || compact === 'pending' || compact === 'inprogress' || compact === 'process') return 'Processing';
+  if (compact === 'done' || compact === 'completed' || compact === 'complete') return 'Done';
+  return raw;
+}
+
+function _getProcessStageOrder_(sheetName) {
+  var canonical = _normalizeProcessSheetName_(sheetName);
+  for (var i = 0; i < PROCESS_TRACKING_STAGES.length; i++) {
+    if (PROCESS_TRACKING_STAGES[i] === canonical) return i;
+  }
+  return -1;
+}
+
+function _getDisplayedProcessLabel_(sheetName, status) {
+  var canonicalSheet = _normalizeProcessSheetName_(sheetName);
+  var displaySheet = canonicalSheet || String(sheetName || '').trim();
+  var normalizedStatus = _normalizeProcessStatus_(status);
+  var displayStatus = String(normalizedStatus || status || '').trim();
+  var order = _getProcessStageOrder_(canonicalSheet);
+  var lastIndex = PROCESS_TRACKING_STAGES.length - 1;
+
+  if (normalizedStatus === 'Rejected') {
+    return displaySheet ? ('Rejected at ' + displaySheet) : 'Rejected';
+  }
+
+  if (order >= 0) {
+    if (order === lastIndex) {
+      if (normalizedStatus === 'Done') return 'Setup Product ID Done';
+      if (normalizedStatus === 'Processing') return 'Setup Product ID Pending';
+    } else if (normalizedStatus === 'Processing' || normalizedStatus === 'Done') {
+      return PROCESS_TRACKING_STAGES[order + 1] + ' Pending';
+    }
+  }
+
+  if (displaySheet && displayStatus) return displaySheet + ' | ' + displayStatus;
+  if (displaySheet) return displaySheet;
+  if (displayStatus) return displayStatus;
+  return 'Process unavailable';
+}
+
+function _buildProcessStageTimeline_(sheetName, status) {
+  var canonicalSheet = _normalizeProcessSheetName_(sheetName);
+  var normalizedStatus = _normalizeProcessStatus_(status);
+  var order = _getProcessStageOrder_(canonicalSheet);
+  var lastIndex = PROCESS_TRACKING_STAGES.length - 1;
+  var timeline = [];
+  var i;
+
+  for (i = 0; i < PROCESS_TRACKING_STAGES.length; i++) {
+    timeline.push({
+      name: PROCESS_TRACKING_STAGES[i],
+      state: 'pending'
+    });
+  }
+
+  if (order < 0) return timeline;
+
+  if (normalizedStatus === 'Rejected') {
+    for (i = 0; i < order; i++) timeline[i].state = 'done';
+    timeline[order].state = 'rejected';
+    return timeline;
+  }
+
+  if (normalizedStatus === 'Processing' || normalizedStatus === 'Done') {
+    if (order === lastIndex) {
+      for (i = 0; i < order; i++) timeline[i].state = 'done';
+      timeline[order].state = normalizedStatus === 'Done' ? 'done' : 'current';
+      return timeline;
+    }
+
+    for (i = 0; i <= order; i++) timeline[i].state = 'done';
+    timeline[order + 1].state = 'current';
+    return timeline;
+  }
+
+  for (i = 0; i < order; i++) timeline[i].state = 'done';
+  timeline[order].state = 'current';
+  return timeline;
+}
+
+function _extractGoogleDriveFileId_(url) {
+  var raw = String(url || '').trim();
+  if (!raw) return '';
+  var match = raw.match(/\/d\/([^/?#]+)/i);
+  if (match && match[1]) return match[1];
+  match = raw.match(/[?&]id=([^&#]+)/i);
+  if (match && match[1]) return match[1];
+  return '';
+}
+
+function _buildProcessPreviewImageUrl_(url) {
+  var raw = String(url || '').trim();
+  if (!raw) return '';
+  var fileId = _extractGoogleDriveFileId_(raw);
+  if (fileId) return 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w1200';
+  return raw;
+}
+
+function _extractPrimaryImageUrl_(rawUrl) {
+  if (rawUrl === null || rawUrl === undefined) return '';
+  var parts = String(rawUrl).split(/[;\n]+/);
+  for (var i = 0; i < parts.length; i++) {
+    var item = String(parts[i] || '').trim();
+    if (item) return item;
+  }
+  return '';
+}
+
+function _formatProcessLastSeen_(value) {
+  if (value instanceof Date && !isNaN(value.getTime())) {
+    var tz = '';
+    try { tz = Session.getScriptTimeZone(); } catch (err) { tz = ''; }
+    return Utilities.formatDate(value, tz || 'Asia/Ho_Chi_Minh', 'yyyy-MM-dd HH:mm:ss');
+  }
+  return String(value == null ? '' : value).trim();
+}
+
+function _parseProcessLastSeenTimestamp_(value) {
+  if (value instanceof Date && !isNaN(value.getTime())) return value.getTime();
+  if (typeof value === 'number' && isFinite(value)) return value;
+  var raw = String(value == null ? '' : value).trim();
+  if (!raw) return -1;
+  var parsed = new Date(raw);
+  if (!isNaN(parsed.getTime())) return parsed.getTime();
+  return -1;
+}
+
+function _isProcessHeaderLikeRow_(rowValues) {
+  if (!Array.isArray(rowValues) || !rowValues.length) return false;
+  var checks = 0;
+  var col0 = _normalizeProcessLooseText_(rowValues[0]);
+  var col1 = _normalizeProcessLooseText_(rowValues[1]);
+  var col2 = _normalizeProcessLooseText_(rowValues[2]);
+  var col3 = _normalizeProcessLooseText_(rowValues[3]);
+  var col4 = _normalizeProcessLooseText_(rowValues[4]);
+  var col5 = _normalizeProcessLooseText_(rowValues[5]);
+  var col6 = _normalizeProcessLooseText_(rowValues[6]);
+  var col7 = _normalizeProcessLooseText_(rowValues[7]);
+  if (col0 === 'danh sach chinh' || col0 === 'main list') checks++;
+  if (col1 === 'sheet') checks++;
+  if (col2 === 'last seen' || col2 === 'last_seen') checks++;
+  if (col3 === 'status') checks++;
+  if (col4 === 'product name') checks++;
+  if (col5.indexOf('uom') >= 0) checks++;
+  if (col6.indexOf('image') >= 0 || col6.indexOf('url') >= 0) checks++;
+  if (col7 === 'product group') checks++;
+  return checks >= 3;
+}
+
+function _buildProcessRecordFromRow_(rowValues, rowNumber) {
+  if (!Array.isArray(rowValues) || rowValues.length < 8) return null;
+
+  var key = String(rowValues[0] == null ? '' : rowValues[0]).trim();
+  var keyNorm = _normalizeProcessExactKey_(key);
+  if (!keyNorm) return null;
+
+  var normalizedSheet = _normalizeProcessSheetName_(rowValues[1]);
+  var normalizedStatus = _normalizeProcessStatus_(rowValues[3]);
+  var displaySheet = normalizedSheet || String(rowValues[1] == null ? '' : rowValues[1]).trim();
+  var displayStatus = normalizedStatus || String(rowValues[3] == null ? '' : rowValues[3]).trim();
+  var imageOriginalUrl = _extractPrimaryImageUrl_(rowValues[6]);
+  var productGroup = String(rowValues[7] == null ? '' : rowValues[7]).trim();
+
+  return {
+    rowNumber: rowNumber,
+    key: key,
+    keyNorm: keyNorm,
+    currentSheet: displaySheet,
+    currentStatus: displayStatus,
+    lastSeen: _formatProcessLastSeen_(rowValues[2]),
+    lastSeenTs: _parseProcessLastSeenTimestamp_(rowValues[2]),
+    productName: String(rowValues[4] == null ? '' : rowValues[4]).trim(),
+    barcodeOrUom: String(rowValues[5] == null ? '' : rowValues[5]).trim(),
+    imageOriginalUrl: imageOriginalUrl,
+    imageUrl: _buildProcessPreviewImageUrl_(imageOriginalUrl),
+    productGroup: productGroup,
+    productGroupNorm: _normalizeProcessProductGroup_(productGroup),
+    displayStageLabel: _getDisplayedProcessLabel_(displaySheet, displayStatus),
+    stageTimeline: _buildProcessStageTimeline_(displaySheet, displayStatus)
+  };
+}
+
+function _readProcessRecords_() {
+  var opened;
+  try {
+    opened = _openProcessSheet_();
+  } catch (err) {
+    return {
+      sheet: null,
+      records: [],
+      warning: { code: 'PROCESS_SHEET_NOT_FOUND', message: err.message }
+    };
+  }
+
+  var sheet = opened;
+  var lastRow = sheet.getLastRow();
+  if (lastRow < CONFIG.DATA_START_ROW) {
+    return { sheet: sheet, records: [], warning: null };
+  }
+
+  var rowCount = lastRow - CONFIG.DATA_START_ROW + 1;
+  var rawData = sheet.getRange(CONFIG.DATA_START_ROW, 3, rowCount, 8).getValues();
+  var records = [];
+
+  for (var i = 0; i < rawData.length; i++) {
+    var row = rawData[i];
+    var hasContent = false;
+    for (var j = 0; j < row.length; j++) {
+      if (row[j] !== null && row[j] !== undefined && row[j] !== '') {
+        hasContent = true;
+        break;
+      }
+    }
+    if (!hasContent) continue;
+    if (_isProcessHeaderLikeRow_(row)) continue;
+
+    var record = _buildProcessRecordFromRow_(row, CONFIG.DATA_START_ROW + i);
+    if (record) records.push(record);
+  }
+
+  return { sheet: sheet, records: records, warning: null };
+}
+
+function _readAccessScopedRowsFromCurrentSheet_(access) {
+  var sheet = _openSheet(access);
+  var headers = _trimTrailingEmptyHeaders_(_getHeaders(sheet));
+  var lastRow = sheet.getLastRow();
+  if (!headers.length || lastRow < CONFIG.DATA_START_ROW) {
+    return { sheet: sheet, headers: headers, rows: [] };
+  }
+
+  var rowCount = lastRow - CONFIG.DATA_START_ROW + 1;
+  var rawData = sheet.getRange(CONFIG.DATA_START_ROW, 1, rowCount, headers.length).getValues();
+  var rows = [];
+
+  for (var i = 0; i < rawData.length; i++) {
+    var row = rawData[i];
+    var hasContent = false;
+    for (var j = 0; j < row.length; j++) {
+      if (row[j] !== null && row[j] !== undefined && row[j] !== '') {
+        hasContent = true;
+        break;
+      }
+    }
+    if (!hasContent) continue;
+    rows.push(_buildRowObjectFromArray_(headers, row, CONFIG.DATA_START_ROW + i));
+  }
+
+  return {
+    sheet: sheet,
+    headers: headers,
+    rows: _applyAccessScopeToRows_(rows, access)
+  };
+}
+
+function _pushAllowedProcessGroup_(collector, rawValue, source) {
+  var raw = String(rawValue == null ? '' : rawValue).trim();
+  var normalized = _normalizeProcessProductGroup_(raw);
+  if (!raw || !normalized) return;
+  if (!collector.map[normalized]) {
+    collector.map[normalized] = raw;
+    collector.list.push(raw);
+  }
+  if (source) collector.sources[source] = true;
+}
+
+function _getAllowedProcessGroupsForAccess_(access, records) {
+  var info = {
+    list: [],
+    map: {},
+    sources: {},
+    warning: null
+  };
+
+  if (!access) {
+    info.warning = {
+      code: 'PROCESS_GROUP_SCOPE_EMPTY',
+      message: 'Khong the xac dinh Product Group hop le cho tai khoan hien tai.'
+    };
+    return info;
+  }
+
+  var accessibleRows = [];
+  try {
+    accessibleRows = _readAccessScopedRowsFromCurrentSheet_(access).rows || [];
+  } catch (err) {
+    accessibleRows = [];
+  }
+
+  for (var i = 0; i < accessibleRows.length; i++) {
+    var row = accessibleRows[i] || {};
+    _pushAllowedProcessGroup_(info, row['Product Group'] || row['PRODUCT GROUP'] || '', 'currentSheet');
+  }
+
+  var processGroupCatalog = {};
+  var processRows = Array.isArray(records) ? records : [];
+  for (var r = 0; r < processRows.length; r++) {
+    var record = processRows[r];
+    if (!record || !record.productGroupNorm || processGroupCatalog[record.productGroupNorm]) continue;
+    processGroupCatalog[record.productGroupNorm] = record.productGroup;
+  }
+
+  var scopes = Array.isArray(access.scope) ? access.scope : [];
+  for (var s = 0; s < scopes.length; s++) {
+    var normalizedScope = _normalizeProcessProductGroup_(scopes[s]);
+    if (!normalizedScope || !processGroupCatalog[normalizedScope]) continue;
+    _pushAllowedProcessGroup_(info, processGroupCatalog[normalizedScope], 'scope');
+  }
+
+  if (!info.list.length) {
+    info.warning = {
+      code: 'PROCESS_GROUP_SCOPE_EMPTY',
+      message: 'Khong xac dinh duoc Product Group hop le. Danh sach process se an toan va tra ve rong cho den khi exact code lookup duoc xac minh scope.'
+    };
+  }
+
+  return info;
+}
+
+function _isProcessRecordAllowedByGroup_(record, allowedGroupInfo) {
+  return !!(record && record.productGroupNorm && allowedGroupInfo && allowedGroupInfo.map && allowedGroupInfo.map[record.productGroupNorm]);
+}
+
+function _filterProcessRowsByProductGroup_(rows, access, options) {
+  var list = Array.isArray(rows) ? rows : [];
+  var opts = options || {};
+  var allowedGroupInfo = opts.allowedGroupInfo || _getAllowedProcessGroupsForAccess_(access, list);
+  if (!allowedGroupInfo.list.length) return [];
+
+  return list.filter(function(record) {
+    return _isProcessRecordAllowedByGroup_(record, allowedGroupInfo);
+  });
+}
+
+function _getProcessSheetLookupTokens_(sheetName) {
+  var canonical = _normalizeProcessSheetName_(sheetName);
+  if (!canonical) return [];
+  var parts = _normalizeProcessLooseText_(canonical).split(' ');
+  var out = [];
+  for (var i = 0; i < parts.length; i++) {
+    if (parts[i]) out.push(parts[i]);
+  }
+  return out;
+}
+
+function _openProcessSourceSheet_(sheetName) {
+  var canonical = _normalizeProcessSheetName_(sheetName);
+  if (!canonical) return { sheet: null, allNames: [] };
+  var ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+  return _findSheetByLooseName_(ss, [canonical], _getProcessSheetLookupTokens_(canonical));
+}
+
+function _readProcessSourceSheetRows_(sheetName) {
+  var opened = _openProcessSourceSheet_(sheetName);
+  if (!opened.sheet) {
+    return { sheet: null, available: opened.allNames || [], headers: [], rows: [] };
+  }
+
+  var sheet = opened.sheet;
+  var headers = _trimTrailingEmptyHeaders_(_getHeaders(sheet));
+  var lastRow = sheet.getLastRow();
+  if (!headers.length || lastRow < CONFIG.DATA_START_ROW) {
+    return { sheet: sheet, available: opened.allNames || [], headers: headers, rows: [] };
+  }
+
+  var rowCount = lastRow - CONFIG.DATA_START_ROW + 1;
+  var rows = sheet.getRange(CONFIG.DATA_START_ROW, 1, rowCount, headers.length).getValues();
+  return { sheet: sheet, available: opened.allNames || [], headers: headers, rows: rows };
+}
+
+function _verifyProcessRecordAccessStrict_(record, access) {
+  if (!record || !access) return false;
+  if (_isDirectorViewAccess_(access)) return true;
+
+  var sourceTable = _readProcessSourceSheetRows_(record.currentSheet);
+  if (!sourceTable.sheet || !sourceTable.headers.length || !sourceTable.rows.length) return false;
+
+  var keyIndexes = _findProcessHeaderIndexes_(sourceTable.headers, PROCESS_TRACKING_KEY_ALIASES);
+  if (!keyIndexes.length) return false;
+
+  for (var i = 0; i < sourceTable.rows.length; i++) {
+    var row = sourceTable.rows[i];
+    var matched = false;
+    for (var k = 0; k < keyIndexes.length; k++) {
+      var idx = keyIndexes[k];
+      if (_normalizeProcessExactKey_(row[idx]) === record.keyNorm) {
+        matched = true;
+        break;
+      }
+    }
+    if (!matched) continue;
+
+    var rowObj = _buildRowObjectFromArray_(sourceTable.headers, row, CONFIG.DATA_START_ROW + i);
+    if (_hasRowAccess_(rowObj, access)) return true;
+  }
+
+  return false;
+}
+
+function _filterProcessByAccess_(records, access, options) {
+  var list = Array.isArray(records) ? records : [];
+  var opts = options || {};
+  var allowedKeys = opts.allowedKeys || null;
+  var rowSnapshot = opts.rowSnapshot || null;
+  var requireVerifiedAccess = opts.requireVerifiedAccess === true;
+  var enforceProductGroup = opts.enforceProductGroup === true;
+  var allowBlankGroupWhenVerified = opts.allowBlankGroupWhenVerified === true;
+  var allowVerifiedAccessBypassGroup = opts.allowVerifiedAccessBypassGroup === true;
+  var allowedGroupInfo = opts.allowedGroupInfo || null;
+  var out = [];
+
+  if (rowSnapshot && !_hasRowAccess_(rowSnapshot, access)) return [];
+  if (enforceProductGroup && !allowedGroupInfo) {
+    allowedGroupInfo = _getAllowedProcessGroupsForAccess_(access, list);
+  }
+
+  for (var i = 0; i < list.length; i++) {
+    var record = list[i];
+    if (!record) continue;
+    if (allowedKeys && !allowedKeys[record.keyNorm]) continue;
+    if (enforceProductGroup) {
+      var groupAllowed = _isProcessRecordAllowedByGroup_(record, allowedGroupInfo);
+      var verifiedAccess = null;
+      if (!groupAllowed && (allowBlankGroupWhenVerified || allowVerifiedAccessBypassGroup) && requireVerifiedAccess) {
+        verifiedAccess = _verifyProcessRecordAccessStrict_(record, access);
+      }
+      if (!groupAllowed && allowBlankGroupWhenVerified && !record.productGroupNorm && verifiedAccess === true) {
+        groupAllowed = true;
+      }
+      if (!groupAllowed && allowVerifiedAccessBypassGroup && verifiedAccess === true) {
+        groupAllowed = true;
+      }
+      if (!groupAllowed) continue;
+      if (requireVerifiedAccess && verifiedAccess !== true && !_verifyProcessRecordAccessStrict_(record, access)) continue;
+    } else if (requireVerifiedAccess && !_verifyProcessRecordAccessStrict_(record, access)) {
+      continue;
+    }
+    out.push(record);
+  }
+
+  return out;
+}
+
+function _getProcessRecordStageRank_(record) {
+  if (!record) return -1;
+  return _getProcessStageOrder_(record.currentSheet);
+}
+
+function _compareProcessRecords_(candidate, current, keyRankMap) {
+  if (!candidate && !current) return 0;
+  if (candidate && !current) return 1;
+  if (!candidate && current) return -1;
+
+  if (keyRankMap) {
+    var candidateKeyRank = keyRankMap.hasOwnProperty(candidate.keyNorm) ? keyRankMap[candidate.keyNorm] : 999999;
+    var currentKeyRank = keyRankMap.hasOwnProperty(current.keyNorm) ? keyRankMap[current.keyNorm] : 999999;
+    if (candidateKeyRank !== currentKeyRank) return candidateKeyRank < currentKeyRank ? 1 : -1;
+  }
+
+  var candidateTs = typeof candidate.lastSeenTs === 'number' ? candidate.lastSeenTs : -1;
+  var currentTs = typeof current.lastSeenTs === 'number' ? current.lastSeenTs : -1;
+  if (candidateTs !== currentTs) return candidateTs > currentTs ? 1 : -1;
+
+  var candidateStage = _getProcessRecordStageRank_(candidate);
+  var currentStage = _getProcessRecordStageRank_(current);
+  if (candidateStage !== currentStage) return candidateStage > currentStage ? 1 : -1;
+
+  var candidateRow = parseInt(candidate.rowNumber, 10) || 0;
+  var currentRow = parseInt(current.rowNumber, 10) || 0;
+  if (candidateRow !== currentRow) return candidateRow > currentRow ? 1 : -1;
+
+  return 0;
+}
+
+function _buildProcessKeyRankMap_(candidateKeys) {
+  var map = {};
+  var list = Array.isArray(candidateKeys) ? candidateKeys : [];
+  for (var i = 0; i < list.length; i++) {
+    var item = list[i];
+    var normalized = typeof item === 'string' ? item : (item && item.normalized);
+    if (!normalized || map.hasOwnProperty(normalized)) continue;
+    map[normalized] = i;
+  }
+  return map;
+}
+
+function _findBestProcessMatch_(records, candidateKeys) {
+  var list = Array.isArray(records) ? records : [];
+  var rankMap = candidateKeys ? _buildProcessKeyRankMap_(candidateKeys) : null;
+  var hasRankMap = rankMap && Object.keys(rankMap).length > 0;
+  var best = null;
+
+  for (var i = 0; i < list.length; i++) {
+    var record = list[i];
+    if (!record) continue;
+    if (hasRankMap && !rankMap.hasOwnProperty(record.keyNorm)) continue;
+    if (_compareProcessRecords_(record, best, rankMap) > 0) best = record;
+  }
+
+  return best;
+}
+
+function _buildBestProcessIndexByKey_(records) {
+  var out = {};
+  var list = Array.isArray(records) ? records : [];
+  for (var i = 0; i < list.length; i++) {
+    var record = list[i];
+    if (!record || !record.keyNorm) continue;
+    if (!out[record.keyNorm] || _compareProcessRecords_(record, out[record.keyNorm], null) > 0) {
+      out[record.keyNorm] = record;
+    }
+  }
+  return out;
+}
+
+function _getRowSnapshotsByNumber_(sheet, headers, rowNumbers) {
+  var out = {};
+  var unique = [];
+  var seen = {};
+  var lastRow = sheet.getLastRow();
+  var i;
+
+  for (i = 0; i < rowNumbers.length; i++) {
+    var rowNumber = parseInt(rowNumbers[i], 10);
+    if (!rowNumber || rowNumber < CONFIG.DATA_START_ROW || rowNumber > lastRow || seen[rowNumber]) continue;
+    seen[rowNumber] = true;
+    unique.push(rowNumber);
+  }
+
+  if (!unique.length) return out;
+
+  unique.sort(function(a, b) { return a - b; });
+  var minRow = unique[0];
+  var maxRow = unique[unique.length - 1];
+  var raw = sheet.getRange(minRow, 1, maxRow - minRow + 1, headers.length).getValues();
+
+  for (i = 0; i < unique.length; i++) {
+    var rn = unique[i];
+    out[rn] = _buildRowObjectFromArray_(headers, raw[rn - minRow], rn);
+  }
+
+  return out;
+}
+
+function _getProcessRowFallbackSummary_(rowObj) {
+  var rawImage = _extractPrimaryImageUrl_(_getProcessAliasValueFromObject_(rowObj, ['URL Image', 'Url Image', 'URL IMAGE']));
+  return {
+    productName: _getProcessAliasValueFromObject_(rowObj, ['Product Name', 'PIC input Product Name (Duoi 40 ki tu)']),
+    barcodeOrUom: _getProcessAliasValueFromObject_(rowObj, ['UOM Information', 'UOM INFORMATION']),
+    productGroup: _getProcessAliasValueFromObject_(rowObj, ['Product Group']),
+    imageOriginalUrl: rawImage,
+    imageUrl: _buildProcessPreviewImageUrl_(rawImage)
+  };
+}
+
+function _buildProcessCardSummary_(record, fallback) {
+  var base = fallback || {};
+  var current = record || {};
+  return {
+    key: current.key || base.key || '',
+    productName: current.productName || base.productName || '',
+    imageUrl: current.imageUrl || base.imageUrl || '',
+    imageOriginalUrl: current.imageOriginalUrl || base.imageOriginalUrl || '',
+    barcodeOrUom: current.barcodeOrUom || base.barcodeOrUom || '',
+    productGroup: current.productGroup || base.productGroup || '',
+    currentSheet: current.currentSheet || '',
+    currentStatus: current.currentStatus || '',
+    displayStageLabel: current.displayStageLabel || base.displayStageLabel || '',
+    lastSeen: current.lastSeen || ''
+  };
+}
+
+function _buildProcessDetailModel_(record, fallback) {
+  var summary = _buildProcessCardSummary_(record, fallback);
+  return {
+    key: summary.key,
+    productName: summary.productName,
+    imageUrl: summary.imageUrl,
+    imageOriginalUrl: summary.imageOriginalUrl,
+    barcodeOrUom: summary.barcodeOrUom,
+    productGroup: summary.productGroup,
+    currentSheet: summary.currentSheet,
+    currentStatus: summary.currentStatus,
+    displayStageLabel: summary.displayStageLabel,
+    lastSeen: summary.lastSeen,
+    stageTimeline: record ? record.stageTimeline : _buildProcessStageTimeline_('', '')
+  };
+}
+
+function _buildProcessLookupEntry_(record, rowSnapshot, primaryKey) {
+  var fallback = rowSnapshot ? _getProcessRowFallbackSummary_(rowSnapshot) : {};
+  if (primaryKey && !fallback.key) fallback.key = primaryKey;
+  if (!record) {
+    var emptySummary = _buildProcessCardSummary_(null, fallback);
+    return {
+      exists: false,
+      key: emptySummary.key,
+      label: '',
+      currentSheet: '',
+      currentStatus: '',
+      lastSeen: '',
+      imageUrl: emptySummary.imageUrl,
+      imageOriginalUrl: emptySummary.imageOriginalUrl,
+      productName: emptySummary.productName,
+      barcodeOrUom: emptySummary.barcodeOrUom,
+      productGroup: emptySummary.productGroup
+    };
+  }
+
+  var summary = _buildProcessCardSummary_(record, fallback);
+  return {
+    exists: true,
+    key: summary.key || primaryKey || '',
+    label: record.displayStageLabel || '',
+    currentSheet: summary.currentSheet || '',
+    currentStatus: summary.currentStatus || '',
+    lastSeen: summary.lastSeen || '',
+    imageUrl: summary.imageUrl || '',
+    imageOriginalUrl: summary.imageOriginalUrl || '',
+    productName: summary.productName || '',
+    barcodeOrUom: summary.barcodeOrUom || '',
+    productGroup: summary.productGroup || ''
+  };
+}
+
+function _buildProcessDetailPayload_(record, rowSnapshot, primaryKey) {
+  var fallback = rowSnapshot ? _getProcessRowFallbackSummary_(rowSnapshot) : {};
+  if (primaryKey && !fallback.key) fallback.key = primaryKey;
+  return _buildProcessDetailModel_(record, fallback);
+}
+
+function _isProcessListEligible_(record) {
+  if (!record || !record.keyNorm) return false;
+  return !(_normalizeProcessSheetName_(record.currentSheet) === 'Setup Product ID' && _normalizeProcessStatus_(record.currentStatus) === 'Done');
+}
+
+function _buildProcessSearchText_(record) {
+  if (!record) return '';
+  return _normalizeProcessLooseText_([
+    record.key || '',
+    record.productName || '',
+    record.barcodeOrUom || '',
+    record.productGroup || '',
+    record.currentSheet || '',
+    record.currentStatus || '',
+    record.displayStageLabel || ''
+  ].join(' '));
+}
+
+function _matchesProcessingProductsQuery_(record, query) {
+  var raw = String(query == null ? '' : query).trim();
+  if (!raw) return true;
+  var exact = _normalizeProcessExactKey_(raw);
+  if (exact && record && record.keyNorm === exact) return true;
+  var loose = _normalizeProcessLooseText_(raw);
+  if (!loose) return true;
+  return _buildProcessSearchText_(record).indexOf(loose) >= 0;
+}
+
+function _getProcessingProductsLimit_(value) {
+  var limit = parseInt(value, 10);
+  if (!limit || limit < 1) return PROCESS_TRACKING_CARD_LIMIT_DEFAULT;
+  return Math.min(limit, PROCESS_TRACKING_CARD_LIMIT_MAX);
+}
+
+function getProcessingProducts(params) {
+  try {
+    params = params || {};
+    var accessRes = _requireProcessTrackingAccess_(params);
+    if (!accessRes.ok) return accessRes;
+
+    var processTable = _readProcessRecords_();
+    if (processTable.warning) {
+      return _ok({
+        items: [],
+        total: 0,
+        returned: 0,
+        limit: _getProcessingProductsLimit_(params.limit),
+        allowedGroups: [],
+        warning: processTable.warning
+      });
+    }
+
+    var allowedGroupInfo = _getAllowedProcessGroupsForAccess_(accessRes.data, processTable.records);
+    var filtered = _filterProcessRowsByProductGroup_(processTable.records, accessRes.data, {
+      allowedGroupInfo: allowedGroupInfo
+    });
+    var bestByKey = _buildBestProcessIndexByKey_(filtered);
+    var deduped = [];
+    for (var keyNorm in bestByKey) {
+      if (!bestByKey.hasOwnProperty(keyNorm)) continue;
+      deduped.push(bestByKey[keyNorm]);
+    }
+
+    deduped = deduped.filter(function(record) {
+      return _isProcessListEligible_(record);
+    });
+
+    var query = String(params.query || '').trim();
+    if (query) {
+      deduped = deduped.filter(function(record) {
+        return _matchesProcessingProductsQuery_(record, query);
+      });
+    }
+
+    deduped.sort(function(a, b) {
+      var compared = _compareProcessRecords_(a, b, null);
+      if (compared > 0) return -1;
+      if (compared < 0) return 1;
+      return 0;
+    });
+
+    var total = deduped.length;
+    var limit = _getProcessingProductsLimit_(params.limit);
+    var items = deduped.slice(0, limit).map(function(record) {
+      return _buildProcessCardSummary_(record, null);
+    });
+
+    return _ok({
+      items: items,
+      total: total,
+      returned: items.length,
+      limit: limit,
+      query: query,
+      allowedGroups: allowedGroupInfo.list,
+      warning: allowedGroupInfo.warning
+    });
+  } catch (err) {
+    Logger.log('getProcessingProducts ERROR: ' + err.toString());
+    return _err('PROCESS_PRODUCTS_ERROR', err.message, err.stack);
+  }
+}
+
+function getProcessLookup(params) {
+  try {
+    params = params || {};
+    var accessRes = _requireProcessTrackingAccess_(params);
+    if (!accessRes.ok) return accessRes;
+
+    var items = Array.isArray(params.items) ? params.items : [];
+    var rowNumbers = [];
+    for (var i = 0; i < items.length; i++) {
+      var rowNumber = parseInt(items[i] && items[i].rowNumber, 10);
+      if (rowNumber) rowNumbers.push(rowNumber);
+    }
+
+    if (!rowNumbers.length) {
+      return _ok({ byRowNumber: {}, byKey: {} });
+    }
+
+    var sheet = _openSheet(accessRes.data);
+    var headers = _trimTrailingEmptyHeaders_(_getHeaders(sheet));
+    if (!headers.length || sheet.getLastRow() < CONFIG.DATA_START_ROW) {
+      return _ok({ byRowNumber: {}, byKey: {} });
+    }
+
+    var rowSnapshots = _getRowSnapshotsByNumber_(sheet, headers, rowNumbers);
+    var processTable = _readProcessRecords_();
+    if (processTable.warning) {
+      return _ok({
+        byRowNumber: {},
+        byKey: {},
+        warning: processTable.warning
+      });
+    }
+
+    var bestByKey = _buildBestProcessIndexByKey_(processTable.records);
+    var byRowNumber = {};
+    var byKey = {};
+
+    for (var r = 0; r < rowNumbers.length; r++) {
+      var rn = rowNumbers[r];
+      var rowSnapshot = rowSnapshots[rn];
+      if (!rowSnapshot || !_hasRowAccess_(rowSnapshot, accessRes.data)) continue;
+
+      var keyInfo = _collectProcessCandidateKeysFromRow_(rowSnapshot);
+      if (!keyInfo.list.length) continue;
+
+      var candidates = [];
+      for (var k = 0; k < keyInfo.list.length; k++) {
+        var keyNorm = keyInfo.list[k].normalized;
+        if (bestByKey[keyNorm]) candidates.push(bestByKey[keyNorm]);
+      }
+
+      var matched = _findBestProcessMatch_(candidates, keyInfo.list);
+      var entry = _buildProcessLookupEntry_(matched, rowSnapshot, keyInfo.primary);
+      byRowNumber[String(rn)] = entry;
+      if (entry.key) {
+        var existing = byKey[entry.key];
+        if (!existing || (entry.exists && !existing.exists)) byKey[entry.key] = entry;
+      }
+    }
+
+    return _ok({
+      byRowNumber: byRowNumber,
+      byKey: byKey
+    });
+  } catch (err) {
+    Logger.log('getProcessLookup ERROR: ' + err.toString());
+    return _err('PROCESS_LOOKUP_ERROR', err.message, err.stack);
+  }
+}
+
+function getProcessDetail(params) {
+  try {
+    params = params || {};
+    var accessRes = _requireProcessTrackingAccess_(params);
+    if (!accessRes.ok) return accessRes;
+
+    var processTable = _readProcessRecords_();
+    if (processTable.warning) {
+      return _err(processTable.warning.code || 'PROCESS_SHEET_NOT_FOUND', processTable.warning.message || 'Process sheet is not available.');
+    }
+
+    if (params.rowNumber) {
+      var rowNumber = parseInt(params.rowNumber, 10);
+      if (!rowNumber) return _err('INVALID_ROW', 'Row number is invalid.');
+
+      var sheet = _openSheet(accessRes.data);
+      var headers = _trimTrailingEmptyHeaders_(_getHeaders(sheet));
+      var lastRow = sheet.getLastRow();
+      if (!headers.length || rowNumber < CONFIG.DATA_START_ROW || rowNumber > lastRow) {
+        return _err('INVALID_ROW', 'Row number is out of range.');
+      }
+
+      var rowSnapshot = _getRowSnapshotByNumber_(sheet, headers, rowNumber);
+      if (!_hasRowAccess_(rowSnapshot, accessRes.data)) {
+        return _err('FORBIDDEN_SCOPE', 'Tai khoan hien tai khong duoc phep xem process cua san pham nay.');
+      }
+
+      var rowKeys = _collectProcessCandidateKeysFromRow_(rowSnapshot);
+      if (!rowKeys.list.length) {
+        return _err('MISSING_PROCESS_KEY', 'San pham chua co ma hop le de tra process.');
+      }
+
+      var allowedRecords = _filterProcessByAccess_(processTable.records, accessRes.data, {
+        rowSnapshot: rowSnapshot,
+        allowedKeys: rowKeys.map
+      });
+      var matchedRowRecord = _findBestProcessMatch_(allowedRecords, rowKeys.list);
+      if (!matchedRowRecord) {
+        return _err('PROCESS_NOT_FOUND', 'Khong tim thay du lieu process cho ma: ' + rowKeys.primary);
+      }
+
+      return _ok(_buildProcessDetailPayload_(matchedRowRecord, rowSnapshot, rowKeys.primary));
+    }
+
+    var query = String(params.query || '').trim();
+    var queryNorm = _normalizeProcessExactKey_(query);
+    if (!queryNorm) return _err('MISSING_QUERY', 'Vui long nhap ma san pham de tra process.');
+
+    var queryMatches = [];
+    for (var i = 0; i < processTable.records.length; i++) {
+      if (processTable.records[i].keyNorm === queryNorm) queryMatches.push(processTable.records[i]);
+    }
+
+    if (!queryMatches.length) {
+      return _err('PROCESS_NOT_FOUND', 'Khong tim thay du lieu process cho ma: ' + query);
+    }
+
+    var allowedGroupInfo = _getAllowedProcessGroupsForAccess_(accessRes.data, queryMatches.length ? queryMatches : processTable.records);
+    var verifiedMatches = _filterProcessByAccess_(queryMatches, accessRes.data, {
+      requireVerifiedAccess: true,
+      enforceProductGroup: true,
+      allowBlankGroupWhenVerified: true,
+      allowVerifiedAccessBypassGroup: true,
+      allowedGroupInfo: allowedGroupInfo
+    });
+    var matchedQueryRecord = _findBestProcessMatch_(verifiedMatches, [{ raw: query, normalized: queryNorm }]);
+    if (!matchedQueryRecord) {
+      return _err('FORBIDDEN_SCOPE', 'Khong the hien thi process cho ma nay trong pham vi quyen hien tai.');
+    }
+
+    return _ok(_buildProcessDetailPayload_(matchedQueryRecord, null, query));
+  } catch (err) {
+    Logger.log('getProcessDetail ERROR: ' + err.toString());
+    return _err('PROCESS_DETAIL_ERROR', err.message, err.stack);
+  }
 }
 
 // ========================================
