@@ -813,20 +813,18 @@
       if (!_selectorList) return;
       _selectorList.innerHTML = '';
       (_selectorState.views || []).forEach(function(view) {
+        var viewCode = String(view.code || '').toUpperCase();
+        var viewLabel = viewCode === 'MAN'
+          ? 'Manager'
+          : (viewCode === 'DIR' ? 'Director' : (viewCode === 'CAT' ? 'Category' : String(view.name || '').replace(/\s*View\s*$/i, '').trim()));
+        var modeLabel = String(view.dataMode || viewCode || '').toLowerCase();
         var btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'selector-card';
         btn.innerHTML = ''
           + '<div class="selector-row">'
-          + '  <div class="selector-name">' + view.name + '</div>'
+          + '  <div class="selector-name">' + viewLabel + ': ' + modeLabel + '</div>'
           + '  <span class="selector-chip ' + (view.canEdit ? 'edit' : 'readonly') + '">' + (view.canEdit ? 'Editable' : 'Read only') + '</span>'
-          + '</div>'
-          + '<div class="selector-mode">' + (view.description || '') + '</div>'
-          + '<div class="selector-meta">'
-          + '  <span class="selector-meta-item">Page: ' + view.page + '</span>'
-          + '  <span class="selector-meta-item">Mode: ' + view.dataMode + '</span>'
-          + '  <span class="selector-meta-item">Sheet: ' + view.sheetName + '</span>'
-          + '  <span class="selector-meta-item">Edit: ' + (view.editRule || 'Read only') + '</span>'
           + '</div>';
         btn.addEventListener('click', function() {
           selectView(view.code);

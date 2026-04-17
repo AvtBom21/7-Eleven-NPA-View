@@ -69,16 +69,39 @@ function _legacyRoleToViewCode_(role) {
 }
 
 var ACCESS_TOKEN_TO_VIEW_CODE = {
+  CAT_VIEW: 'CAT',
   CAT_EDIT: 'CAT',
+  MAN_VIEW: 'MAN',
   MAN_EDIT: 'MAN',
+  DIR_VIEW: 'DIR',
   DIR_EDIT: 'DIR'
 };
 
-var ACCESS_VIEW_CODE_TO_TOKEN = {
+var ACCESS_VIEW_CODE_TO_VIEW_TOKEN = {
+  CAT: 'CAT_VIEW',
+  MAN: 'MAN_VIEW',
+  DIR: 'DIR_VIEW'
+};
+
+var ACCESS_VIEW_CODE_TO_EDIT_TOKEN = {
   CAT: 'CAT_EDIT',
   MAN: 'MAN_EDIT',
   DIR: 'DIR_EDIT'
 };
+
+function _getAccessTokenMeta_(token) {
+  var normalized = _normalizeCanEditToken_(token);
+  var viewCode = ACCESS_TOKEN_TO_VIEW_CODE[normalized] || '';
+  if (!viewCode) return null;
+  return {
+    token: normalized,
+    viewCode: viewCode,
+    canView: true,
+    canEdit: /_EDIT$/.test(normalized),
+    viewToken: ACCESS_VIEW_CODE_TO_VIEW_TOKEN[viewCode] || '',
+    editToken: ACCESS_VIEW_CODE_TO_EDIT_TOKEN[viewCode] || ''
+  };
+}
 
 function _normalizeViewCode_(value) {
   var normalized = String(value == null ? '' : value)
@@ -92,9 +115,11 @@ function _normalizeViewCode_(value) {
   return '';
 }
 
-function _toCanEditTokenFromViewCode_(viewCode) {
+function _toAccessTokenFromViewCode_(viewCode, canEdit) {
   var code = _normalizeViewCode_(viewCode);
-  return ACCESS_VIEW_CODE_TO_TOKEN[code] || '';
+  if (!code) return '';
+  if (canEdit === true) return ACCESS_VIEW_CODE_TO_EDIT_TOKEN[code] || '';
+  return ACCESS_VIEW_CODE_TO_VIEW_TOKEN[code] || '';
 }
 
 function _splitAccessTokenList_(raw) {
@@ -139,7 +164,7 @@ function _parseCanEditTokens_(raw) {
     var rawToken = items[i];
     var normalized = _normalizeCanEditToken_(rawToken);
     if (!normalized) continue;
-    if (!ACCESS_TOKEN_TO_VIEW_CODE[normalized]) {
+    if (!_getAccessTokenMeta_(normalized)) {
       invalidTokens.push({ raw: rawToken, normalized: normalized });
       continue;
     }
@@ -157,34 +182,53 @@ function _parseCanEditTokens_(raw) {
 
 function _buildAllowedViewsFromCanEditTokens_(canEditTokens) {
   var out = [];
-  var seen = {};
+  var byViewCode = {};
+  var orderedViewCodes = [];
 
   var list = Array.isArray(canEditTokens) ? canEditTokens : [];
   for (var i = 0; i < list.length; i++) {
     var token = _normalizeCanEditToken_(list[i]);
-    var viewCode = ACCESS_TOKEN_TO_VIEW_CODE[token] || '';
-    if (!viewCode || seen[viewCode]) continue;
+    var tokenMeta = _getAccessTokenMeta_(token);
+    if (!tokenMeta) continue;
 
-    var viewDef = _getViewDefinition_(viewCode);
-    if (!viewDef) continue;
+    var viewCode = tokenMeta.viewCode;
+    var viewEntry = byViewCode[viewCode];
+    if (!viewEntry) {
+      var viewDef = _getViewDefinition_(viewCode);
+      if (!viewDef) continue;
 
-    out.push({
-      code: viewDef.code,
-      name: viewDef.name,
-      page: viewDef.page,
-      htmlFile: viewDef.htmlFile,
-      title: viewDef.title,
-      dataMode: viewDef.dataMode,
-      sheetName: viewDef.sheetName,
-      legacyRole: viewDef.legacyRole,
-      description: viewDef.description,
-      accessToken: token,
-      editRule: token,
-      editRuleNormalized: token,
-      canEdit: true
-    });
+      viewEntry = {
+        code: viewDef.code,
+        name: viewDef.name,
+        page: viewDef.page,
+        htmlFile: viewDef.htmlFile,
+        title: viewDef.title,
+        dataMode: viewDef.dataMode,
+        sheetName: viewDef.sheetName,
+        legacyRole: viewDef.legacyRole,
+        description: viewDef.description,
+        accessToken: tokenMeta.viewToken || token,
+        editRule: '',
+        editRuleNormalized: '',
+        canView: true,
+        canEdit: false
+      };
 
-    seen[viewCode] = true;
+      byViewCode[viewCode] = viewEntry;
+      orderedViewCodes.push(viewCode);
+    }
+
+    if (tokenMeta.canEdit) {
+      viewEntry.canEdit = true;
+      viewEntry.accessToken = tokenMeta.editToken || token;
+      viewEntry.editRule = tokenMeta.editToken || token;
+      viewEntry.editRuleNormalized = tokenMeta.editToken || token;
+    }
+  }
+
+  for (var j = 0; j < orderedViewCodes.length; j++) {
+    var code = orderedViewCodes[j];
+    if (byViewCode[code]) out.push(byViewCode[code]);
   }
 
   return out;
@@ -200,16 +244,22 @@ function _collectCanEditTokensFromAllowedViews_(allowedViews, selectedViewCode, 
     var view = list[i] || {};
     var viewCode = _normalizeViewCode_(view.code || view.viewCode || '');
     if (!viewCode) continue;
-    var canEdit = view.canEdit === true || (selectedCanEdit === true && viewCode === selected);
-    if (!canEdit) continue;
-    var token = _toCanEditTokenFromViewCode_(viewCode);
+
+    var canEdit = view.canEdit === true;
+    if (!canEdit && view.editRule) {
+      var editMeta = _getAccessTokenMeta_(view.editRule);
+      canEdit = !!(editMeta && editMeta.canEdit);
+    }
+    if (!canEdit && selectedCanEdit === true && viewCode === selected && view.canEdit !== false) canEdit = true;
+
+    var token = _toAccessTokenFromViewCode_(viewCode, canEdit);
     if (!token || seen[token]) continue;
     seen[token] = true;
     out.push(token);
   }
 
-  if (!out.length && selectedCanEdit === true) {
-    var selectedToken = _toCanEditTokenFromViewCode_(selected);
+  if (!out.length && selected) {
+    var selectedToken = _toAccessTokenFromViewCode_(selected, selectedCanEdit === true);
     if (selectedToken) out.push(selectedToken);
   }
 
@@ -232,10 +282,10 @@ function _resolveCanEditRawFromAccessData_(source) {
   );
   if (fromViews.length) return fromViews.join(', ');
 
-  if (data.currentViewCanEdit === true || data.canEdit === true) {
-    var fallbackView = _normalizeViewCode_(data.selectedView || data.viewCode || '')
-      || _legacyRoleToViewCode_(data.role || data.baseRole || '');
-    var fallbackToken = _toCanEditTokenFromViewCode_(fallbackView);
+  var fallbackView = _normalizeViewCode_(data.selectedView || data.viewCode || '')
+    || _legacyRoleToViewCode_(data.role || data.baseRole || '');
+  if (fallbackView) {
+    var fallbackToken = _toAccessTokenFromViewCode_(fallbackView, data.currentViewCanEdit === true || data.canEdit === true);
     if (fallbackToken) return fallbackToken;
   }
 
@@ -2353,7 +2403,7 @@ function getProcessDetail(params) {
 // API: updateRow
 // ========================================
 function _getEditableFieldsForAccess_(access) {
-  var canEdit = access && (access.currentViewCanEdit === true || access.canEdit === true);
+  var canEdit = access && access.currentViewCanEdit === true;
   if (!canEdit) return [];
   if (_isDirectorViewAccess_(access)) return DIRECTOR_EDITABLE_FIELDS.slice();
   return PIC_EDITABLE_FIELDS.slice();
@@ -3209,7 +3259,7 @@ function _getUserAccessByEmail_(email, password, enforcePassword) {
     });
 
     if (!access.allowedViews || !access.allowedViews.length) {
-      return _err('INVALID_ACCESS', 'Can Edit rong hoac khong co token hop le. Su dung: CAT_Edit, MAN_Edit, DIR_Edit.');
+      return _err('INVALID_ACCESS', 'Can Edit rong hoac khong co token hop le. Su dung token: CAT_View/CAT_Edit, MAN_View/MAN_Edit, DIR_View/DIR_Edit.');
     }
 
     if (!access.selectedView && access.allowedViews.length === 1) {
@@ -3293,7 +3343,7 @@ function setupUserMasterSheet() {
       { header: 'Role', note: 'Legacy role label for identity and scope context.', width: 130 },
       { header: 'Status', note: 'ACTIVE or INACTIVE.', width: 120 },
       { header: 'Category', note: 'Category scope for Manager/Category views.', width: 360 },
-      { header: 'Can Edit', note: 'Access tokens. Use CAT_Edit, MAN_Edit, DIR_Edit. Multiple tokens separated by comma/new line/semicolon.', width: 280 },
+      { header: 'Can Edit', note: 'Access tokens. Use CAT_View/CAT_Edit, MAN_View/MAN_Edit, DIR_View/DIR_Edit. Multiple tokens separated by comma/new line/semicolon.', width: 280 },
       { header: 'Notes', note: 'Internal note.', width: 280 },
       { header: 'Created At', note: 'Created timestamp.', width: 170 },
       { header: 'Updated At', note: 'Updated timestamp.', width: 170 }

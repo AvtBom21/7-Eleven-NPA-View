@@ -4140,6 +4140,16 @@
       background: #fffbf5
     }
 
+    #overlay.is-readonly .s2-workflow .sdrop.ef,
+    #overlay.is-readonly .s2-workflow .file-upload,
+    #overlay.is-readonly .s2-workflow .remove-uom,
+    #overlay.is-readonly .s2-workflow .pog-add-btn,
+    #overlay.is-readonly .s2-workflow .pog-slot-clear {
+      pointer-events: none;
+      opacity: .62;
+      cursor: not-allowed !important;
+    }
+
     .sdrop.open .sdrop-input {
       border-color: var(--blue);
       background: #fff;
@@ -4702,6 +4712,59 @@
     .bfc textarea.bfp-fc {
       min-height: 110px;
       resize: vertical;
+    }
+
+    .oi-split {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .oi-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .oi-check {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 170px;
+      font: 600 12px var(--font);
+      color: var(--text2);
+      user-select: none;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .oi-check input[type='checkbox'] {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+      accent-color: var(--blue);
+      cursor: pointer;
+    }
+
+    .oi-amount {
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .oi-amount:disabled {
+      background: #f1f5f9;
+      color: #94a3b8;
+      cursor: not-allowed;
+    }
+
+    @media(max-width:700px) {
+      .oi-check {
+        min-width: 142px;
+      }
+
+      .oi-row {
+        gap: 8px;
+      }
     }
 
     .bfp-active-strip {
@@ -7072,8 +7135,22 @@
               </div>
               <div class="bfc full" id="bfc_OtherIncome">
                 <div class="bfc-lbl">Other Income + Listing Fee</div>
-                <div class="bfc-inp">
-                  <textarea class="bfp-fc" id="bf_OtherIncome" placeholder="Commercial support, listing fee, or other income logic" oninput="App.bfChange('OtherIncome',this.value)"></textarea>
+                <div class="bfc-inp oi-split">
+                  <div class="oi-row">
+                    <label class="oi-check" for="bf_OtherIncomeCheck">
+                      <input type="checkbox" id="bf_OtherIncomeCheck" onchange="App.otherIncomeToggle('batch','other')">
+                      <span>Orther Income</span>
+                    </label>
+                    <input type="text" class="bfp-fc oi-amount" id="bf_OtherIncomeAmount" placeholder="Nhập số tiền" inputmode="numeric" oninput="App.otherIncomeAmountInput('batch','other',this.value)" disabled>
+                  </div>
+                  <div class="oi-row">
+                    <label class="oi-check" for="bf_ListingFeeCheck">
+                      <input type="checkbox" id="bf_ListingFeeCheck" onchange="App.otherIncomeToggle('batch','listing')">
+                      <span>Listing Fee</span>
+                    </label>
+                    <input type="text" class="bfp-fc oi-amount" id="bf_ListingFeeAmount" placeholder="Nhập số tiền" inputmode="numeric" oninput="App.otherIncomeAmountInput('batch','listing',this.value)" disabled>
+                  </div>
+                  <input type="hidden" id="bf_OtherIncome">
                 </div>
               </div>
               <div class="bfc" id="bfc_RetailT6">
@@ -7613,7 +7690,23 @@
               </div>
               <div class="mc full dw-strategic" id="mc_otherincome">
                 <div class="mc-label">Other Income + Listing Fee<div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
-                <div class="mc-body"><textarea id="mf_Other_Income_Listing_Fee" placeholder="Commercial support, listing fee, or other income logic"></textarea></div>
+                <div class="mc-body oi-split">
+                  <div class="oi-row">
+                    <label class="oi-check" for="mf_OtherIncomeCheck">
+                      <input type="checkbox" id="mf_OtherIncomeCheck" onchange="App.otherIncomeToggle('modal','other')">
+                      <span>Orther Income</span>
+                    </label>
+                    <input type="text" id="mf_OtherIncomeAmount" class="oi-amount" placeholder="Nhập số tiền" inputmode="numeric" oninput="App.otherIncomeAmountInput('modal','other',this.value)" disabled>
+                  </div>
+                  <div class="oi-row">
+                    <label class="oi-check" for="mf_ListingFeeCheck">
+                      <input type="checkbox" id="mf_ListingFeeCheck" onchange="App.otherIncomeToggle('modal','listing')">
+                      <span>Listing Fee</span>
+                    </label>
+                    <input type="text" id="mf_ListingFeeAmount" class="oi-amount" placeholder="Nhập số tiền" inputmode="numeric" oninput="App.otherIncomeAmountInput('modal','listing',this.value)" disabled>
+                  </div>
+                  <input type="hidden" id="mf_Other_Income_Listing_Fee">
+                </div>
               </div>
             </div>
           </div>
@@ -8090,7 +8183,7 @@
       var SELECTED_SHEET_NAME = String(APP_USER.selectedSheetName || '').trim() || (SELECTED_VIEW === 'MAN' ? 'Manager' : 'Category');
       var SELECTED_EDIT_RULE = String(APP_USER.selectedEditRule || '').trim();
       var AVAILABLE_VIEWS = Array.isArray(APP_USER.allowedViews) ? APP_USER.allowedViews.slice() : [];
-      var USER_CAN_EDIT = APP_USER.currentViewCanEdit === true || APP_USER.canEdit === true;
+      var USER_CAN_EDIT = APP_USER.currentViewCanEdit === true;
       var USER_SCOPE = Array.isArray(APP_USER.scope) ? APP_USER.scope.slice() : [];
 
       var EMOJIS = {
@@ -9077,10 +9170,218 @@
         return fields;
       }
 
+      function _extractMoneyDigits_(value) {
+        var digits = String(value == null ? '' : value).replace(/[^0-9]/g, '');
+        if (!digits) return '';
+        digits = digits.replace(/^0+/, '');
+        return digits || '0';
+      }
+
+      function _formatMoneyWithComma_(digits) {
+        var cleanDigits = _extractMoneyDigits_(digits);
+        if (!cleanDigits) return '';
+        return cleanDigits.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      }
+
+      function _formatMoneyInputText_(digits) {
+        var formatted = _formatMoneyWithComma_(digits);
+        return formatted ? (formatted + ' đ') : '';
+      }
+
+      function _formatMoneyStorageText_(digits) {
+        var formatted = _formatMoneyWithComma_(digits);
+        return formatted ? (formatted + 'đ') : '';
+      }
+
+      function _parseOtherIncomeListingFee_(raw) {
+        var text = String(raw == null ? '' : raw).replace(/\r/g, '\n').trim();
+        var out = {
+          otherChecked: false,
+          otherAmount: '',
+          listingChecked: false,
+          listingAmount: '',
+          recognized: false
+        };
+        if (!text) return out;
+
+        var match;
+        var otherRegex = /(orther|other)\s*income[^0-9]*([0-9][0-9,.\s]*)/ig;
+        while ((match = otherRegex.exec(text))) {
+          var otherDigits = _extractMoneyDigits_(match[2]);
+          if (!otherDigits) continue;
+          out.otherChecked = true;
+          out.otherAmount = otherDigits;
+          out.recognized = true;
+        }
+
+        var listingRegex = /listing\s*fee[^0-9]*([0-9][0-9,.\s]*)/ig;
+        while ((match = listingRegex.exec(text))) {
+          var listingDigits = _extractMoneyDigits_(match[1]);
+          if (!listingDigits) continue;
+          out.listingChecked = true;
+          out.listingAmount = listingDigits;
+          out.recognized = true;
+        }
+
+        if (!out.recognized) {
+          var hasOtherWord = /(orther|other)\s*income/i.test(text);
+          var hasListingWord = /listing\s*fee/i.test(text);
+          var nums = text.match(/[0-9][0-9,.\s]*/g) || [];
+
+          if (hasOtherWord && nums.length) {
+            out.otherChecked = true;
+            out.otherAmount = _extractMoneyDigits_(nums[0]);
+            if (out.otherAmount) out.recognized = true;
+          }
+
+          if (hasListingWord && nums.length) {
+            var idx = nums.length > 1 ? 1 : 0;
+            out.listingChecked = true;
+            out.listingAmount = _extractMoneyDigits_(nums[idx]);
+            if (out.listingAmount) out.recognized = true;
+          }
+
+          if (!hasOtherWord && !hasListingWord && nums.length === 1) {
+            out.otherChecked = true;
+            out.otherAmount = _extractMoneyDigits_(nums[0]);
+            if (out.otherAmount) out.recognized = true;
+          }
+        }
+
+        return out;
+      }
+
+      function _serializeOtherIncomeListingFee_(state) {
+        var lines = [];
+        if (state && state.otherChecked && _extractMoneyDigits_(state.otherAmount)) {
+          lines.push('Orther Income: ' + _formatMoneyStorageText_(state.otherAmount));
+        }
+        if (state && state.listingChecked && _extractMoneyDigits_(state.listingAmount)) {
+          lines.push('Listing Fee: ' + _formatMoneyStorageText_(state.listingAmount));
+        }
+        return lines.join('\n').trim();
+      }
+
+      function _normalizeOtherIncomeListingFeeValue_(value) {
+        var raw = String(value == null ? '' : value).trim();
+        if (!raw) return '';
+        var parsed = _parseOtherIncomeListingFee_(raw);
+        var serialized = _serializeOtherIncomeListingFee_(parsed);
+        if (serialized) return serialized;
+        return raw;
+      }
+
+      function _getOtherIncomeUiElements_(scope) {
+        var isBatch = scope === 'batch';
+        var prefix = isBatch ? 'bf' : 'mf';
+        return {
+          otherCheck: document.getElementById(prefix + '_OtherIncomeCheck'),
+          otherAmount: document.getElementById(prefix + '_OtherIncomeAmount'),
+          listingCheck: document.getElementById(prefix + '_ListingFeeCheck'),
+          listingAmount: document.getElementById(prefix + '_ListingFeeAmount'),
+          hidden: document.getElementById(isBatch ? 'bf_OtherIncome' : 'mf_Other_Income_Listing_Fee')
+        };
+      }
+
+      function _syncOtherIncomeRowState_(els) {
+        if (!els) return;
+        var otherOn = !!(els.otherCheck && els.otherCheck.checked);
+        var listingOn = !!(els.listingCheck && els.listingCheck.checked);
+        if (els.otherAmount) {
+          els.otherAmount.disabled = !otherOn;
+          els.otherAmount.style.display = otherOn ? '' : 'none';
+        }
+        if (els.listingAmount) {
+          els.listingAmount.disabled = !listingOn;
+          els.listingAmount.style.display = listingOn ? '' : 'none';
+        }
+      }
+
+      function _loadOtherIncomeUiFromValue_(scope, rawValue) {
+        var els = _getOtherIncomeUiElements_(scope);
+        if (!els.hidden) return;
+        var parsed = _parseOtherIncomeListingFee_(rawValue);
+        if (els.otherCheck) els.otherCheck.checked = !!parsed.otherChecked;
+        if (els.otherAmount) els.otherAmount.value = parsed.otherChecked ? _formatMoneyInputText_(parsed.otherAmount) : '';
+        if (els.listingCheck) els.listingCheck.checked = !!parsed.listingChecked;
+        if (els.listingAmount) els.listingAmount.value = parsed.listingChecked ? _formatMoneyInputText_(parsed.listingAmount) : '';
+        _syncOtherIncomeRowState_(els);
+      }
+
+      function _dispatchInputEvent_(element) {
+        if (!element) return;
+        var evt;
+        try {
+          evt = new Event('input', { bubbles: true });
+        } catch (e) {
+          evt = document.createEvent('Event');
+          evt.initEvent('input', true, true);
+        }
+        element.dispatchEvent(evt);
+      }
+
+      function _syncOtherIncomeHiddenFromUi_(scope) {
+        var els = _getOtherIncomeUiElements_(scope);
+        if (!els.hidden) return '';
+
+        var otherChecked = !!(els.otherCheck && els.otherCheck.checked);
+        var listingChecked = !!(els.listingCheck && els.listingCheck.checked);
+        var otherDigits = otherChecked ? _extractMoneyDigits_(els.otherAmount && els.otherAmount.value) : '';
+        var listingDigits = listingChecked ? _extractMoneyDigits_(els.listingAmount && els.listingAmount.value) : '';
+
+        if (els.otherAmount) els.otherAmount.value = otherDigits ? _formatMoneyInputText_(otherDigits) : '';
+        if (els.listingAmount) els.listingAmount.value = listingDigits ? _formatMoneyInputText_(listingDigits) : '';
+        _syncOtherIncomeRowState_(els);
+
+        var serialized = _serializeOtherIncomeListingFee_({
+          otherChecked: otherChecked,
+          otherAmount: otherDigits,
+          listingChecked: listingChecked,
+          listingAmount: listingDigits
+        });
+        els.hidden.value = serialized;
+        return serialized;
+      }
+
+      function otherIncomeToggle(scope, kind) {
+        var targetScope = scope === 'batch' ? 'batch' : 'modal';
+        if (targetScope === 'modal' && !_ensureEditableAction()) return;
+
+        var els = _getOtherIncomeUiElements_(targetScope);
+        if (!els.hidden) return;
+        if (kind === 'other' && els.otherCheck && !els.otherCheck.checked && els.otherAmount) els.otherAmount.value = '';
+        if (kind === 'listing' && els.listingCheck && !els.listingCheck.checked && els.listingAmount) els.listingAmount.value = '';
+
+        var serialized = _syncOtherIncomeHiddenFromUi_(targetScope);
+        if (targetScope === 'batch') {
+          bfChange('OtherIncome', serialized);
+          return;
+        }
+        _dispatchInputEvent_(els.hidden);
+      }
+
+      function otherIncomeAmountInput(scope, kind, rawValue) {
+        var targetScope = scope === 'batch' ? 'batch' : 'modal';
+        if (targetScope === 'modal' && !_ensureEditableAction()) return;
+
+        var els = _getOtherIncomeUiElements_(targetScope);
+        if (!els.hidden) return;
+        var inputEl = kind === 'listing' ? els.listingAmount : els.otherAmount;
+        if (inputEl) inputEl.value = _formatMoneyInputText_(_extractMoneyDigits_(rawValue));
+
+        var serialized = _syncOtherIncomeHiddenFromUi_(targetScope);
+        if (targetScope === 'batch') {
+          bfChange('OtherIncome', serialized);
+          return;
+        }
+        _dispatchInputEvent_(els.hidden);
+      }
+
       function _normalizeFieldValue(field, value) {
         var v = value === null || value === undefined ? '' : String(value);
         if (_isMultiValueField(field)) return normalizeMultiValue(v);
         if (field === POG_PRODUCT_FIELD || field === POG_ACTION_FIELD) return _normalizePogSerializedValue(v);
+        if (field === OTHER_INCOME_FIELD) return _normalizeOtherIncomeListingFeeValue_(v);
         if (field === 'Retail Price (+VAT) in Tier 6') {
           v = v.replace(/,/g, '').trim();
         } else {
@@ -9183,7 +9484,39 @@
         _refreshProcessTriggerState();
         syncTopNavState();
       }
+      function _syncModalReadonlyState_() {
+        var overlay = document.getElementById('overlay');
+        if (!overlay) return;
+        var lock = !USER_CAN_EDIT;
+        overlay.classList.toggle('is-readonly', lock);
+        if (!lock) return;
+
+        overlay.querySelectorAll('.s2-workflow input, .s2-workflow textarea, .s2-workflow select').forEach(function (el) {
+          if (!el) return;
+          var type = String(el.type || '').toLowerCase();
+          if (type === 'hidden') return;
+          if (el.tagName && el.tagName.toLowerCase() !== 'select') {
+            el.setAttribute('readonly', 'readonly');
+          }
+          el.disabled = true;
+        });
+
+        overlay.querySelectorAll('.s2-workflow button').forEach(function (btn) {
+          if (!btn) return;
+          var action = String(btn.getAttribute('onclick') || '');
+          if (
+            action.indexOf('App.modalAddUom') >= 0
+            || action.indexOf('App.modalRemoveUom') >= 0
+            || action.indexOf('App.modalAddPogSlot') >= 0
+            || action.indexOf('App.modalClearPogSlot') >= 0
+          ) {
+            btn.disabled = true;
+            btn.title = 'View hiện tại đang ở chế độ chỉ xem';
+          }
+        });
+      }
       function syncModalAccess() {
+        _syncModalReadonlyState_();
         var step2Btn = document.getElementById('mStepBtn2');
         if (step2Btn) step2Btn.disabled = !USER_CAN_EDIT;
         var ssvCard = document.getElementById('mc_ssvnote');
@@ -9192,6 +9525,10 @@
           btn.disabled = !USER_CAN_EDIT;
           btn.title = USER_CAN_EDIT ? '' : 'View hiện tại đang ở chế độ chỉ xem';
         });
+        var saveMeta = document.getElementById('mSaveTime');
+        if (!USER_CAN_EDIT && saveMeta) {
+          saveMeta.textContent = 'Read only mode - this workspace does not allow editing.';
+        }
         if (!USER_CAN_EDIT && S.detailStep === 2) setDetailStep(1);
       }
       function pill(val) {
@@ -9948,6 +10285,7 @@
           if (el.classList && el.classList.contains('sdrop')) setDropdownValue('bf_' + key, value || '', true);
           else el.value = value || '';
         }
+        if (key === 'OtherIncome') _loadOtherIncomeUiFromValue_('batch', value || '');
         _setBfCardVisual(key, !!markDirty);
       }
 
@@ -10446,6 +10784,7 @@
       }
 
       function modalPogSlotChange(index, part, value) {
+        if (!_ensureEditableAction()) return;
         var idx = parseInt(index, 10);
         if (isNaN(idx) || idx < 0 || idx >= MODAL_POG_STATE.length) return;
         if (part === 'product') {
@@ -10484,6 +10823,7 @@
       }
 
       function modalAddPogSlot() {
+        if (!_ensureEditableAction()) return;
         if (!_canAddAnotherPogSlot()) return;
         MODAL_POG_STATE = _getFilledPogSlots(MODAL_POG_STATE);
         if (MODAL_POG_STATE.length >= POG_MAX_SLOTS) return;
@@ -10496,6 +10836,7 @@
       }
 
       function modalClearPogSlot(index) {
+        if (!_ensureEditableAction()) return;
         var idx = parseInt(index, 10);
         if (isNaN(idx) || idx < 0 || idx >= MODAL_POG_STATE.length) return;
         MODAL_POG_STATE.splice(idx, 1);
@@ -10508,6 +10849,7 @@
       }
 
       function modalUomInput() {
+        if (!_ensureEditableAction()) return;
         MODAL_UOM_DIRTY = true;
         _syncModalUomField();
         if (!S.modalRow) return;
@@ -10516,6 +10858,7 @@
       }
 
       function modalAddUom() {
+        if (!_ensureEditableAction()) return;
         _readModalUomEditor();
         MODAL_UOM_STATE.extras.push(_newUomExtra());
         _renderModalUomExtras();
@@ -10523,6 +10866,7 @@
       }
 
       function modalRemoveUom(index) {
+        if (!_ensureEditableAction()) return;
         _readModalUomEditor();
         var idx = parseInt(index, 10);
         if (isNaN(idx) || idx < 0 || idx >= MODAL_UOM_STATE.extras.length) return;
@@ -10532,6 +10876,7 @@
       }
 
       function modalUomFileChange(inputEl, target, index, labelId) {
+        if (!_ensureEditableAction()) return;
         if (!inputEl || !inputEl.files || !inputEl.files.length) return;
         var idxNum = parseInt(index, 10);
         var rowWrap = target === 'extra' && inputEl.closest ? inputEl.closest('.uom-row') : null;
@@ -11271,6 +11616,9 @@
         var c = document.getElementById(cid); if (!c) return;
         var cfg = config || {};
         var multiple = !!cfg.multiple || _isMultiValueField(fieldName);
+        function isLocked() {
+          return !USER_CAN_EDIT && c.classList.contains('ef');
+        }
         var normalizeStoredValue = typeof cfg.valueNormalizer === 'function'
           ? cfg.valueNormalizer
           : function (rawValue) { return _normalizeDropdownOptionValue(fieldName, rawValue); };
@@ -11372,8 +11720,23 @@
         }
         // Stop prop on menu to allow scrolling/dragging without closing
         var menuFn = c.querySelector('.sdrop-menu'); if (menuFn) menuFn.addEventListener('click', function (e) { e.stopPropagation(); });
-        function toggle(e) { e.stopPropagation(); var was = c.classList.contains('open'); document.querySelectorAll('.sdrop.open').forEach(function (el) { el.classList.remove('open'); }); if (!was) { c.classList.add('open'); posMenu(); if (srch) { srch.value = ''; filterOpts(''); srch.focus(); } } }
+        function toggle(e) {
+          if (isLocked()) return;
+          e.stopPropagation();
+          var was = c.classList.contains('open');
+          document.querySelectorAll('.sdrop.open').forEach(function (el) { el.classList.remove('open'); });
+          if (!was) {
+            c.classList.add('open');
+            posMenu();
+            if (srch) {
+              srch.value = '';
+              filterOpts('');
+              srch.focus();
+            }
+          }
+        }
         function selOpt(opt) {
+          if (isLocked()) return;
           if (opt.classList.contains('sdrop-opt-clear')) {
             clearSelection(false, multiple);
             return;
@@ -11407,8 +11770,19 @@
           var em = c.querySelector('.sdrop-empty');
           if (em) em.style.display = vis === 0 ? 'block' : 'none';
         }
-        inp.addEventListener('click', toggle);
+        inp.addEventListener('click', function (e) {
+          if (isLocked()) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+          }
+          toggle(e);
+        });
         inp.addEventListener('keydown', function (e) {
+          if (isLocked()) {
+            e.preventDefault();
+            return;
+          }
           if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(e); return; }
           if (e.key === 'Backspace' || e.key === 'Delete') {
             e.preventDefault();
@@ -11417,6 +11791,11 @@
         });
         if (clearBtn) {
           clearBtn.addEventListener('click', function (e) {
+            if (isLocked()) {
+              e.preventDefault();
+              e.stopPropagation();
+              return;
+            }
             e.preventDefault();
             e.stopPropagation();
             clearSelection(false, false);
@@ -11425,6 +11804,7 @@
         if (srch) { srch.addEventListener('input', function () { filterOpts(this.value); }); srch.addEventListener('click', function (e) { e.stopPropagation(); }); }
         if (menu) {
           menu.addEventListener('click', function (e) {
+            if (isLocked()) return;
             var opt = e.target && e.target.closest ? e.target.closest('.sdrop-opt') : null;
             if (!opt || !c.contains(opt)) return;
             e.stopPropagation();
@@ -13155,6 +13535,7 @@
           if (field === 'REFERENCE PRODUCT ID (Nếu không có điền NO)' && !val) val = 'NO';
           el.value = val;
         }
+        _loadOtherIncomeUiFromValue_('modal', document.getElementById('mf_Other_Income_Listing_Fee') ? document.getElementById('mf_Other_Income_Listing_Fee').value : '');
         _loadModalUomField(document.getElementById('mf_UOMInfo') ? document.getElementById('mf_UOMInfo').value : '');
         // Open overlay with crossfade
         var ov = document.getElementById('overlay');
@@ -13226,6 +13607,7 @@
           if (field === 'REFERENCE PRODUCT ID (Nếu không có điền NO)' && !val) val = 'NO';
           el.value = val;
         }
+        _loadOtherIncomeUiFromValue_('modal', document.getElementById('mf_Other_Income_Listing_Fee') ? document.getElementById('mf_Other_Income_Listing_Fee').value : '');
         _loadModalUomField(document.getElementById('mf_UOMInfo') ? document.getElementById('mf_UOMInfo').value : '');
         initModalDropdowns(row);
         _loadModalPogField(
@@ -13663,6 +14045,7 @@
         modalUomInput: modalUomInput, modalAddUom: modalAddUom, modalRemoveUom: modalRemoveUom, modalUomFileChange: modalUomFileChange,
         modalPogSlotChange: modalPogSlotChange, modalAddPogSlot: modalAddPogSlot, modalClearPogSlot: modalClearPogSlot,
         setToggle: setToggle,
+        otherIncomeToggle: otherIncomeToggle, otherIncomeAmountInput: otherIncomeAmountInput,
         goSection: goSection, clearActiveProduct: clearActiveProduct, openViewSelector: openViewSelector,
         selectBatchPreviewProduct: selectBatchPreviewProduct,
         openSelectedModal: openSelectedModal, previewSelected: previewSelected,
