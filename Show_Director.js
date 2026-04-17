@@ -801,7 +801,7 @@ function authenticateAccount(email, password) {
 
     var selectedRes = _resolveSelectedAccess_(accessRes.data, 'DIR');
     if (!selectedRes.ok) {
-      return { ok: false, message: 'Only accounts with DIR permission can access this page.' };
+      return { ok: false, message: 'Only accounts with DIR_Edit access can open this page.' };
     }
 
     var token = _createAuthToken_(selectedRes.data);

@@ -68,7 +68,19 @@ function _legacyRoleToViewCode_(role) {
   return '';
 }
 
-function _normalizePermissionCode_(value) {
+var ACCESS_TOKEN_TO_VIEW_CODE = {
+  CAT_EDIT: 'CAT',
+  MAN_EDIT: 'MAN',
+  DIR_EDIT: 'DIR'
+};
+
+var ACCESS_VIEW_CODE_TO_TOKEN = {
+  CAT: 'CAT_EDIT',
+  MAN: 'MAN_EDIT',
+  DIR: 'DIR_EDIT'
+};
+
+function _normalizeViewCode_(value) {
   var normalized = String(value == null ? '' : value)
     .trim()
     .toUpperCase()
@@ -80,84 +92,81 @@ function _normalizePermissionCode_(value) {
   return '';
 }
 
-function _splitIndexedAccessList_(raw) {
+function _toCanEditTokenFromViewCode_(viewCode) {
+  var code = _normalizeViewCode_(viewCode);
+  return ACCESS_VIEW_CODE_TO_TOKEN[code] || '';
+}
+
+function _splitAccessTokenList_(raw) {
   if (raw === null || raw === undefined) return [];
   var text = String(raw)
+    .replace(/[\u200B-\u200D\uFEFF]/g, '')
     .replace(/\r\n?/g, '\n')
     .replace(/[;\n]/g, ',');
-  return text.split(',').map(function(item) {
-    return String(item == null ? '' : item).trim();
-  });
+  return text
+    .split(',')
+    .map(function(item) {
+      return String(item == null ? '' : item).replace(/\s+/g, ' ').trim();
+    })
+    .filter(function(item) {
+      return !!item;
+    });
 }
 
-function _parsePermissionSlots_(raw) {
-  var items = _splitIndexedAccessList_(raw);
-  var out = [];
+function _normalizeCanEditToken_(value) {
+  var token = String(value == null ? '' : value);
+  if (token && typeof token.normalize === 'function') {
+    try {
+      token = token.normalize('NFKC');
+    } catch (err) {}
+  }
+  return token
+    .replace(/[\u200B-\u200D\uFEFF]/g, '')
+    .replace(/[\s-]+/g, '_')
+    .replace(/_+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .toUpperCase()
+    .trim();
+}
+
+function _parseCanEditTokens_(raw) {
+  var items = _splitAccessTokenList_(raw);
+  var normalizedTokens = [];
+  var invalidTokens = [];
+  var seen = {};
+
   for (var i = 0; i < items.length; i++) {
     var rawToken = items[i];
-    var code = _normalizePermissionCode_(rawToken);
-    out.push({
-      index: i,
-      raw: rawToken,
-      code: code,
-      valid: !!code
-    });
+    var normalized = _normalizeCanEditToken_(rawToken);
+    if (!normalized) continue;
+    if (!ACCESS_TOKEN_TO_VIEW_CODE[normalized]) {
+      invalidTokens.push({ raw: rawToken, normalized: normalized });
+      continue;
+    }
+    if (seen[normalized]) continue;
+    seen[normalized] = true;
+    normalizedTokens.push(normalized);
   }
-  return out;
+
+  return {
+    raw: String(raw == null ? '' : raw),
+    normalizedTokens: normalizedTokens,
+    invalidTokens: invalidTokens
+  };
 }
 
-function _normalizeEditRuleToken_(value) {
-  return String(value == null ? '' : value).trim();
-}
-
-function _normalizeEditRuleKey_(value) {
-  return _normalizeEditRuleToken_(value)
-    .toUpperCase()
-    .replace(/\s+/g, '_');
-}
-
-function _isValidEditRuleToken_(value) {
-  var token = _normalizeEditRuleKey_(value);
-  if (!token) return false;
-  if (token === 'TRUE' || token === 'YES' || token === 'Y' || token === 'EDIT' || token === 'CAN_EDIT') return true;
-  return /(?:^|_)EDIT$/.test(token);
-}
-
-function _parseEditRuleSlots_(raw) {
-  var items = _splitIndexedAccessList_(raw);
-  var out = [];
-  for (var i = 0; i < items.length; i++) {
-    var rawToken = _normalizeEditRuleToken_(items[i]);
-    out.push({
-      index: i,
-      raw: rawToken,
-      normalized: _normalizeEditRuleKey_(rawToken),
-      canEdit: _isValidEditRuleToken_(rawToken)
-    });
-  }
-  return out;
-}
-
-function _buildAllowedViews_(permissionSlots, editRuleSlots) {
+function _buildAllowedViewsFromCanEditTokens_(canEditTokens) {
   var out = [];
   var seen = {};
-  var permissions = Array.isArray(permissionSlots) ? permissionSlots : [];
-  var edits = Array.isArray(editRuleSlots) ? editRuleSlots : [];
 
-  for (var i = 0; i < permissions.length; i++) {
-    var permissionSlot = permissions[i];
-    if (!permissionSlot || !permissionSlot.valid || !permissionSlot.code) continue;
-    if (seen[permissionSlot.code]) continue;
+  var list = Array.isArray(canEditTokens) ? canEditTokens : [];
+  for (var i = 0; i < list.length; i++) {
+    var token = _normalizeCanEditToken_(list[i]);
+    var viewCode = ACCESS_TOKEN_TO_VIEW_CODE[token] || '';
+    if (!viewCode || seen[viewCode]) continue;
 
-    var viewDef = _getViewDefinition_(permissionSlot.code);
+    var viewDef = _getViewDefinition_(viewCode);
     if (!viewDef) continue;
-
-    var editSlot = edits[permissionSlot.index] || {
-      index: permissionSlot.index,
-      raw: '',
-      normalized: '',
-      canEdit: false
-    };
 
     out.push({
       code: viewDef.code,
@@ -169,17 +178,68 @@ function _buildAllowedViews_(permissionSlots, editRuleSlots) {
       sheetName: viewDef.sheetName,
       legacyRole: viewDef.legacyRole,
       description: viewDef.description,
-      permissionIndex: permissionSlot.index,
-      permissionToken: permissionSlot.raw,
-      editRule: editSlot.raw || '',
-      editRuleNormalized: editSlot.normalized || '',
-      canEdit: editSlot.canEdit === true
+      accessToken: token,
+      editRule: token,
+      editRuleNormalized: token,
+      canEdit: true
     });
 
-    seen[permissionSlot.code] = true;
+    seen[viewCode] = true;
   }
 
   return out;
+}
+
+function _collectCanEditTokensFromAllowedViews_(allowedViews, selectedViewCode, selectedCanEdit) {
+  var out = [];
+  var seen = {};
+  var selected = _normalizeViewCode_(selectedViewCode);
+  var list = Array.isArray(allowedViews) ? allowedViews : [];
+
+  for (var i = 0; i < list.length; i++) {
+    var view = list[i] || {};
+    var viewCode = _normalizeViewCode_(view.code || view.viewCode || '');
+    if (!viewCode) continue;
+    var canEdit = view.canEdit === true || (selectedCanEdit === true && viewCode === selected);
+    if (!canEdit) continue;
+    var token = _toCanEditTokenFromViewCode_(viewCode);
+    if (!token || seen[token]) continue;
+    seen[token] = true;
+    out.push(token);
+  }
+
+  if (!out.length && selectedCanEdit === true) {
+    var selectedToken = _toCanEditTokenFromViewCode_(selected);
+    if (selectedToken) out.push(selectedToken);
+  }
+
+  return out;
+}
+
+function _resolveCanEditRawFromAccessData_(source) {
+  var data = source || {};
+  if (typeof data.canEditRaw === 'string' && data.canEditRaw.trim()) return data.canEditRaw;
+  if (typeof data.canEditTokensRaw === 'string' && data.canEditTokensRaw.trim()) return data.canEditTokensRaw;
+  if (Array.isArray(data.canEditTokensNormalized) && data.canEditTokensNormalized.length) {
+    return data.canEditTokensNormalized.join(', ');
+  }
+  if (typeof data.editRulesRaw === 'string' && data.editRulesRaw.trim()) return data.editRulesRaw;
+
+  var fromViews = _collectCanEditTokensFromAllowedViews_(
+    data.allowedViews,
+    data.selectedView || data.viewCode || '',
+    data.currentViewCanEdit === true || data.canEdit === true
+  );
+  if (fromViews.length) return fromViews.join(', ');
+
+  if (data.currentViewCanEdit === true || data.canEdit === true) {
+    var fallbackView = _normalizeViewCode_(data.selectedView || data.viewCode || '')
+      || _legacyRoleToViewCode_(data.role || data.baseRole || '');
+    var fallbackToken = _toCanEditTokenFromViewCode_(fallbackView);
+    if (fallbackToken) return fallbackToken;
+  }
+
+  return '';
 }
 
 function _clonePlainObject_(value) {
@@ -187,7 +247,7 @@ function _clonePlainObject_(value) {
 }
 
 function _findAllowedView_(access, viewCode) {
-  var code = _normalizePermissionCode_(viewCode);
+  var code = _normalizeViewCode_(viewCode);
   var allowedViews = access && Array.isArray(access.allowedViews) ? access.allowedViews : [];
   for (var i = 0; i < allowedViews.length; i++) {
     if (allowedViews[i] && allowedViews[i].code === code) return allowedViews[i];
@@ -224,9 +284,13 @@ function _resolveDefaultView_(allowedViews) {
 
 function _getSelectedViewCode_(access) {
   if (!access) return '';
-  var direct = _normalizePermissionCode_(access.selectedView || access.viewCode || '');
+  var direct = _normalizeViewCode_(access.selectedView || access.viewCode || '');
   if (direct) return direct;
-  return _legacyRoleToViewCode_(access.role || access.baseRole || '');
+  var allowedViews = access && Array.isArray(access.allowedViews) ? access.allowedViews : [];
+  if (allowedViews.length === 1 && allowedViews[0]) {
+    return _normalizeViewCode_(allowedViews[0].code || '');
+  }
+  return '';
 }
 
 function _hasSelectedView_(access) {
@@ -240,20 +304,13 @@ function _isDirectorViewAccess_(access) {
 function _buildAccessModel_(options) {
   var opts = options || {};
   var rawRole = String(opts.role || '').trim().toUpperCase();
-  var permissionsRaw = String(opts.permissionsRaw || '').trim();
-  if (!permissionsRaw) permissionsRaw = _legacyRoleToViewCode_(rawRole);
-
-  var permissionSlots = _parsePermissionSlots_(permissionsRaw);
-  var permissionListNormalized = permissionSlots
-    .filter(function(slot) { return slot && slot.valid && slot.code; })
-    .map(function(slot) { return slot.code; });
-
-  var editRulesRaw = String(opts.editRulesRaw || '').trim();
-  if (!editRulesRaw && opts.legacyCanEdit === true && permissionListNormalized.length === 1) {
-    editRulesRaw = 'TRUE';
+  var canEditRaw = String(opts.canEditRaw == null ? '' : opts.canEditRaw);
+  var parsedCanEdit = _parseCanEditTokens_(canEditRaw);
+  if (parsedCanEdit.invalidTokens.length) {
+    Logger.log('ACCESS_CAN_EDIT_INVALID tokens=' + JSON.stringify(parsedCanEdit.invalidTokens) + ' email=' + _normalizeLoginEmail_(opts.email));
   }
-  var editRuleSlots = _parseEditRuleSlots_(editRulesRaw);
-  var allowedViews = _buildAllowedViews_(permissionSlots, editRuleSlots);
+
+  var allowedViews = _buildAllowedViewsFromCanEditTokens_(parsedCanEdit.normalizedTokens);
   var categoryScope = Array.isArray(opts.categoryScope) ? opts.categoryScope.slice() : [];
 
   var access = {
@@ -264,12 +321,9 @@ function _buildAccessModel_(options) {
     status: String(opts.status || '').trim().toUpperCase(),
     scope: categoryScope.slice(),
     categoryScope: categoryScope.slice(),
-    permissionsRaw: permissionsRaw,
-    permissionSlots: permissionSlots,
-    permissionListNormalized: permissionListNormalized,
-    editRulesRaw: editRulesRaw,
-    editRuleSlots: editRuleSlots,
-    editRuleListNormalized: editRuleSlots.map(function(slot) { return slot.normalized || ''; }),
+    canEditRaw: parsedCanEdit.raw,
+    canEditTokensNormalized: parsedCanEdit.normalizedTokens.slice(),
+    invalidCanEditTokens: parsedCanEdit.invalidTokens.slice(),
     allowedViews: allowedViews,
     defaultView: _resolveDefaultView_(allowedViews),
     selectedView: '',
@@ -297,7 +351,7 @@ function _buildAccessModel_(options) {
 
 function _normalizeLegacyAccessData_(data) {
   var source = data || {};
-  var selectedView = _normalizePermissionCode_(source.selectedView || '') || _legacyRoleToViewCode_(source.role || source.baseRole || '');
+  var selectedView = _normalizeViewCode_(source.selectedView || source.viewCode || '');
   var categoryScope = Array.isArray(source.categoryScope)
     ? source.categoryScope.slice()
     : (Array.isArray(source.scope) ? source.scope.slice() : []);
@@ -306,10 +360,8 @@ function _normalizeLegacyAccessData_(data) {
     fullName: source.fullName,
     role: source.baseRole || source.role,
     status: source.status,
-    permissionsRaw: source.permissionsRaw || selectedView,
-    editRulesRaw: source.editRulesRaw || (source.currentViewCanEdit === true || source.canEdit === true ? 'TRUE' : ''),
+    canEditRaw: _resolveCanEditRawFromAccessData_(source),
     categoryScope: categoryScope,
-    legacyCanEdit: source.canEdit === true || source.currentViewCanEdit === true,
     selectedView: source.selectedView || selectedView
   });
 
@@ -324,13 +376,7 @@ function _normalizeLegacyAccessData_(data) {
 
 function _normalizeAccessData_(data) {
   if (!data || typeof data !== 'object') return null;
-  var looksNew = Array.isArray(data.allowedViews)
-    || Array.isArray(data.permissionSlots)
-    || Array.isArray(data.permissionListNormalized)
-    || Array.isArray(data.editRuleSlots)
-    || typeof data.permissionsRaw === 'string'
-    || typeof data.editRulesRaw === 'string';
-  return looksNew ? _normalizeLegacyAccessData_(data) : _normalizeLegacyAccessData_(data);
+  return _normalizeLegacyAccessData_(data);
 }
 
 function _storeAccessByToken_(token, accessData) {
@@ -458,64 +504,8 @@ function _safeErrorText_(err, fallback) {
 function doGet(e) {
   try {
     var page = (e && e.parameter && e.parameter.page)
-      ? e.parameter.page.toLowerCase() : 'index';
-    if (page !== 'login' && page !== 'index' && page !== 'director') {
-      page = 'index';
-    }
-
-    if (page === 'login') {
-      return _renderLoginPage('', _resolveRequestEmail_(e) || '');
-    }
-
-    if (page !== 'index' && page !== 'director') {
-      return _renderLoginPage('Trang không hợp lệ. Vui lòng đăng nhập lại.', _resolveRequestEmail_(e) || '');
-    }
-
-    var token = e && e.parameter ? String(e.parameter.token || '').trim() : '';
-    var access;
-    if (!token) {
-      // Force login for production - no bypass
-      return _renderLoginPage('Vui lòng đăng nhập để tiếp tục.', _resolveRequestEmail_(e) || '');
-    } else {
-      access = _getAccessByToken_(token);
-      if (!access.ok) {
-        return _renderLoginPage(access.error.message, _resolveRequestEmail_(e) || '');
-      }
-    }
-
-    // If non-director requests director page, always show index page.
-    if (page === 'director' && access.data.role !== 'DIRECTOR') {
-      page = 'index';
-    }
-
-    var fileName = page === 'director' ? 'Director_View' : 'Index';
-    var title = page === 'director' ? 'Director – NPA Dashboard' : 'NPA Product Dashboard';
-    var tpl = HtmlService.createTemplateFromFile(fileName);
-    tpl.appUserJson = JSON.stringify({
-      email: access.data.email,
-      fullName: access.data.fullName,
-      role: access.data.role,
-      scope: access.data.scope,
-      canEdit: access.data.canEdit,
-      authToken: token
-    }).replace(/</g, '\\u003c');
-    var html = tpl.evaluate();
-    html.setTitle(title);
-    html.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-    return html;
-  } catch (err) {
-    var msg = _safeErrorText_(err, 'Unknown error');
-    return HtmlService.createHtmlOutput(
-      '<h2 style="font-family:sans-serif;color:red">Error: ' + msg + '</h2>'
-    );
-  }
-}
-
-function doGet(e) {
-  try {
-    var page = (e && e.parameter && e.parameter.page)
       ? String(e.parameter.page || '').toLowerCase() : 'index';
-    var requestedView = e && e.parameter ? _normalizePermissionCode_(e.parameter.view || '') : '';
+    var requestedView = e && e.parameter ? _normalizeViewCode_(e.parameter.view || '') : '';
     var token = e && e.parameter ? String(e.parameter.token || '').trim() : '';
 
     if (page !== 'login' && page !== 'index' && page !== 'director') {
@@ -586,10 +576,9 @@ function _renderAppPage_(access, token) {
     categoryScope: Array.isArray(access.categoryScope) ? access.categoryScope : [],
     canEdit: access.currentViewCanEdit === true,
     currentViewCanEdit: access.currentViewCanEdit === true,
-    permissionsRaw: access.permissionsRaw,
-    permissionListNormalized: access.permissionListNormalized,
-    editRulesRaw: access.editRulesRaw,
-    editRuleListNormalized: access.editRuleListNormalized,
+    canEditRaw: access.canEditRaw || '',
+    canEditTokensNormalized: Array.isArray(access.canEditTokensNormalized) ? access.canEditTokensNormalized : [],
+    invalidCanEditTokens: Array.isArray(access.invalidCanEditTokens) ? access.invalidCanEditTokens : [],
     allowedViews: access.allowedViews || [],
     defaultView: access.defaultView || '',
     selectedView: access.selectedView || '',
@@ -609,17 +598,6 @@ function _renderAppPage_(access, token) {
 // ========================================
 // HELPER: Safe sheet access
 // ========================================
-function _openSheet(access) {
-  var sheetName = (access && access.role === 'MANAGER') ? CONFIG.SHEET_NAME_MANAGER : CONFIG.SHEET_NAME_CATEGORY;
-  var ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
-  var sheet = ss.getSheetByName(sheetName);
-  if (!sheet) {
-    var names = ss.getSheets().map(function(s) { return s.getName(); }).join(', ');
-    throw new Error('Sheet "' + sheetName + '" not found. Available: ' + names);
-  }
-  return sheet;
-}
-
 function _openSheet(access) {
   var viewCode = _getSelectedViewCode_(access);
   var sheetName = CONFIG.SHEET_NAME_CATEGORY;
@@ -684,12 +662,14 @@ function _getRowSnapshotByNumber_(sheet, headers, rowNumber) {
 
 function _hasRowAccess_(rowObj, access) {
   if (!rowObj) return false;
-  if (!access || !access.role || access.role === 'DIRECTOR') return true;
+  if (!access) return false;
+  if (_isDirectorViewAccess_(access)) return true;
   return _applyAccessScopeToRows_([rowObj], access).length > 0;
 }
 
 function _getScopeDisplay_(access) {
-  if (!access || access.role === 'DIRECTOR') return 'ALL';
+  if (!access) return '';
+  if (_isDirectorViewAccess_(access)) return 'ALL';
   var scopes = Array.isArray(access.scope) ? access.scope : [];
   return scopes.length ? scopes.join(', ') : '';
 }
@@ -744,7 +724,7 @@ function _resolveAuditSource_(payload, access, fallback) {
   var source = payload && payload.source ? String(payload.source).trim() : '';
   if (source) return source;
   if (fallback) return fallback;
-  return (access && access.role === 'DIRECTOR') ? 'DIRECTOR_UPDATE' : 'PIC_UPDATE';
+  return _isDirectorViewAccess_(access) ? 'DIRECTOR_UPDATE' : 'PIC_UPDATE';
 }
 
 function _ensureAuditLogSheet_() {
@@ -840,7 +820,9 @@ if (!String.prototype.padStart) {
 }
 
 function _applyAccessScopeToRows_(rows, access) {
-  if (!access || !access.role || access.role === 'DIRECTOR') return rows;
+  if (!Array.isArray(rows)) return [];
+  if (!access) return [];
+  if (_isDirectorViewAccess_(access)) return rows;
   var scopes = Array.isArray(access.scope) ? access.scope : [];
   if (!scopes.length) return [];
   var scopeFields = _detectCategoryScopeFieldNames_(rows);
@@ -977,21 +959,28 @@ function _detectCategoryScopeFieldNames_(rows) {
 }
 
 function _resolveAccessForDataApi_(params) {
-  if (typeof params === 'string') return _getAccessByToken_(params);
-  if (!params || typeof params !== 'object') {
+  var token = '';
+  if (typeof params === 'string') {
+    token = String(params || '').trim();
+  } else if (params && typeof params === 'object') {
+    token = params.token ? String(params.token).trim() : '';
+  } else {
     return _err('MISSING_TOKEN', 'Vui long dang nhap de tiep tuc.');
   }
-  var token = params.token ? String(params.token).trim() : '';
+
   if (!token) {
     return _err('MISSING_TOKEN', 'Vui long dang nhap de tiep tuc.');
   }
-  return _getAccessByToken_(token);
-}
+  var accessRes = _getAccessByToken_(token);
+  if (!accessRes.ok) return accessRes;
 
-function _getEditableFieldsForAccess_(access) {
-  if (!access || access.canEdit !== true) return [];
-  if (access.role === 'DIRECTOR') return DIRECTOR_EDITABLE_FIELDS.slice();
-  return PIC_EDITABLE_FIELDS.slice();
+  var access = accessRes.data || {};
+  var hasManyViews = Array.isArray(access.allowedViews) && access.allowedViews.length > 1;
+  if (hasManyViews && !_hasSelectedView_(access)) {
+    return _err('VIEW_SELECTION_REQUIRED', 'Tai khoan co nhieu view. Vui long chon workspace truoc khi tiep tuc.');
+  }
+
+  return accessRes;
 }
 
 // ========================================
@@ -2363,65 +2352,6 @@ function getProcessDetail(params) {
 // ========================================
 // API: updateRow
 // ========================================
-function _requireWriteAccess_(token) {
-  var accessRes = _getAccessByToken_(token);
-  if (!accessRes.ok) return accessRes;
-  if (!accessRes.data || accessRes.data.canEdit !== true) {
-    return _err('FORBIDDEN', 'Tài khoản hiện không có quyền chỉnh sửa.');
-  }
-  return accessRes;
-}
-
-function _hasRowAccess_(rowObj, access) {
-  if (!rowObj) return false;
-  if (!access) return false;
-  if (_isDirectorViewAccess_(access)) return true;
-  return _applyAccessScopeToRows_([rowObj], access).length > 0;
-}
-
-function _getScopeDisplay_(access) {
-  if (!access) return '';
-  if (_isDirectorViewAccess_(access)) return 'ALL';
-  var scopes = Array.isArray(access.scope) ? access.scope : [];
-  return scopes.length ? scopes.join(', ') : '';
-}
-
-function _resolveAuditSource_(payload, access, fallback) {
-  var source = payload && payload.source ? String(payload.source).trim() : '';
-  if (source) return source;
-  if (fallback) return fallback;
-  return _isDirectorViewAccess_(access) ? 'DIRECTOR_UPDATE' : 'PIC_UPDATE';
-}
-
-function _applyAccessScopeToRows_(rows, access) {
-  if (!Array.isArray(rows)) return [];
-  if (!access) return [];
-  if (_isDirectorViewAccess_(access)) return rows;
-
-  var scopes = Array.isArray(access.scope) ? access.scope : [];
-  if (!scopes.length) return [];
-
-  var scopeFields = _detectCategoryScopeFieldNames_(rows);
-  if (!scopeFields.length) return [];
-
-  var scopeMap = {};
-  for (var i = 0; i < scopes.length; i++) {
-    var scopeKey = _normalizeCategoryKey_(scopes[i]);
-    if (scopeKey) scopeMap[scopeKey] = true;
-  }
-  if (scopeMap['all']) return rows;
-
-  return rows.filter(function(r) {
-    if (!r) return false;
-    for (var f = 0; f < scopeFields.length; f++) {
-      var field = scopeFields[f];
-      var rowCategory = _normalizeCategoryKey_(r[field] || '');
-      if (rowCategory && scopeMap[rowCategory]) return true;
-    }
-    return false;
-  });
-}
-
 function _getEditableFieldsForAccess_(access) {
   var canEdit = access && (access.currentViewCanEdit === true || access.canEdit === true);
   if (!canEdit) return [];
@@ -3059,43 +2989,6 @@ function _calcRefGpPct_(gpValue, retail) {
   return (gpValue / retail) * 100;
 }
 
-function loginWithEmail(email, password) {
-  try {
-    var access = _getUserAccessByEmail_(email, password, true);
-    if (!access.ok) return access;
-
-    var page = access.data.role === 'DIRECTOR' ? 'director' : 'index';
-    var token = _createAuthToken_(access.data);
-    var baseUrl = ScriptApp.getService().getUrl();
-    var targetUrl = baseUrl
-      ? (baseUrl + '?page=' + page + '&token=' + encodeURIComponent(token))
-      : ('?page=' + page + '&token=' + encodeURIComponent(token));
-    return _ok({
-      email: access.data.email,
-      role: access.data.role,
-      page: page,
-      token: token,
-      url: targetUrl
-    });
-  } catch (err) {
-    return _err('LOGIN_ERROR', err.message, err.stack);
-  }
-}
-
-function getCurrentUserAccess(token) {
-  return _getAccessByToken_(token);
-}
-
-function _renderLoginPage(message, prefillEmail) {
-  var tpl = HtmlService.createTemplateFromFile('Login');
-  tpl.loginMessage = message || '';
-  tpl.prefillEmail = prefillEmail || '';
-  var out = tpl.evaluate();
-  out.setTitle('NPA Login');
-  out.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-  return out;
-}
-
 function _resolveRequestEmail_(e) {
   var fromQuery = e && e.parameter && e.parameter.email ? String(e.parameter.email).trim() : '';
   if (fromQuery) return fromQuery.toLowerCase();
@@ -3135,128 +3028,6 @@ function _normalizeLoginEmail_(value) {
     .replace(/\s+/g, '')
     .trim()
     .toLowerCase();
-}
-
-function _getUserAccessByEmail_(email, password, enforcePassword) {
-  try {
-    var em = _normalizeLoginEmail_(email);
-    if (!em) return _err('MISSING_EMAIL', 'Không tìm thấy email đăng nhập');
-    var pwd = String(password || '');
-
-    var ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
-    var sheet = ss.getSheetByName(CONFIG.USER_MASTER_SHEET);
-    if (!sheet) return _err('USER_MASTER_NOT_FOUND', 'Chưa có sheet User_Master');
-
-    var lastRow = sheet.getLastRow();
-    var lastCol = sheet.getLastColumn();
-    if (lastRow < 2 || lastCol < 1) return _err('USER_NOT_FOUND', 'User_Master chưa có dữ liệu');
-
-    var headers = sheet.getRange(1, 1, 1, lastCol).getDisplayValues()[0].map(function(h) {
-      return String(h || '').trim();
-    });
-    var data = sheet.getRange(2, 1, lastRow - 1, lastCol).getDisplayValues();
-
-    var hEmail = _findUserMasterHeaderIndex_(headers, ['Email']);
-    var hPassword = _findUserMasterHeaderIndex_(headers, ['Password']);
-    var hName = _findUserMasterHeaderIndex_(headers, ['Full Name', 'FullName']);
-    var hRole = _findUserMasterHeaderIndex_(headers, ['Role']);
-    var hStatus = _findUserMasterHeaderIndex_(headers, ['Status']);
-    var hCategory = _findUserMasterHeaderIndex_(headers, ['Category']);
-    var hManaged = _findUserMasterHeaderIndex_(headers, ['Managed Categories', 'Managed Category']);
-    var hLanding = _findUserMasterHeaderIndex_(headers, ['Landing Page (Auto)', 'Landing Page']);
-    var hCanEdit = _findUserMasterHeaderIndex_(headers, ['Can Edit', 'Permission']);
-    var hScope = _findUserMasterHeaderIndex_(headers, ['Effective Scope (Auto)', 'Effective Scope']);
-
-    if (hEmail < 0 || hRole < 0 || hStatus < 0) {
-      return _err('USER_MASTER_SCHEMA_ERROR', 'Thiếu cột Email/Role/Status trong User_Master');
-    }
-
-    var found = null;
-    for (var i = 0; i < data.length; i++) {
-      var rowEmail = _normalizeLoginEmail_(data[i][hEmail]);
-      if (rowEmail === em) {
-        found = data[i];
-        break;
-      }
-    }
-    if (!found) {
-      Logger.log('USER_NOT_FOUND lookup=' + em + ' headers=' + headers.join(' | '));
-      return _err('USER_NOT_FOUND', 'Không tìm thấy tài khoản trong User_Master cho email: ' + em);
-    }
-
-    var status = String(found[hStatus] || '').trim().toUpperCase();
-    if (status !== 'ACTIVE') return _err('USER_INACTIVE', 'Tài khoản đang bị khóa (INACTIVE)');
-
-    if (enforcePassword) {
-      if (hPassword < 0) return _err('MISSING_PASSWORD_COLUMN', 'Thiếu cột Password trong User_Master');
-      if (!pwd) return _err('MISSING_PASSWORD', 'Vui lòng nhập mật khẩu');
-      var sheetPwd = String(found[hPassword] || '');
-      if (pwd !== sheetPwd) return _err('INVALID_PASSWORD', 'Mật khẩu không đúng');
-    }
-
-    var role = String(found[hRole] || '').trim().toUpperCase();
-    if (role !== 'DIRECTOR' && role !== 'MANAGER' && role !== 'CATEGORY') {
-      return _err('INVALID_ROLE', 'Role không hợp lệ: ' + role);
-    }
-
-    var fullName = hName >= 0 ? String(found[hName] || '').trim() : '';
-    var canEditRaw = hCanEdit >= 0 ? found[hCanEdit] : true;
-    var canEdit = (canEditRaw === true || String(canEditRaw).toLowerCase() === 'true');
-    var landing = hLanding >= 0 ? String(found[hLanding] || '').trim() : '';
-    var scopeRaw = hScope >= 0 ? String(found[hScope] || '').trim() : '';
-    var category = hCategory >= 0 ? String(found[hCategory] || '').trim() : '';
-    var managed = hManaged >= 0 ? String(found[hManaged] || '').trim() : '';
-
-    // Merge all possible scope columns to avoid missing categories when one column is stale/empty.
-    var scopeJoined = []
-      .concat(_parseScopeList_(scopeRaw))
-      .concat(_parseScopeList_(category))
-      .concat(_parseScopeList_(managed));
-    var scopeSeen = {};
-    var scope = [];
-    for (var si = 0; si < scopeJoined.length; si++) {
-      var raw = scopeJoined[si];
-      var key = _normalizeCategoryKey_(raw);
-      if (!key || scopeSeen[key]) continue;
-      scopeSeen[key] = true;
-      scope.push(raw);
-    }
-    if (role === 'DIRECTOR') scope = ['ALL'];
-
-    return _ok({
-      email: em,
-      fullName: fullName,
-      role: role,
-      status: status,
-      canEdit: canEdit,
-      landingPage: landing || (role === 'DIRECTOR' ? 'DIRECTOR_VIEW' : 'INDEX'),
-      scope: scope
-    });
-  } catch (err) {
-    return _err('USER_ACCESS_ERROR', err.message, err.stack);
-  }
-}
-
-function _createAuthToken_(accessData) {
-  var token = Utilities.getUuid().replace(/-/g, '') + Utilities.getUuid().replace(/-/g, '');
-  var cache = CacheService.getScriptCache();
-  cache.put('AUTH_' + token, JSON.stringify(accessData || {}), 21600); // 6h
-  return token;
-}
-
-function _getAccessByToken_(token) {
-  try {
-    var tk = String(token || '').trim();
-    if (!tk) return _err('MISSING_TOKEN', 'Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.');
-
-    var raw = CacheService.getScriptCache().get('AUTH_' + tk);
-    if (!raw) return _err('TOKEN_EXPIRED', 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
-    var data = JSON.parse(raw);
-    if (!data || !data.email) return _err('INVALID_TOKEN', 'Phiên đăng nhập không hợp lệ.');
-    return _ok(data);
-  } catch (err) {
-    return _err('TOKEN_READ_ERROR', err.message, err.stack);
-  }
 }
 
 function _collectScopeFromUserRow_(scopeRaw, category, managed) {
@@ -3317,7 +3088,7 @@ function loginWithEmail(email, password) {
 function selectUserView(token, viewCode) {
   try {
     var tk = String(token || '').trim();
-    var desiredView = _normalizePermissionCode_(viewCode);
+    var desiredView = _normalizeViewCode_(viewCode);
     if (!tk) return _err('MISSING_TOKEN', 'Vui long dang nhap de tiep tuc.');
     if (!desiredView) return _err('INVALID_VIEW', 'View khong hop le.');
 
@@ -3382,15 +3153,14 @@ function _getUserAccessByEmail_(email, password, enforcePassword) {
     var hPassword = _findUserMasterHeaderIndex_(headers, ['Password']);
     var hName = _findUserMasterHeaderIndex_(headers, ['Full Name', 'FullName']);
     var hRole = _findUserMasterHeaderIndex_(headers, ['Role']);
-    var hPermission = _findUserMasterHeaderIndex_(headers, ['Permission', 'Permissions']);
     var hStatus = _findUserMasterHeaderIndex_(headers, ['Status']);
     var hCategory = _findUserMasterHeaderIndex_(headers, ['Category']);
     var hManaged = _findUserMasterHeaderIndex_(headers, ['Managed Categories', 'Managed Category']);
     var hCanEdit = _findUserMasterHeaderIndex_(headers, ['Can Edit']);
     var hScope = _findUserMasterHeaderIndex_(headers, ['Effective Scope (Auto)', 'Effective Scope']);
 
-    if (hEmail < 0 || hStatus < 0 || (hPermission < 0 && hRole < 0)) {
-      return _err('USER_MASTER_SCHEMA_ERROR', 'Thieu cot Email/Status/Permission trong User_Master.');
+    if (hEmail < 0 || hRole < 0 || hStatus < 0 || hCanEdit < 0) {
+      return _err('USER_MASTER_SCHEMA_ERROR', 'Thieu cot bat buoc Email/Role/Status/Can Edit trong User_Master.');
     }
 
     var found = null;
@@ -3416,31 +3186,30 @@ function _getUserAccessByEmail_(email, password, enforcePassword) {
       if (pwd !== sheetPwd) return _err('INVALID_PASSWORD', 'Mat khau khong dung.');
     }
 
-    var rawRole = hRole >= 0 ? String(found[hRole] || '').trim().toUpperCase() : '';
-    var permissionsRaw = hPermission >= 0 ? String(found[hPermission] || '').trim() : '';
-    if (!permissionsRaw) permissionsRaw = _legacyRoleToViewCode_(rawRole);
+    var rawRole = String(found[hRole] || '').trim().toUpperCase();
+    if (rawRole !== 'DIRECTOR' && rawRole !== 'MANAGER' && rawRole !== 'CATEGORY') {
+      return _err('INVALID_ROLE', 'Role khong hop le: ' + rawRole);
+    }
 
     var fullName = hName >= 0 ? String(found[hName] || '').trim() : '';
-    var editRulesRaw = hCanEdit >= 0 ? String(found[hCanEdit] || '').trim() : '';
-    var legacyCanEdit = String(editRulesRaw || '').trim().toLowerCase() === 'true';
+    var canEditRaw = String(found[hCanEdit] || '').trim();
     var scopeRaw = hScope >= 0 ? String(found[hScope] || '').trim() : '';
     var category = hCategory >= 0 ? String(found[hCategory] || '').trim() : '';
     var managed = hManaged >= 0 ? String(found[hManaged] || '').trim() : '';
     var scope = _collectScopeFromUserRow_(scopeRaw, category, managed);
+    if (rawRole === 'DIRECTOR') scope = ['ALL'];
 
     var access = _buildAccessModel_({
       email: em,
       fullName: fullName,
       role: rawRole,
       status: status,
-      permissionsRaw: permissionsRaw,
-      editRulesRaw: editRulesRaw,
-      categoryScope: scope,
-      legacyCanEdit: legacyCanEdit
+      canEditRaw: canEditRaw,
+      categoryScope: scope
     });
 
     if (!access.allowedViews || !access.allowedViews.length) {
-      return _err('INVALID_PERMISSION', 'Permission rong hoac khong hop le. Khong the xac dinh view truy cap.');
+      return _err('INVALID_ACCESS', 'Can Edit rong hoac khong co token hop le. Su dung: CAT_Edit, MAN_Edit, DIR_Edit.');
     }
 
     if (!access.selectedView && access.allowedViews.length === 1) {
@@ -3484,147 +3253,6 @@ function _getAccessByToken_(token) {
 // ADMIN: Setup User_Master for Role-based Login
 // Roles: DIRECTOR > MANAGER > CATEGORY
 // ========================================
-function setupUserMasterSheet() {
-  try {
-    var ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
-    var sheet = ss.getSheetByName(CONFIG.USER_MASTER_SHEET);
-    if (!sheet) {
-      sheet = ss.insertSheet(CONFIG.USER_MASTER_SHEET);
-    }
-
-    var headers = [
-      'Email',
-      'Password',
-      'Full Name',
-      'Role',
-      'Status',
-      'Category',
-      'Can Edit',
-      'Notes',
-      'Created At',
-      'Updated At'
-    ];
-
-    var notes = [
-      'Email đăng nhập (nên dùng email domain công ty), duy nhất',
-      'Mật khẩu đăng nhập (hiện đang lưu dạng plain text)',
-      'Tên hiển thị',
-      'DIRECTOR | MANAGER | CATEGORY',
-      'ACTIVE | INACTIVE',
-      'Category/scope được phép xem (có thể nhiều giá trị, ngăn cách bằng dấu phẩy)',
-      'TRUE/FALSE quyền chỉnh sửa',
-      'Ghi chú nội bộ',
-      'Thời điểm tạo tài khoản',
-      'Thời điểm cập nhật gần nhất'
-    ];
-
-    var requiredCols = headers.length;
-    if (sheet.getMaxColumns() < requiredCols) {
-      sheet.insertColumnsAfter(sheet.getMaxColumns(), requiredCols - sheet.getMaxColumns());
-    }
-    if (sheet.getMaxRows() < 200) {
-      sheet.insertRowsAfter(sheet.getMaxRows(), 200 - sheet.getMaxRows());
-    }
-
-    sheet.getRange(1, 1, 1, requiredCols).setValues([headers]);
-    sheet.getRange(1, 1, 1, requiredCols).setNotes([notes]);
-    sheet.setFrozenRows(1);
-
-    var headerRange = sheet.getRange(1, 1, 1, requiredCols);
-    headerRange
-      .setFontWeight('bold')
-      .setBackground('#1f4e78')
-      .setFontColor('#ffffff')
-      .setHorizontalAlignment('center');
-
-    var widths = [260, 140, 180, 130, 120, 360, 110, 280, 170, 170];
-    for (var i = 0; i < widths.length; i++) {
-      sheet.setColumnWidth(i + 1, widths[i]);
-    }
-
-    var maxRows = sheet.getMaxRows();
-    var dataRows = maxRows - 1;
-
-    // Data validation rules
-    var roleRule = SpreadsheetApp.newDataValidation()
-      .requireValueInList(['DIRECTOR', 'MANAGER', 'CATEGORY'], true)
-      .setAllowInvalid(false)
-      .build();
-    sheet.getRange(2, 4, dataRows, 1).setDataValidation(roleRule);
-
-    var statusRule = SpreadsheetApp.newDataValidation()
-      .requireValueInList(['ACTIVE', 'INACTIVE'], true)
-      .setAllowInvalid(false)
-      .build();
-    sheet.getRange(2, 5, dataRows, 1).setDataValidation(statusRule);
-
-    var editRule = SpreadsheetApp.newDataValidation()
-      .requireCheckbox()
-      .build();
-    sheet.getRange(2, 7, dataRows, 1).setDataValidation(editRule);
-
-    // Remove legacy helper column if present
-    var legacyHeader = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-    var helperColIdx = legacyHeader.indexOf('Category_List_Helper');
-    if (helperColIdx >= 0) {
-      sheet.deleteColumn(helperColIdx + 1);
-      // ensure header row is still correct after deleting old column
-      sheet.getRange(1, 1, 1, requiredCols).setValues([headers]);
-    }
-
-    // Category validation from main data sheet
-    var categories = _extractCategoriesFromMainSheet_();
-    if (categories.length > 0) {
-      var catRule = SpreadsheetApp.newDataValidation()
-        .requireValueInList(categories, true)
-        .setAllowInvalid(true)
-        .build();
-      sheet.getRange(2, 6, dataRows, 1).setDataValidation(catRule);
-    } else {
-      sheet.getRange(2, 6, dataRows, 1).clearDataValidations();
-    }
-
-    // Formatting
-    sheet.getRange(2, 1, dataRows, 10).setVerticalAlignment('middle');
-    sheet.getRange(2, 6, dataRows, 1).setWrap(true); // Category scope
-    sheet.getRange(2, 8, dataRows, 1).setWrap(true); // Notes
-    sheet.getRange(2, 9, dataRows, 2).setNumberFormat('yyyy-mm-dd hh:mm');
-
-    // Seed sample rows if empty
-    var hasAnyUser = false;
-    if (sheet.getLastRow() >= 2) {
-      var emailVals = sheet.getRange(2, 1, sheet.getLastRow() - 1, 1).getValues();
-      hasAnyUser = emailVals.some(function(r) {
-        return String(r[0] || '').trim() !== '';
-      });
-    }
-
-    if (!hasAnyUser) {
-      var now = new Date();
-      var c1 = categories[0] || 'Non Alcoholic';
-      var seed = [
-        ['director@yourcompany.com', '7-Eleven', 'Director User', 'DIRECTOR', 'ACTIVE', '', true, 'Xem toàn bộ sản phẩm', now, now],
-        ['manager@yourcompany.com', '7-Eleven', 'Manager User', 'MANAGER', 'ACTIVE', c1, true, 'Quản lý nhóm category', now, now],
-        ['category@yourcompany.com', '7-Eleven', 'Category User', 'CATEGORY', 'ACTIVE', c1, true, 'Chỉ xem category được phân quyền', now, now]
-      ];
-      sheet.getRange(2, 1, seed.length, requiredCols).setValues(seed);
-    }
-
-    // Basic filter
-    if (!sheet.getFilter()) {
-      sheet.getRange(1, 1, sheet.getMaxRows(), 10).createFilter();
-    }
-
-    return _ok({
-      sheetName: CONFIG.USER_MASTER_SHEET,
-      categoriesLoaded: categories.length,
-      message: 'User_Master is ready'
-    });
-  } catch (err) {
-    return _err('SETUP_USER_MASTER_ERROR', err.message, err.stack);
-  }
-}
-
 function _ensureUserMasterColumn_(sheet, headerName, previousHeaderName) {
   var lastCol = Math.max(sheet.getLastColumn(), 1);
   var headers = sheet.getRange(1, 1, 1, lastCol).getDisplayValues()[0].map(function(h) {
@@ -3662,11 +3290,10 @@ function setupUserMasterSheet() {
       { header: 'Email', note: 'Login email. Must be unique.', width: 260 },
       { header: 'Password', note: 'Current login password.', width: 140 },
       { header: 'Full Name', note: 'Display name.', width: 180 },
-      { header: 'Role', note: 'Legacy single-role label for backward compatibility.', width: 130 },
-      { header: 'Permission', note: 'Allowed views. Use DIR, MAN, CAT. Multiple values keep order.', width: 220 },
+      { header: 'Role', note: 'Legacy role label for identity and scope context.', width: 130 },
       { header: 'Status', note: 'ACTIVE or INACTIVE.', width: 120 },
       { header: 'Category', note: 'Category scope for Manager/Category views.', width: 360 },
-      { header: 'Can Edit', note: 'Edit tokens mapped by Permission order. Example: Page1_Edit, Page2_Edit.', width: 220 },
+      { header: 'Can Edit', note: 'Access tokens. Use CAT_Edit, MAN_Edit, DIR_Edit. Multiple tokens separated by comma/new line/semicolon.', width: 280 },
       { header: 'Notes', note: 'Internal note.', width: 280 },
       { header: 'Created At', note: 'Created timestamp.', width: 170 },
       { header: 'Updated At', note: 'Updated timestamp.', width: 170 }
@@ -3680,6 +3307,17 @@ function setupUserMasterSheet() {
     var headers = sheet.getRange(1, 1, 1, lastCol).getDisplayValues()[0].map(function(h) {
       return String(h || '').trim();
     });
+
+    var permissionIdx = _findUserMasterHeaderIndex_(headers, ['Permission', 'Permissions']);
+    while (permissionIdx >= 0) {
+      sheet.deleteColumn(permissionIdx + 1);
+      lastCol = sheet.getLastColumn();
+      headers = sheet.getRange(1, 1, 1, lastCol).getDisplayValues()[0].map(function(h) {
+        return String(h || '').trim();
+      });
+      permissionIdx = _findUserMasterHeaderIndex_(headers, ['Permission', 'Permissions']);
+    }
+
     var headerNotes = sheet.getRange(1, 1, 1, lastCol).getNotes()[0];
 
     for (var i = 0; i < specs.length; i++) {
@@ -3707,7 +3345,6 @@ function setupUserMasterSheet() {
     var idxCreated = _findUserMasterHeaderIndex_(headers, ['Created At']);
     var idxUpdated = _findUserMasterHeaderIndex_(headers, ['Updated At']);
     var idxCanEdit = _findUserMasterHeaderIndex_(headers, ['Can Edit']);
-    var idxPermission = _findUserMasterHeaderIndex_(headers, ['Permission']);
 
     if (idxRole >= 0) {
       var roleRule = SpreadsheetApp.newDataValidation()
@@ -3728,10 +3365,6 @@ function setupUserMasterSheet() {
     if (idxCanEdit >= 0) {
       sheet.getRange(2, idxCanEdit + 1, dataRows, 1).clearDataValidations();
       sheet.getRange(2, idxCanEdit + 1, dataRows, 1).setWrap(true);
-    }
-
-    if (idxPermission >= 0) {
-      sheet.getRange(2, idxPermission + 1, dataRows, 1).setWrap(true);
     }
 
     var categories = _extractCategoriesFromMainSheet_();
@@ -3771,10 +3404,9 @@ function setupUserMasterSheet() {
           password: '7-Eleven',
           fullName: 'Director User',
           role: 'DIRECTOR',
-          permission: 'DIR',
           status: 'ACTIVE',
           category: '',
-          canEdit: 'Page1_Edit',
+          canEdit: 'DIR_Edit',
           notes: 'Director workspace'
         },
         {
@@ -3782,10 +3414,9 @@ function setupUserMasterSheet() {
           password: '7-Eleven',
           fullName: 'Manager User',
           role: 'MANAGER',
-          permission: 'MAN',
           status: 'ACTIVE',
           category: c1,
-          canEdit: 'Page1_Edit',
+          canEdit: 'MAN_Edit',
           notes: 'Manager workspace'
         },
         {
@@ -3793,10 +3424,9 @@ function setupUserMasterSheet() {
           password: '7-Eleven',
           fullName: 'Category User',
           role: 'CATEGORY',
-          permission: 'CAT',
           status: 'ACTIVE',
           category: c1,
-          canEdit: 'Page1_Edit',
+          canEdit: 'CAT_Edit',
           notes: 'Category workspace'
         }
       ];
@@ -3810,7 +3440,6 @@ function setupUserMasterSheet() {
         if (idxPassword >= 0) row[idxPassword] = item.password;
         if (idxFullName >= 0) row[idxFullName] = item.fullName;
         if (idxRole >= 0) row[idxRole] = item.role;
-        if (idxPermission >= 0) row[idxPermission] = item.permission;
         if (idxStatus >= 0) row[idxStatus] = item.status;
         if (idxCategory >= 0) row[idxCategory] = item.category;
         if (idxCanEdit >= 0) row[idxCanEdit] = item.canEdit;

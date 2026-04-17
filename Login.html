@@ -724,48 +724,6 @@
         .toLowerCase();
     }
 
-    function doLogin() {
-      var email = normalizeLoginEmail(_email.value || '');
-      var password = (_pwd.value || '');
-      _email.value = email;
-
-      if (!email) {
-        setMsg('Vui lòng nhập email.', 'err');
-        _email.focus();
-        return;
-      }
-      if (!password) {
-        setMsg('Vui lòng nhập mật khẩu.', 'err');
-        _pwd.focus();
-        return;
-      }
-
-      setLoading(true);
-      setMsg('Đang kiểm tra quyền truy cập...', '');
-
-      google.script.run
-        .withSuccessHandler(function(res) {
-          setLoading(false);
-          if (!res || !res.ok) {
-            setMsg(_toErrorText(res && res.error ? res.error : res, 'Đăng nhập thất bại'), 'err');
-            errorMotion();
-            completeProgress();
-            return;
-          }
-          try { localStorage.setItem('npa_last_email', email); } catch (e) {}
-          setMsg('Đăng nhập thành công. Đang chuyển trang...', 'ok');
-          completeProgress();
-          window.location.href = res.data.url;
-        })
-        .withFailureHandler(function(err) {
-          setLoading(false);
-          setMsg('Lỗi hệ thống: ' + _toErrorText(err, 'Unknown'), 'err');
-          errorMotion();
-          completeProgress();
-        })
-        .loginWithEmail(email, password);
-    }
-
     document.getElementById('togglePwd').addEventListener('click', function() {
       var isHide = _pwd.type === 'password';
       _pwd.type = isHide ? 'text' : 'password';
