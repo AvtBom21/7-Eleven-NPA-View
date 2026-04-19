@@ -218,6 +218,14 @@ Implemented behavior:
 - Exact code lookup remains a separate fallback via lookupProcessExactCode().
 - Detail and chat requests use sequence/key guards so older responses cannot overwrite a newer selection.
 - When a search/filter is run intentionally, the current selection is kept if it still exists in the returned queue; otherwise selection/detail/chat are cleared deliberately.
+- The queue response primes a lightweight client detail cache for returned cards, so selecting a queued item can render the right panel immediately from cached summary/timeline data while a background detail refresh verifies freshness.
+- Process chat responses are cached per New Product ID. Opening Process preloads chat for the active/first item and the first few queued items; selecting a cached item shows the thread immediately and refreshes in the background.
+- Empty SSV Note Product is a valid empty conversation, not an error.
+
+Chat lookup correction:
+- rowNumber is only a hint for chat storage lookup.
+- If rowNumber does not match the requested product, Chat_Service.js now falls back to scanning by New Product ID instead of throwing a row mismatch error.
+- Only a full product-id scan miss returns a real *_ROW_NOT_FOUND error.
 
 UI language note:
 - The Process Tracking and chat text touched in the latest pass has been localized to Vietnamese while keeping sheet/header names such as Product Group and New Product ID where they are real data labels.
@@ -260,6 +268,13 @@ Latest validation after Process queue/state and Vietnamese UI stabilization:
 - git diff --check passed with only normal CRLF warnings.
 - Static audit confirms queue cards call App.selectProcessQueueItem(key), not App.openProcessKey(key) or App.openProcess({query:key}).
 - Static audit confirms search queue still runs only through searchProcess/searchProcessQueue paths tied to Search/Enter/reload actions.
+
+Latest validation after Process cache/preload and chat rowNumber fallback:
+- node --check Code.js passed.
+- node --check Chat_Service.js passed.
+- node --check Show_Director.js passed.
+- Parsed client script blocks in Index.html and Director_View.html; both parsed successfully, Apps Script template blocks skipped.
+- git diff --check passed with only normal CRLF warnings.
 
 Logic tests run locally:
 - Business flow state machine cases:

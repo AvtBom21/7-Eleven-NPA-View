@@ -8591,6 +8591,7 @@
         processProducts: [], processProductsMeta: null, processProductsLoading: false, processProductsError: null, processProductsSeq: 0, processProductsLoaded: false,
         processDetailSeq: 0, processModalOpen: false, processLoading: false, processError: null, processDetail: null,
         processLastRequest: null, processSearchValue: '', processActiveKey: '',
+        processDetailCache: {}, processChatCache: {}, processChatPrefetching: {},
         processChatSeq: 0, processChatKey: '', processChatLoading: false, processChatError: null, processChatHistory: null,
         processChatBusy: false, processChatEditId: '', processChatDraft: '', processChatEditDraft: '',
         workspaceChatSeq: 0, workspaceChatKey: '', workspaceChatRowNumber: null, workspaceChatLoading: false,
@@ -8827,6 +8828,87 @@
           }
         }
         return lookup ? _normalizeProcessCardSummary(lookup) : null;
+      }
+      function _getProcessCacheKey(value) {
+        if (value && typeof value === 'object') return _normalizeProcessSearchKey(value.key || value.newProductId || value.productId || '');
+        return _normalizeProcessSearchKey(value || '');
+      }
+      function _cacheProcessDetail(key, detail) {
+        var cacheKey = _getProcessCacheKey(key || detail);
+        if (!cacheKey || !detail) return;
+        S.processDetailCache[cacheKey] = _normalizeProcessDetail(detail, null, detail);
+      }
+      function _getCachedProcessDetail(key) {
+        var cacheKey = _getProcessCacheKey(key);
+        var cached = cacheKey ? S.processDetailCache[cacheKey] : null;
+        return cached ? _normalizeProcessDetail(cached, null, cached) : null;
+      }
+      function _cacheProcessChatHistory(key, history) {
+        var cacheKey = _getProcessCacheKey(key);
+        if (!cacheKey) return;
+        S.processChatCache[cacheKey] = _normalizeProductChatHistoryPayload(history);
+      }
+      function _getCachedProcessChatHistory(key) {
+        var cacheKey = _getProcessCacheKey(key);
+        var cached = cacheKey ? S.processChatCache[cacheKey] : null;
+        return cached ? _normalizeProductChatHistoryPayload(cached) : null;
+      }
+      function _primeProcessDetailCacheFromQueue() {
+        for (var i = 0; i < S.processProducts.length; i++) {
+          var item = _normalizeProcessCardSummary(S.processProducts[i]);
+          if (!item.key) continue;
+          _cacheProcessDetail(item.key, _normalizeProcessDetail(item, null, item));
+        }
+      }
+      function _prefetchProcessChatHistory(key, detail) {
+        var cacheKey = _getProcessCacheKey(key || detail);
+        if (!cacheKey || S.processChatCache[cacheKey] || S.processChatPrefetching[cacheKey]) return;
+        var sourceDetail = detail || _getCachedProcessDetail(cacheKey) || _findProcessSummaryByKey(cacheKey);
+        if (!sourceDetail || !sourceDetail.key) return;
+        S.processChatPrefetching[cacheKey] = true;
+        google.script.run
+          .withSuccessHandler(function (res) {
+            delete S.processChatPrefetching[cacheKey];
+            if (!res || !res.ok) return;
+            _cacheProcessChatHistory(cacheKey, res.data);
+            if (_normalizeProcessSearchKey(S.processChatKey || '') === cacheKey && !S.processChatHistory) {
+              S.processChatHistory = _getCachedProcessChatHistory(cacheKey);
+              S.processChatLoading = false;
+              S.processChatError = null;
+              _renderProcessChatOnly();
+            }
+          })
+          .withFailureHandler(function () {
+            delete S.processChatPrefetching[cacheKey];
+          })
+          .getProductChatHistory(_getProcessChatPayload({ newProductId: sourceDetail.key }, sourceDetail));
+      }
+      function _prefetchProcessChatFromQueue(limit) {
+        var max = Math.max(0, parseInt(limit, 10) || 0);
+        if (!max) return;
+        var seen = {};
+        var activeKey = _chooseProcessPreloadKey();
+        if (activeKey) {
+          var activeDetail = _getCachedProcessDetail(activeKey) || _findProcessSummaryByKey(activeKey);
+          _prefetchProcessChatHistory(activeKey, activeDetail);
+          seen[_getProcessCacheKey(activeKey)] = true;
+        }
+        for (var i = 0; i < S.processProducts.length && Object.keys(seen).length < max; i++) {
+          var item = _normalizeProcessCardSummary(S.processProducts[i]);
+          var cacheKey = _getProcessCacheKey(item.key);
+          if (!cacheKey || seen[cacheKey]) continue;
+          seen[cacheKey] = true;
+          _prefetchProcessChatHistory(item.key, _getCachedProcessDetail(item.key) || _normalizeProcessDetail(item, null, item));
+        }
+      }
+      function _chooseProcessPreloadKey(preferKey) {
+        var preferred = _normalizeProcessSearchKey(preferKey || '');
+        if (preferred && _hasProcessProductInQueue(preferred)) return preferred;
+        var active = _normalizeProcessSearchKey(S.processActiveKey || '');
+        if (active && _hasProcessProductInQueue(active)) return active;
+        var detailKey = _normalizeProcessSearchKey(S.processDetail && S.processDetail.key);
+        if (detailKey && _hasProcessProductInQueue(detailKey)) return detailKey;
+        return S.processProducts.length ? String(S.processProducts[0].key || '') : '';
       }
       function _isProcessQueueSelectionCurrent(key) {
         var normalized = _normalizeProcessSearchKey(key);
@@ -9113,7 +9195,7 @@
         } else if (cfg.loading && !history.items.length) {
           html += '<div class="process-chat-muted">' + esc(cfg.loadingText || 'Đang tải hội thoại...') + '</div>';
         } else if (!history.items.length) {
-          html += '<div class="process-chat-muted">' + esc(cfg.emptyText || 'Chưa có tin nhắn.') + '</div>';
+          html += '<div class="process-chat-muted">' + esc(cfg.emptyText || 'Chưa có hội thoại.') + '</div>';
         } else {
           html += '<div class="process-chat-list">';
           history.items.forEach(function (item) {
@@ -9171,8 +9253,8 @@
         S.processChatDraft = '';
         S.processChatEditDraft = '';
       }
-      function _getProcessChatPayload(extra) {
-        var detail = S.processDetail || {};
+      function _getProcessChatPayload(extra, detailOverride) {
+        var detail = detailOverride || S.processDetail || {};
         var lastPayload = S.processLastRequest && S.processLastRequest.payload ? S.processLastRequest.payload : {};
         var payload = Object.assign({
           token: AUTH_TOKEN,
@@ -9180,7 +9262,9 @@
           sheetContext: SELECTED_SHEET_NAME || (SELECTED_VIEW === 'MAN' ? 'Manager' : 'Category'),
           viewContext: 'INDEX_PROCESS_MODAL'
         }, extra || {});
-        if (lastPayload.rowNumber) payload.rowNumber = lastPayload.rowNumber;
+        var canUseLastPayload = !detailOverride
+          || _normalizeProcessSearchKey(detail && detail.key) === _normalizeProcessSearchKey(S.processDetail && S.processDetail.key);
+        if (canUseLastPayload && lastPayload.rowNumber) payload.rowNumber = lastPayload.rowNumber;
         var effectiveSheet = _getEffectiveBusinessCurrentSheet(detail);
         if (effectiveSheet || detail.currentSheet) payload.currentProductSheet = effectiveSheet || detail.currentSheet;
         if (detail.currentSheet) payload.currentSheet = detail.currentSheet;
@@ -9213,7 +9297,7 @@
           cancelEditFn: 'cancelProcessChatEdit',
           saveEditFn: 'saveProcessChatEdit',
           deleteFn: 'deleteProcessChatMessage',
-          emptyText: 'Chưa có tin nhắn trong Process.',
+          emptyText: 'Chưa có hội thoại trong Process.',
           readOnlyText: 'Bạn đang ở chế độ chỉ xem trong view này.'
         });
       }
@@ -9221,14 +9305,17 @@
         var panel = document.getElementById('processChatPanel');
         if (panel) panel.innerHTML = _buildProcessChatHtml();
       }
-      function _requestProductChatHistory(detail) {
+      function _requestProductChatHistory(detail, options) {
+        var opts = options || {};
         var key = String(detail && detail.key || '').trim();
         if (!key) return;
+        var cachedHistory = opts.useCache === false ? null : _getCachedProcessChatHistory(key);
+        var backgroundRefresh = opts.backgroundRefresh === true && !!cachedHistory;
         var seq = ++S.processChatSeq;
         S.processChatKey = key;
-        S.processChatLoading = true;
+        S.processChatLoading = !backgroundRefresh;
         S.processChatError = null;
-        S.processChatHistory = null;
+        S.processChatHistory = cachedHistory || null;
         S.processChatEditId = '';
         _renderProcessChatOnly();
 
@@ -9238,11 +9325,17 @@
             S.processChatLoading = false;
             if (!res || !res.ok) {
               if (handleAuthIssue(res)) return;
+              if (backgroundRefresh && S.processChatHistory) {
+                S.processChatError = null;
+                _renderProcessChatOnly();
+                return;
+              }
               S.processChatError = res && res.error ? res.error : { code: 'CHAT_READ_ERROR', message: 'Không thể tải chat.' };
               _renderProcessChatOnly();
               return;
             }
             S.processChatHistory = _normalizeProductChatHistoryPayload(res.data);
+            _cacheProcessChatHistory(key, S.processChatHistory);
             S.processChatError = null;
             _renderProcessChatOnly();
           })
@@ -9250,13 +9343,18 @@
             if (seq !== S.processChatSeq || S.processChatKey !== key) return;
             if (handleAuthIssue(e)) return;
             S.processChatLoading = false;
+            if (backgroundRefresh && S.processChatHistory) {
+              S.processChatError = null;
+              _renderProcessChatOnly();
+              return;
+            }
             S.processChatError = { code: 'CHAT_READ_ERROR', message: (e && e.message) || 'Không thể tải chat.' };
             _renderProcessChatOnly();
           })
-          .getProductChatHistory(_getProcessChatPayload({ newProductId: key }));
+        .getProductChatHistory(_getProcessChatPayload({ newProductId: key }, detail));
       }
-      function requestProcessChat(detail) {
-        _requestProductChatHistory(detail || S.processDetail || {});
+      function requestProcessChat(detail, options) {
+        _requestProductChatHistory(detail || S.processDetail || {}, options || {});
       }
       function retryProcessChat() {
         if (S.processDetail && S.processDetail.key) requestProcessChat(S.processDetail);
@@ -9270,6 +9368,7 @@
           return false;
         }
         S.processChatHistory = _normalizeProductChatHistoryPayload(res.data && (res.data.history || res.data));
+        _cacheProcessChatHistory(S.processDetail && S.processDetail.key, S.processChatHistory);
         S.processChatError = null;
         S.processChatEditId = '';
         S.processChatDraft = '';
@@ -9429,7 +9528,7 @@
           cancelEditFn: 'cancelWorkspaceChatEdit',
           saveEditFn: 'saveWorkspaceChatEdit',
           deleteFn: 'deleteWorkspaceChatMessage',
-          emptyText: 'Chưa có tin nhắn tại Workspace.',
+          emptyText: 'Chưa có hội thoại tại Workspace.',
           readOnlyText: 'Bạn đang ở chế độ chỉ xem trong Workspace.'
         });
       }
@@ -9883,8 +9982,10 @@
             S.processProducts = Array.isArray(res.data && res.data.items) ? res.data.items.map(_normalizeProcessCardSummary) : [];
             S.processProductsMeta = res.data || {};
             S.processProductsLoaded = true;
+            _primeProcessDetailCacheFromQueue();
             if (opts.preferKey) S.processActiveKey = _normalizeProcessSearchKey(opts.preferKey);
             var activeKey = _normalizeProcessSearchKey(S.processActiveKey || '');
+            _prefetchProcessChatFromQueue(4);
             var shouldClearSelection = opts.clearSelectionWhenMissing === true
               && !!activeKey
               && !_hasProcessProductInQueue(activeKey);
@@ -9894,6 +9995,14 @@
             _renderProcessList({ resetScroll: opts.resetScroll === true });
             if (shouldClearSelection) _renderProcessModalBody(null, null);
             _refreshProcessTriggerState();
+            var preloadKey = opts.autoSelectFirst === true ? _chooseProcessPreloadKey(opts.preferKey || '') : '';
+            if (preloadKey && !S.processLoading && !S.processDetail) {
+              selectProcessProduct(preloadKey, {
+                source: 'queue-preload',
+                backgroundRefresh: true,
+                useCache: true
+              });
+            }
           })
           .withFailureHandler(function (e) {
             if (seq !== S.processProductsSeq) return;
@@ -9924,11 +10033,9 @@
           || fallbackSummary.key
           || (fallbackRow ? _getRowProcessPrimaryKey(fallbackRow) : '')
         );
+        var cachedDetail = (ctx.backgroundRefresh === true && ctx.useCache !== false) ? (ctx.cachedDetail || _getCachedProcessDetail(expectedKey)) : null;
         var seq = ++S.processDetailSeq;
-        S.processLoading = true;
         S.processError = null;
-        if (ctx.clearDetailOnLoad === true) S.processDetail = null;
-        if (ctx.resetChatOnLoad !== false) _resetProcessChatState();
         if (expectedKey) S.processActiveKey = expectedKey;
         S.processLastRequest = {
           payload: Object.assign({}, requestPayload),
@@ -9937,7 +10044,18 @@
           expectedKey: expectedKey,
           source: String(ctx.source || 'detail').trim() || 'detail'
         };
-        _renderProcessModalBody(fallbackRow, fallbackSummary);
+
+        if (cachedDetail) {
+          S.processLoading = false;
+          S.processDetail = _normalizeProcessDetail(cachedDetail, fallbackRow, fallbackSummary);
+          _renderProcessModalBody(fallbackRow, fallbackSummary);
+          requestProcessChat(S.processDetail, { backgroundRefresh: true, useCache: true });
+        } else {
+          S.processLoading = true;
+          if (ctx.clearDetailOnLoad === true) S.processDetail = null;
+          if (ctx.resetChatOnLoad !== false) _resetProcessChatState();
+          _renderProcessModalBody(fallbackRow, fallbackSummary);
+        }
         _syncProcessListActiveState();
 
         google.script.run
@@ -9946,6 +10064,12 @@
             if (!res || !res.ok) {
               if (handleAuthIssue(res)) return;
               S.processLoading = false;
+              if (cachedDetail) {
+                S.processError = null;
+                _renderProcessModalBody(fallbackRow, fallbackSummary);
+                _syncProcessListActiveState();
+                return;
+              }
               S.processError = res && res.error ? res.error : { code: 'PROCESS_DETAIL_ERROR', message: 'Không thể tải chi tiết Process.' };
               _renderProcessModalBody(fallbackRow, fallbackSummary);
               _syncProcessListActiveState();
@@ -9954,15 +10078,22 @@
             S.processLoading = false;
             S.processError = null;
             S.processDetail = _normalizeProcessDetail(res.data, fallbackRow, fallbackSummary);
+            _cacheProcessDetail(expectedKey || (S.processDetail && S.processDetail.key), S.processDetail);
             if (S.processDetail && S.processDetail.key) S.processActiveKey = _normalizeProcessSearchKey(S.processDetail.key);
             _renderProcessModalBody(fallbackRow, fallbackSummary);
             _syncProcessListActiveState();
-            requestProcessChat(S.processDetail);
+            if (!cachedDetail) requestProcessChat(S.processDetail);
           })
           .withFailureHandler(function (e) {
             if (!_isProcessDetailRequestCurrent(seq, expectedKey)) return;
             if (handleAuthIssue(e)) return;
             S.processLoading = false;
+            if (cachedDetail) {
+              S.processError = null;
+              _renderProcessModalBody(fallbackRow, fallbackSummary);
+              _syncProcessListActiveState();
+              return;
+            }
             S.processError = { code: 'PROCESS_DETAIL_ERROR', message: (e && e.message) || 'Không thể tải chi tiết Process.' };
             _renderProcessModalBody(fallbackRow, fallbackSummary);
             _syncProcessListActiveState();
@@ -10003,6 +10134,11 @@
         if (opts.rowNumber) row = _findAnyRowByRn(opts.rowNumber) || _getSelectedRowSnapshot(opts.rowNumber);
         if (!row) row = _findAnyRowByProcessKey(rawKey);
         var summary = _findProcessSummaryByKey(rawKey);
+        if (summary && normalizedKey) {
+          _cacheProcessDetail(normalizedKey, _normalizeProcessDetail(summary, row, summary));
+        }
+        var hasCachedDetail = !!_getCachedProcessDetail(normalizedKey);
+        var useCachedDetail = opts.useCache !== false && hasCachedDetail && opts.forceReload !== true;
 
         var payload = {};
         if (row && row._rowNumber) payload.rowNumber = row._rowNumber;
@@ -10013,12 +10149,14 @@
           fallbackRow: row,
           fallbackSummary: summary,
           expectedKey: normalizedKey,
-          clearDetailOnLoad: true,
-          resetChatOnLoad: true
+          clearDetailOnLoad: !useCachedDetail,
+          resetChatOnLoad: !useCachedDetail,
+          backgroundRefresh: opts.backgroundRefresh === true || useCachedDetail,
+          useCache: opts.useCache !== false
         });
       }
       function selectProcessQueueItem(key, options) {
-        var opts = Object.assign({ source: 'queue-select', focusSearch: false }, options || {});
+        var opts = Object.assign({ source: 'queue-select', focusSearch: false, backgroundRefresh: true, useCache: true }, options || {});
         return selectProcessProduct(key, opts);
       }
       function openProcessModal(options) {
@@ -10043,13 +10181,15 @@
           reset: opts.reset !== false,
           clearSelectionWhenMissing: opts.clearSelectionWhenMissing === true,
           resetScroll: opts.resetScroll === true,
-          preferKey: opts.preferKey || ''
+          preferKey: opts.preferKey || '',
+          autoSelectFirst: opts.autoSelectFirst === true
         });
       }
       function openProcess(options) {
         if (!_isProcessTrackingEnabled()) return;
         var opts = (options && typeof options === 'object') ? options : {};
         var row = opts.rowNumber ? (_findAnyRowByRn(opts.rowNumber) || _getSelectedRowSnapshot(opts.rowNumber)) : null;
+        var explicitKey = String(opts.key || opts.query || '').trim();
         openProcessModal({ focusSearch: opts.focusSearch === true });
 
         if (opts.reloadQueue === true || (!S.processProductsLoaded && !S.processProductsLoading)) {
@@ -10057,7 +10197,8 @@
             reset: opts.reloadQueue === true,
             clearSelectionWhenMissing: false,
             resetScroll: opts.reloadQueue === true,
-            focusSearch: false
+            focusSearch: false,
+            autoSelectFirst: !row && !explicitKey && opts.autoSelectFirst !== false
           });
         } else {
           _renderProcessList();
@@ -10069,28 +10210,40 @@
             selectProcessProduct(rowKey, {
               rowNumber: row._rowNumber,
               source: 'open-row',
-              forceReload: opts.forceReload === true
+              forceReload: opts.forceReload === true,
+              backgroundRefresh: opts.forceReload !== true,
+              useCache: true
             });
             return;
           }
         }
 
-        var explicitKey = String(opts.key || opts.query || '').trim();
         if (explicitKey) {
           selectProcessProduct(explicitKey, {
             source: 'open-key',
-            forceReload: opts.forceReload === true
+            forceReload: opts.forceReload === true,
+            backgroundRefresh: opts.forceReload !== true,
+            useCache: true
           });
           return;
         }
 
         if (!S.processDetail && !S.processLoading && !S.processError) {
-          _resetProcessChatState();
-          _renderProcessModalBody(null, null);
+          var preloadKey = _chooseProcessPreloadKey();
+          if (preloadKey && opts.autoSelectFirst !== false) {
+            selectProcessProduct(preloadKey, {
+              source: 'open-preload',
+              backgroundRefresh: true,
+              useCache: true
+            });
+          } else {
+            _resetProcessChatState();
+            _renderProcessModalBody(null, null);
+          }
         }
       }
       function openProcessKey(key) {
-        selectProcessProduct(String(key || '').trim(), { source: 'legacy-openProcessKey' });
+        selectProcessProduct(String(key || '').trim(), { source: 'legacy-openProcessKey', backgroundRefresh: true, useCache: true });
       }
       function openModalProcessThread() {
         if (S.modalRow) openProcess({ rowNumber: S.modalRow, forceReload: true, focusSearch: false });
@@ -15236,6 +15389,9 @@
         S.processProductsLoading = false;
         S.processProductsError = null;
         S.processProductsLoaded = false;
+        S.processDetailCache = {};
+        S.processChatCache = {};
+        S.processChatPrefetching = {};
         S.processLoading = false;
         S.processError = null;
         S.processDetail = null;

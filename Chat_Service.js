@@ -579,7 +579,7 @@ function _getProductChatTargetFromSheet_(sheet, productId, options) {
   var lastRow = sheet.getLastRow();
   if (lastRow < CONFIG.DATA_START_ROW) {
     if (opts.allowMissing) return null;
-    _throwProductChatError_(storageMode + '_ROW_NOT_FOUND', 'Product was not found in ' + sheetLabel + '.');
+    _throwProductChatError_(storageMode + '_ROW_NOT_FOUND', 'Không tìm thấy sản phẩm trong ' + sheetLabel + '.');
   }
 
   var targetKey = _normalizeProductChatLookupKey_(productId);
@@ -590,9 +590,7 @@ function _getProductChatTargetFromSheet_(sheet, productId, options) {
     if (_rowHasProductChatProductId_(rowObjByNumber, productId)) {
       return _buildProductChatStorageTarget_(sheet, headers, rowValues, requestedRow, rowObjByNumber, chatCol, productId, opts);
     }
-    if (!opts.allowMissing) {
-      _throwProductChatError_('INVALID_PAYLOAD', 'Row ' + requestedRow + ' in ' + sheetLabel + ' does not match product "' + productId + '".');
-    }
+    Logger.log('Product chat rowNumber hint mismatch. sheet=' + sheetLabel + ' row=' + requestedRow + ' product=' + productId + '. Falling back to product-id scan.');
   }
 
   var rowCount = lastRow - CONFIG.DATA_START_ROW + 1;
@@ -612,7 +610,7 @@ function _getProductChatTargetFromSheet_(sheet, productId, options) {
   }
 
   if (opts.allowMissing) return null;
-  _throwProductChatError_(storageMode + '_ROW_NOT_FOUND', 'Product "' + productId + '" was not found in ' + sheetLabel + '.');
+  _throwProductChatError_(storageMode + '_ROW_NOT_FOUND', 'Không tìm thấy sản phẩm "' + productId + '" trong ' + sheetLabel + '.');
 }
 
 function _buildProductChatStorageTarget_(sheet, headers, rowValues, rowNumber, rowObj, chatCol, productId, options) {
