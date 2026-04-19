@@ -522,7 +522,7 @@ var DIRECTOR_MOBILE_FIELD_ALIASES = {
   noPresent: ['No.Present', 'No Present'],
   presentDate: ['Present Date'],
   status: ['Status', 'Present Status'],
-  note: ['SSV Note Product', 'Note', 'CEO & OPs Note'],
+  note: ['Note', 'CEO & OPs Note'],
   productName: [
     'PIC input Product Name (Duoi 40 ki tu)',
     'PIC input Product Name (Duoi 40 ky tu)',
@@ -572,7 +572,7 @@ var DIRECTOR_MOBILE_FIELD_ALIASES = {
   fcUpsd: ['FC UPSD of NEW SKU', 'UPSD per SKU by Subcategory'],
   skuCountSubcat: ['#SKU by subcategory', '# SKU by subcategory'],
   competitors: ['Competitors (Retail Price)', 'Competitors'],
-  ssvNote: ['SSV Note Product'],
+  ssvNote: [],
   ceoNote: ['CEO & OPs Note'],
   newProductId: ['New Product ID', 'Ticket ID'],
   pattern: ['Pattern'],

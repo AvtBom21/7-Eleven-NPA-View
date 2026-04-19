@@ -2004,14 +2004,27 @@
     .process-board {
       background: rgba(255, 255, 255, .98);
       border: 1px solid #dbe7f3;
-      border-radius: 20px;
+      border-radius: 16px;
       box-shadow: 0 18px 50px rgba(15, 23, 42, .08)
     }
 
     .process-board {
+      display: grid;
+      grid-template-columns: minmax(300px, .92fr) minmax(0, 1.3fr);
+      overflow: hidden
+    }
+
+    .process-queue-pane,
+    .process-detail-pane {
+      min-width: 0;
       display: flex;
       flex-direction: column;
-      overflow: hidden
+      min-height: 0
+    }
+
+    .process-detail-pane {
+      border-left: 1px solid #e2e8f0;
+      background: #fbfdff
     }
 
     .process-pane-head {
@@ -2038,6 +2051,11 @@
       padding: 12px
     }
 
+    .process-detail-body {
+      max-height: 62vh;
+      padding: 14px
+    }
+
     .process-card-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2061,6 +2079,22 @@
       border-color: #93c5fd;
       box-shadow: 0 12px 28px rgba(37, 99, 235, .12);
       transform: translateY(-1px)
+    }
+
+    .process-list-item.is-active {
+      border-color: #2563eb;
+      box-shadow: 0 14px 28px rgba(37, 99, 235, .18);
+      background: linear-gradient(180deg, #f8fbff 0%, #eef5ff 100%);
+    }
+
+    .process-list-item.is-active .process-list-key {
+      color: #1d4ed8;
+    }
+
+    .process-list-item.is-active .process-stage-chip {
+      border-color: #93c5fd;
+      color: #1d4ed8;
+      background: #eff6ff;
     }
 
     .process-list-thumb {
@@ -2243,6 +2277,369 @@
       justify-content: center
     }
 
+    .process-card {
+      display: grid;
+      grid-template-columns: 172px minmax(0, 1fr);
+      gap: 14px;
+      align-items: start
+    }
+
+    .process-hero,
+    .process-summary,
+    .process-chat-wrap {
+      min-width: 0
+    }
+
+    .process-image-frame {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border: 1px solid #dbe7f3;
+      border-radius: 14px;
+      background: #fff;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .process-image-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain
+    }
+
+    .process-image-empty {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: center;
+      color: #64748b;
+      font: 700 12px var(--font)
+    }
+
+    .process-hero-meta {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    .process-keychip,
+    .process-stage-pill {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      max-width: 100%;
+      padding: 5px 9px;
+      border-radius: 999px;
+      border: 1px solid #bfdbfe;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font: 800 10px/1.25 var(--mono);
+      word-break: break-all
+    }
+
+    .process-hero-note,
+    .process-link {
+      font: 600 11px/1.5 var(--font);
+      color: #64748b
+    }
+
+    .process-link {
+      color: #2563eb;
+      text-decoration: none
+    }
+
+    .process-product-name {
+      margin-top: 8px;
+      font: 900 22px/1.2 var(--font);
+      color: #0f172a
+    }
+
+    .process-barcode {
+      margin-top: 5px;
+      font: 500 13px/1.5 var(--font);
+      color: #475569
+    }
+
+    .process-meta-grid {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px
+    }
+
+    .process-meta-card {
+      border: 1px solid #dbe7f3;
+      border-radius: 8px;
+      background: #fff;
+      padding: 9px 10px;
+      min-width: 0
+    }
+
+    .process-meta-label {
+      font: 800 10px/1.2 var(--font);
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: #64748b
+    }
+
+    .process-meta-value {
+      margin-top: 4px;
+      font: 700 12px/1.35 var(--font);
+      color: #0f172a;
+      overflow-wrap: anywhere
+    }
+
+    .process-timeline-wrap,
+    .process-chat-wrap {
+      margin-top: 14px;
+      border: 1px solid #dbe7f3;
+      border-radius: 12px;
+      background: #fff;
+      padding: 12px
+    }
+
+    .process-timeline-head,
+    .process-chat-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 10px
+    }
+
+    .process-timeline-title,
+    .process-chat-title {
+      font: 900 13px/1.2 var(--font);
+      color: #0f172a
+    }
+
+    .process-timeline-sub,
+    .process-chat-sub {
+      margin-top: 3px;
+      font: 500 11px/1.45 var(--font);
+      color: #64748b
+    }
+
+    .process-timeline {
+      display: grid;
+      gap: 7px
+    }
+
+    .process-step {
+      display: grid;
+      grid-template-columns: 24px minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 8px
+    }
+
+    .process-step-marker {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f1f5f9;
+      color: #475569;
+      font: 900 10px var(--font)
+    }
+
+    .process-step-label {
+      font: 800 12px/1.25 var(--font);
+      color: #0f172a
+    }
+
+    .process-step-state {
+      font: 800 10px/1.2 var(--font);
+      color: #64748b;
+      text-transform: uppercase
+    }
+
+    .process-step.is-done .process-step-marker {
+      background: #dcfce7;
+      color: #166534
+    }
+
+    .process-step.is-current .process-step-marker {
+      background: #dbeafe;
+      color: #1d4ed8
+    }
+
+    .process-step.is-rejected .process-step-marker {
+      background: #fee2e2;
+      color: #991b1b
+    }
+
+    .process-chat-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 280px;
+      overflow: auto;
+      padding-right: 2px
+    }
+
+    .process-chat-message {
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      background: #f8fafc;
+      padding: 9px 10px
+    }
+
+    .process-chat-message.is-own {
+      background: #eff6ff;
+      border-color: #bfdbfe
+    }
+
+    .process-chat-message.is-legacy {
+      background: #fff7ed;
+      border-color: #fed7aa
+    }
+
+    .process-chat-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      font: 800 10px/1.25 var(--font);
+      color: #475569
+    }
+
+    .process-chat-pic {
+      color: #0f172a;
+      overflow-wrap: anywhere
+    }
+
+    .process-chat-text {
+      margin-top: 6px;
+      font: 500 13px/1.55 var(--font);
+      color: #0f172a;
+      overflow-wrap: anywhere;
+      white-space: normal
+    }
+
+    .process-chat-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px
+    }
+
+    .process-chat-action {
+      border: 1px solid #cbd5e1;
+      border-radius: 999px;
+      background: #fff;
+      color: #334155;
+      height: 26px;
+      padding: 0 9px;
+      font: 800 10px var(--font);
+      cursor: pointer
+    }
+
+    .process-chat-composer {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: end
+    }
+
+    .process-chat-composer textarea,
+    .process-chat-edit textarea {
+      width: 100%;
+      min-height: 58px;
+      resize: vertical;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 9px 10px;
+      font: 500 13px/1.45 var(--font);
+      color: #0f172a;
+      outline: none
+    }
+
+    .process-chat-composer textarea:focus,
+    .process-chat-edit textarea:focus {
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 3px rgba(96, 165, 250, .16)
+    }
+
+    .process-chat-muted {
+      padding: 12px;
+      border: 1px dashed #cbd5e1;
+      border-radius: 10px;
+      color: #64748b;
+      font: 600 12px/1.5 var(--font);
+      text-align: center
+    }
+
+    .internal-chat-entry {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid #dbe7f3;
+      border-radius: 10px;
+      background: #f8fafc;
+      font: 700 12px var(--font);
+      color: #475569
+    }
+
+    .workspace-chat-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 10px
+    }
+
+    .workspace-chat-panel .process-chat-head {
+      padding-bottom: 8px;
+      border-bottom: 1px solid #e2e8f0
+    }
+
+    .workspace-chat-panel .process-chat-list {
+      max-height: 230px
+    }
+
+    .workspace-chat-handoff {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid #bfdbfe;
+      border-radius: 12px;
+      background: #eff6ff
+    }
+
+    .workspace-chat-handoff-title {
+      color: #0f172a;
+      font: 900 13px/1.3 var(--font)
+    }
+
+    .workspace-chat-handoff-copy {
+      margin-top: 4px;
+      color: #475569;
+      font: 600 12px/1.45 var(--font)
+    }
+
+    .workspace-chat-handoff-sheet {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      max-width: 100%;
+      margin-top: 8px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #dbeafe;
+      color: #1d4ed8;
+      font: 900 10px/1.2 var(--mono)
+    }
+
     @media (max-width: 960px) {
       .sh {
         align-items: stretch;
@@ -2251,6 +2648,19 @@
       }
 
       .process-card-grid {
+        grid-template-columns: 1fr
+      }
+
+      .process-board {
+        grid-template-columns: 1fr
+      }
+
+      .process-detail-pane {
+        border-left: 0;
+        border-top: 1px solid #e2e8f0
+      }
+
+      .process-card {
         grid-template-columns: 1fr
       }
     }
@@ -2631,7 +3041,7 @@
     }
 
     .s1-image-frame.is-empty::before {
-      content: 'No image available';
+      content: 'Chưa có ảnh';
       font: 500 12px var(--font);
       color: #94a3b8
     }
@@ -6794,13 +7204,13 @@
         <button class="topnav-btn" id="navDetails" onclick="App.goSection('details')">Additional Details</button>
       </nav>
       <button class="topnav-track" id="btnTrackProduct" onclick="App.openProcess()" style="display:none">
-        <span class="topnav-track-title">Track Product</span>
-        <span class="topnav-track-meta" id="processTriggerMeta">Open queue</span>
+        <span class="topnav-track-title">Theo dõi sản phẩm</span>
+        <span class="topnav-track-meta" id="processTriggerMeta">Mở danh sách</span>
       </button>
     </div>
     <div id="userBadge" style="display:flex;align-items:center;gap:6px;padding:4px 10px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;flex-shrink:0">
       <span style="font-size:14px">👤</span>
-      <span id="userBadgeLabel" style="font-size:11px;font-weight:700;color:#1d4ed8">Loading...</span>
+      <span id="userBadgeLabel" style="font-size:11px;font-weight:700;color:#1d4ed8">Đang tải...</span>
     </div>
     <div id="modeBadge" style="display:flex;align-items:center;gap:6px;padding:4px 10px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;flex-shrink:0">
       <span style="font-size:14px">🧭</span>
@@ -7225,10 +7635,6 @@
                   </select>
                 </div>
               </div>
-              <div class="bfc full" id="bfc_SSVNote">
-                  <div class="bfc-lbl">SSV Note Product</div>
-                  <div class="bfc-inp"><textarea class="bfp-fc" id="bf_SSVNote" placeholder="Ghi chú vận hành SSV..." oninput="App.bfChange('SSVNote',this.value)"></textarea></div>
-              </div>
             </div>
           </div>
 
@@ -7331,10 +7737,10 @@
         <div class="bfp-foot-info"><b id="bfActiveCount">0</b> trường sẽ áp dụng cho <b id="bfSelCount">0</b> sản phẩm
           đã chọn — chỉ những sản phẩm thay đổi mới được lưu</div>
         <div class="bfp-foot-right">
-          <button class="btn btn-ghost" onclick="App.closeBatchFill()">Cancel</button>
-          <button class="btn btn-ghost" onclick="App.bfReset()">Reset</button>
-          <button class="btn btn-orange" id="bfApplyBtn" onclick="App.applyBatchFill()" disabled>Apply to <span
-              id="bfApplyCount">0</span> products</button>
+          <button class="btn btn-ghost" onclick="App.closeBatchFill()">Hủy</button>
+          <button class="btn btn-ghost" onclick="App.bfReset()">Đặt lại</button>
+          <button class="btn btn-orange" id="bfApplyBtn" onclick="App.applyBatchFill()" disabled>Áp dụng cho <span
+              id="bfApplyCount">0</span> sản phẩm</button>
         </div>
       </div>
     </div>
@@ -7358,7 +7764,7 @@
       <!-- Action bar -->
       <div class="m-actbar">
         <button class="btn btn-ghost btn-sm" onclick="App.closeModal()">Close</button>
-        <button class="btn btn-ghost btn-sm" onclick="App.resetModal()">Reset</button>
+          <button class="btn btn-ghost btn-sm" onclick="App.resetModal()">Đặt lại</button>
         <button class="btn btn-orange btn-sm" onclick="App.saveModal()">Save Product</button>
         <button class="btn btn-green btn-sm" onclick="App.saveAll()">Save All</button>
         <div class="m-dirty-badge" id="mDirtyBadge">
@@ -7428,12 +7834,12 @@
                         <div class="s1-group-title">Source Image</div>
                         <div class="s1-group-badge is-supplier">Reference</div>
                       </div>
-                      <div class="s1-group-sub">Quick visual check of the original image submitted with supplier data.</div>
+                      <div class="s1-group-sub">Kiểm tra nhanh ảnh gốc được gửi cùng dữ liệu nhà cung cấp.</div>
                     </div>
                     <figure class="s1-image-frame is-empty" id="st_img_frame">
-                      <img class="s1-image" id="st_img" alt="Product Image" loading="lazy" style="display:none" />
+                      <img class="s1-image" id="st_img" alt="Ảnh sản phẩm" loading="lazy" style="display:none" />
                     </figure>
-                    <a id="st_url" class="s1-image-link" href="#" target="_blank" rel="noopener noreferrer" style="display:none">Open original image</a>
+                    <a id="st_url" class="s1-image-link" href="#" target="_blank" rel="noopener noreferrer" style="display:none">Mở ảnh gốc</a>
                   </aside>
                 </div>
               </section>
@@ -7581,40 +7987,40 @@
 
             <div class="s2-form-grid cols-3">
               <div class="mc" id="mc_status">
-                <div class="mc-label">Status <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
+                <div class="mc-label">Status <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Đã sửa</span></div>
                 <div class="mc-body"><div class="sdrop ef" id="sd_Status"></div></div>
               </div>
               <div class="mc" id="mc_presentdate">
-                <div class="mc-label">Present Date <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
+                <div class="mc-label">Present Date <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Đã sửa</span></div>
                 <div class="mc-body"><input type="date" id="mf_Present_Date"></div>
               </div>
               <div class="mc" id="mc_newtype">
-                <div class="mc-label">New Product Type <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
+                <div class="mc-label">New Product Type <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Đã sửa</span></div>
                 <div class="mc-body"><div class="sdrop ef" id="sd_New_product_type"></div></div>
               </div>
             </div>
 
             <div class="s2-form-grid cols-3">
               <div class="mc" id="mc_picname">
-                <div class="mc-label">PIC Product Name <span class="mc-rq">*</span><span class="mc-meta">≤40</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
+                <div class="mc-label">PIC Product Name <span class="mc-rq">*</span><span class="mc-meta">≤40</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Đã sửa</span></div>
                 <div class="mc-body">
                   <input type="text" id="mf_PIC_name" maxlength="40" placeholder="PIC product name">
                   <div class="mc-char-hint" id="cnt_PIC_name">0/40</div>
                 </div>
               </div>
               <div class="mc" id="mc_refid">
-                <div class="mc-label">Reference Product ID <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
+                <div class="mc-label">Reference Product ID <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Đã sửa</span></div>
                 <div class="mc-body"><div class="sdrop searchable ef" id="sd_Ref_ID"></div></div>
               </div>
               <div class="mc" id="mc_sameprice">
-                <div class="mc-label">Same Price Product<div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
+                <div class="mc-label">Same Price Product<div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Đã sửa</span></div>
                 <div class="mc-body"><div class="sdrop ef" id="sd_Same_Price_Product"></div></div>
               </div>
             </div>
 
             <div class="s2-form-grid cols-3">
               <div class="mc" id="mc_subcat">
-                <div class="mc-label">Sub Category <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
+                <div class="mc-label">Sub Category <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Đã sửa</span></div>
                 <div class="mc-body"><div class="sdrop searchable ef" id="sd_Sub_Category"></div></div>
               </div>
               <div class="mc mc-auto" id="mc_cat_auto_card">
@@ -7667,29 +8073,29 @@
 
             <div class="s2-form-grid cols-3">
               <div class="mc" id="mc_premium">
-                <div class="mc-label">Premium Products <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
+                <div class="mc-label">Premium Products <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Đã sửa</span></div>
                 <div class="mc-body"><div class="sdrop ef" id="sd_Premium_products"></div></div>
               </div>
               <div class="mc" id="mc_branded">
-                <div class="mc-label">Branded <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
+                <div class="mc-label">Branded <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Đã sửa</span></div>
                 <div class="mc-body"><div class="sdrop ef" id="sd_Branded"></div></div>
               </div>
             </div>
 
             <div class="s2-form-grid">
               <div class="mc full dw-strategic" id="mc_whylist">
-                <div class="mc-label">Why Do We List This Product? <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
+                <div class="mc-label">Why Do We List This Product? <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Đã sửa</span></div>
                 <div class="mc-body"><textarea id="mf_Why_Do_We_List_This_Product" placeholder="Business rationale / shopper need"></textarea></div>
               </div>
               <div class="mc full dw-strategic" id="mc_desc">
-                <div class="mc-label">Product Description <span class="mc-rq">*</span><span class="mc-meta">≤250</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
+                <div class="mc-label">Product Description <span class="mc-rq">*</span><span class="mc-meta">≤250</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Đã sửa</span></div>
                 <div class="mc-body">
                   <textarea id="mf_desc" maxlength="250" placeholder="Short product description"></textarea>
                   <div class="mc-char-hint" id="cnt_desc">0/250</div>
                 </div>
               </div>
               <div class="mc full dw-strategic" id="mc_otherincome">
-                <div class="mc-label">Other Income + Listing Fee<div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
+                <div class="mc-label">Other Income + Listing Fee<div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Đã sửa</span></div>
                 <div class="mc-body oi-split">
                   <div class="oi-row">
                     <label class="oi-check" for="mf_OtherIncomeCheck">
@@ -7721,15 +8127,15 @@
 
             <div class="s2-form-grid">
               <div class="mc full" id="mc_usage">
-                <div class="mc-label">Primary Usage Segment <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
+                <div class="mc-label">Primary Usage Segment <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Đã sửa</span></div>
                 <div class="mc-body"><div class="sdrop searchable ef" id="sd_PRIMARY_USAGE_SEGMENT"></div></div>
               </div>
               <div class="mc full" id="mc_sttype">
-                <div class="mc-label">Target Store Types <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
+                <div class="mc-label">Target Store Types <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Đã sửa</span></div>
                 <div class="mc-body"><div class="sdrop ef" id="sd_TARGET_STORE_TYPES"></div></div>
               </div>
               <div class="mc full" id="mc_custtype">
-                <div class="mc-label">Target Customer Types <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
+                <div class="mc-label">Target Customer Types <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Đã sửa</span></div>
                 <div class="mc-body"><div class="sdrop ef" id="sd_TARGET_CUSTOMER_STORE_TYPES"></div></div>
               </div>
             </div>
@@ -7753,15 +8159,15 @@
 
             <div class="s2-form-grid">
               <div class="mc s2-prominent" id="mc_retailt6">
-                <div class="mc-label">Retail Price (+VAT) Tier 6 <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
+                <div class="mc-label">Retail Price (+VAT) Tier 6 <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Đã sửa</span></div>
                 <div class="mc-body"><input type="number" id="mf_Retail_Price" min="0" step="1000" placeholder="Enter tier 6 retail price"></div>
               </div>
               <div class="mc" id="mc_upsd">
-                <div class="mc-label">FC UPSD of NEW SKU <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
+                <div class="mc-label">FC UPSD of NEW SKU <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Đã sửa</span></div>
                 <div class="mc-body"><input type="text" id="mf_FC_UPSD" placeholder="Forecast UPSD"></div>
               </div>
               <div class="mc full dw-strategic" id="mc_comp">
-                <div class="mc-label">Competitors (Retail Price) <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
+                <div class="mc-label">Competitors (Retail Price) <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Đã sửa</span></div>
                 <div class="mc-body"><textarea id="mf_comp" placeholder="Competitor: retail price"></textarea></div>
               </div>
             </div>
@@ -7882,38 +8288,40 @@
 
             <div class="s2-form-grid cols-3">
               <div class="mc wide s2-prominent" id="mc_displayarea">
-                <div class="mc-label">Display Area (POG) <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
+                <div class="mc-label">Display Area (POG) <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Đã sửa</span></div>
                 <div class="mc-body"><input type="text" id="mf_Display_area" placeholder="POG / display area"></div>
               </div>
               <div class="mc" id="mc_invtype">
-                <div class="mc-label">Inventory Type <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
+                <div class="mc-label">Inventory Type <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Đã sửa</span></div>
                 <div class="mc-body"><div class="sdrop ef" id="sd_Inventory_Type"></div></div>
               </div>
               <div class="mc" id="mc_preserv">
-                <div class="mc-label">Preservation Temperature <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
+                <div class="mc-label">Preservation Temperature <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Đã sửa</span></div>
                 <div class="mc-body"><div class="sdrop ef" id="sd_Preservation_temperature"></div></div>
               </div>
             </div>
 
             <div class="s2-form-grid cols-3">
               <div class="mc" id="mc_pattern">
-                <div class="mc-label">Pattern <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
+                <div class="mc-label">Pattern <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Đã sửa</span></div>
                 <div class="mc-body"><div class="sdrop ef" id="sd_Pattern"></div></div>
               </div>
               <div class="mc" id="mc_logs" hidden>
-                <div class="mc-label">Logistics Group South <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
+                <div class="mc-label">Logistics Group South <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Đã sửa</span></div>
                 <div class="mc-body"><div class="sdrop searchable ef" id="sd_Logistics_South"></div></div>
               </div>
               <div class="mc" id="mc_logn" hidden>
-                <div class="mc-label">Logistics Group North <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
+                <div class="mc-label">Logistics Group North <span class="mc-rq">*</span><div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Đã sửa</span></div>
                 <div class="mc-body"><div class="sdrop searchable ef" id="sd_Logistics_North"></div></div>
               </div>
             </div>
 
             <div class="s2-form-grid">
-              <div class="mc full dw-strategic" id="mc_ssvnote">
-                <div class="mc-label">SSV Note Product<div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
-                <div class="mc-body"><textarea id="mf_ssv_note" placeholder="Operational note"></textarea></div>
+              <div class="mc full dw-strategic" id="mc_internalchat">
+                <div class="mc-label">Chat nội bộ</div>
+                <div class="mc-body">
+                  <div class="workspace-chat-panel" id="workspaceChatPanel"></div>
+                </div>
               </div>
             </div>
           </div>
@@ -7928,7 +8336,7 @@
 
             <div class="pog-decision-top">
               <div class="mc" id="mc_pricingstrategy">
-                <div class="mc-label">Pricing Strategy<div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
+                <div class="mc-label">Pricing Strategy<div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Đã sửa</span></div>
                 <div class="mc-body"><div class="sdrop ef" id="sd_Pricing_Strategy"></div></div>
               </div>
               <div class="pog-decision-note">
@@ -7938,7 +8346,7 @@
             </div>
 
             <div class="mc full pog-module-card" id="mc_pogmodule">
-              <div class="mc-label">POG Reduce Product Facing<div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
+              <div class="mc-label">POG Reduce Product Facing<div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Đã sửa</span></div>
               <div class="mc-body">
                 <input type="hidden" id="mf_POG_Choose_Reduce_product_facing">
                 <input type="hidden" id="mf_POG_Choose_type_Reduce_product_facing">
@@ -7966,7 +8374,7 @@
 
             <div class="s2-form-grid">
               <div class="mc full" id="mc_uominfo">
-                <div class="mc-label">UOM Information<div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Edited</span></div>
+                <div class="mc-label">UOM Information<div class="mc-dirty-dot"></div><span class="mc-edited-lbl">Đã sửa</span></div>
                 <div class="mc-body">
                   <input type="hidden" id="mf_UOMInfo">
                   <div class="bf-uom-wrap">
@@ -8114,7 +8522,7 @@
         <div class="s2-nav-actions">
           <button type="button" class="btn btn-ghost" id="s2BtnPrev" onclick="App.prevStep2Tab()">Previous Section</button>
           <button type="button" class="btn btn-ghost" id="s2BtnNext" onclick="App.nextStep2Tab()">Next Section</button>
-          <button type="button" class="btn btn-ghost" onclick="App.resetModal()">Reset</button>
+          <button type="button" class="btn btn-ghost" onclick="App.resetModal()">Đặt lại</button>
           <button type="button" class="btn btn-primary" onclick="App.saveModal()">Save Product</button>
           <button type="button" class="btn btn-ghost" id="s2BtnSaveAll" onclick="App.saveAll()">Save All</button>
         </div>
@@ -8129,28 +8537,37 @@
     <div class="process-modal">
       <div class="process-head">
         <div>
-          <div class="process-kicker">Process Tracking</div>
-          <div class="process-title">Track Product Progress</div>
-          <div class="process-sub">Ưu tiên hiển thị sẵn các sản phẩm đang process trong đúng <b>Product Group</b> bạn được phép xử lý. Exact code lookup chỉ là fallback an toàn.</div>
+          <div class="process-kicker">Theo dõi Process</div>
+          <div class="process-title">Theo dõi tiến trình sản phẩm</div>
+          <div class="process-sub">Ưu tiên hiển thị sẵn các sản phẩm đang process trong đúng <b>Product Group</b> bạn được phép xử lý. Tra mã chính xác chỉ là fallback an toàn.</div>
         </div>
         <button class="process-close" onclick="App.closeProcessModal()">×</button>
       </div>
       <div class="process-toolbar">
         <div class="process-search">
-          <input type="text" id="processSearchInput" placeholder="Search key, product name, barcode/UOM, Product Group" onkeydown="if (event.key === 'Enter') App.searchProcess()">
+          <input type="text" id="processSearchInput" placeholder="Tìm mã, tên sản phẩm, barcode/UOM, Product Group" onkeydown="if (event.key === 'Enter') App.searchProcess()">
           <div class="process-search-actions">
-            <button class="btn btn-ghost btn-sm" onclick="App.searchProcess()">Search</button>
+            <button class="btn btn-ghost btn-sm" onclick="App.searchProcess()">Tìm</button>
           </div>
         </div>
         <div class="process-toolbar-note" id="processToolbarNote">Chỉ hiển thị các mã đang process thuộc Product Group trong scope hiện tại.</div>
       </div>
       <div class="process-body">
         <section class="process-board">
-          <div class="process-pane-head">
-            <div class="process-pane-title">Current Processing Queue</div>
-            <div class="process-pane-sub" id="processListNote">Đang chuẩn bị danh sách process theo Product Group được phép xem.</div>
+          <div class="process-queue-pane">
+            <div class="process-pane-head">
+              <div class="process-pane-title">Danh sách đang xử lý</div>
+              <div class="process-pane-sub" id="processListNote">Đang chuẩn bị danh sách process theo Product Group được phép xem.</div>
+            </div>
+            <div class="process-list-body" id="processListBody"></div>
           </div>
-          <div class="process-list-body" id="processListBody"></div>
+          <div class="process-detail-pane">
+            <div class="process-pane-head">
+              <div class="process-pane-title">Chi tiết tiến trình</div>
+              <div class="process-pane-sub">Tiến trình và hội thoại nội bộ</div>
+            </div>
+            <div class="process-list-body process-detail-body" id="processModalBody"></div>
+          </div>
         </section>
       </div>
     </div>
@@ -8170,10 +8587,15 @@
         modalRow: null, detailStep: 1, step2Tab: 1, busy: false, view: 'card', dropdowns: {}, mdProductIds: [], mdProductOptions: [],
         subcateMap: {}, subcateMasterMap: {}, subcateBench: {}, subcateBenchMaster: {}, refProductCache: {}, currentRefDetail: null,
         activeRow: null, batchActiveRow: null, navSection: 'list',
-        processLookupByRow: {}, processLookupByKey: {}, processLookupWarning: null, processLookupSeq: 0,
+        processLookupByRow: {}, processLookupByKey: {}, processLookupWarning: null, processLookupSeq: 0, processLookupLoaded: false,
         processProducts: [], processProductsMeta: null, processProductsLoading: false, processProductsError: null, processProductsSeq: 0, processProductsLoaded: false,
         processDetailSeq: 0, processModalOpen: false, processLoading: false, processError: null, processDetail: null,
-        processLastRequest: null, processSearchValue: '', processActiveKey: ''
+        processLastRequest: null, processSearchValue: '', processActiveKey: '',
+        processChatSeq: 0, processChatKey: '', processChatLoading: false, processChatError: null, processChatHistory: null,
+        processChatBusy: false, processChatEditId: '', processChatDraft: '', processChatEditDraft: '',
+        workspaceChatSeq: 0, workspaceChatKey: '', workspaceChatRowNumber: null, workspaceChatLoading: false,
+        workspaceChatError: null, workspaceChatHistory: null, workspaceChatBusy: false, workspaceChatEditId: '',
+        workspaceChatDraft: '', workspaceChatEditDraft: '', workspaceChatMode: 'empty', workspaceChatCurrentSheet: ''
       };
       var APP_USER = window.__APP_USER__ || {};
       var AUTH_TOKEN = String(APP_USER.authToken || '');
@@ -8233,6 +8655,58 @@
           try { txt = txt.normalize('NFKC'); } catch (err) {}
         }
         return txt.replace(/[\u200B-\u200D\uFEFF]/g, '').replace(/\s+/g, ' ').trim().toUpperCase();
+      }
+      function _normalizeBusinessSheetName(value) {
+        var compact = String(value == null ? '' : value)
+          .replace(/[\u200B-\u200D\uFEFF]/g, '')
+          .replace(/\s+/g, ' ')
+          .trim()
+          .toLowerCase()
+          .replace(/\s+/g, '');
+        if (!compact) return '';
+        if (compact === 'cat' || compact === 'category' || compact === 'categoryview') return 'Category';
+        if (compact === 'man' || compact === 'manager' || compact === 'managerview') return 'Manager';
+        if (compact === 'dir' || compact === 'director' || compact === 'directorview') return 'Director';
+        if (compact === 'presentlist') return 'Present List';
+        if (compact === 'finalinformation' || compact === 'finallist') return 'Final Information';
+        if (compact === 'setupproductid') return 'Setup Product ID';
+        return String(value == null ? '' : value).replace(/\s+/g, ' ').trim();
+      }
+      function _getSelectedBusinessSheetName() {
+        return _normalizeBusinessSheetName(S.meta.sheetName || SELECTED_SHEET_NAME || (SELECTED_VIEW === 'MAN' ? 'Manager' : 'Category'));
+      }
+      function _sameBusinessSheetName(a, b) {
+        var left = _normalizeBusinessSheetName(a);
+        var right = _normalizeBusinessSheetName(b);
+        return !!left && !!right && left.toLowerCase() === right.toLowerCase();
+      }
+      function _getEffectiveBusinessCurrentSheet(summary) {
+        var item = summary || {};
+        var flow = item.flowState || item.businessFlowState || item.placement && item.placement.flowState || null;
+        if (flow && flow.effectiveSheet) return _normalizeBusinessSheetName(flow.effectiveSheet);
+        if (item.effectiveSheet) return _normalizeBusinessSheetName(item.effectiveSheet);
+        return _normalizeBusinessSheetName(item.currentProductSheet || item.businessCurrentSheet || item.currentSheet || item['Current Sheet'] || item.sheet || item.Sheet || '');
+      }
+      function _getRowBusinessCurrentSheet(row) {
+        if (!row) return '';
+        var lookup = _getProcessLookupEntryByRow(row);
+        var fromLookup = lookup ? _getEffectiveBusinessCurrentSheet(lookup) : '';
+        var fromRow = row.currentSheet || row['Current Sheet'] || row['currentSheet'] || row['Sheet'] || row['sheet'] || '';
+        return _getEffectiveBusinessCurrentSheet({
+          currentSheet: fromLookup || fromRow || _getSelectedBusinessSheetName(),
+          currentStatus: row.currentStatus || row['Current Status'] || row.Status || ''
+        }) || _getSelectedBusinessSheetName();
+      }
+      function _isWorkspaceChatContext(row) {
+        if (!row) return false;
+        if (SELECTED_VIEW !== 'CAT' && SELECTED_VIEW !== 'MAN') return false;
+        return _sameBusinessSheetName(_getRowBusinessCurrentSheet(row), _getSelectedBusinessSheetName());
+      }
+      function _shouldRenderWorkspaceChat(row) {
+        return _isWorkspaceChatContext(row);
+      }
+      function _shouldRenderProcessChat(detail) {
+        return !!(detail && detail.key);
       }
       function _extractProcessPrimaryUrl(raw) {
         if (raw === null || raw === undefined) return '';
@@ -8295,6 +8769,7 @@
       }
       function _normalizeProcessCardSummary(data) {
         var item = Object.assign({}, data || {});
+        var sourceFlowState = item.flowState || item.businessFlowState || null;
         item.key = _cleanDisplayValue(item.key || '');
         item.productName = _cleanDisplayValue(item.productName || '');
         item.barcodeOrUom = _cleanDisplayValue(item.barcodeOrUom || '');
@@ -8302,9 +8777,12 @@
         item.imageOriginalUrl = _cleanDisplayValue(item.imageOriginalUrl || '');
         item.imageUrl = _cleanDisplayValue(item.imageUrl || item.imageOriginalUrl || '');
         item.currentSheet = _cleanDisplayValue(item.currentSheet || '');
+        item.storedSheet = _cleanDisplayValue(item.storedSheet || item.currentSheet || '');
+        item.effectiveSheet = _cleanDisplayValue(item.effectiveSheet || (sourceFlowState && sourceFlowState.effectiveSheet) || '');
         item.currentStatus = _cleanDisplayValue(item.currentStatus || '');
         item.displayStageLabel = _cleanDisplayValue(item.displayStageLabel || item.label || '');
         item.lastSeen = _cleanDisplayValue(item.lastSeen || '');
+        item.flowState = sourceFlowState;
         return item;
       }
       function _mergeProcessFallback(row, summary) {
@@ -8318,9 +8796,12 @@
           imageOriginalUrl: card.imageOriginalUrl || rowFallback.imageOriginalUrl || '',
           imageUrl: card.imageUrl || rowFallback.imageUrl || '',
           currentSheet: card.currentSheet || '',
+          storedSheet: card.storedSheet || card.currentSheet || '',
+          effectiveSheet: card.effectiveSheet || '',
           currentStatus: card.currentStatus || '',
           displayStageLabel: card.displayStageLabel || '',
-          lastSeen: card.lastSeen || ''
+          lastSeen: card.lastSeen || '',
+          flowState: card.flowState || null
         };
       }
       function _getProcessLookupEntryByRow(rowOrRn) {
@@ -8346,6 +8827,48 @@
           }
         }
         return lookup ? _normalizeProcessCardSummary(lookup) : null;
+      }
+      function _isProcessQueueSelectionCurrent(key) {
+        var normalized = _normalizeProcessSearchKey(key);
+        if (!normalized) return false;
+        var activeKey = _normalizeProcessSearchKey(S.processActiveKey || '');
+        return normalized === activeKey;
+      }
+      function _hasProcessProductInQueue(normalizedKey) {
+        var target = _normalizeProcessSearchKey(normalizedKey);
+        if (!target) return false;
+        for (var i = 0; i < S.processProducts.length; i++) {
+          if (_normalizeProcessSearchKey(S.processProducts[i] && S.processProducts[i].key) === target) return true;
+        }
+        return false;
+      }
+      function _findAnyRowByProcessKey(key) {
+        var normalized = _normalizeProcessSearchKey(key);
+        if (!normalized) return null;
+        for (var i = 0; i < S.allRows.length; i++) {
+          var row = S.allRows[i];
+          var rowKeys = _getRowProcessKeys(row);
+          for (var j = 0; j < rowKeys.length; j++) {
+            if (rowKeys[j].normalized === normalized) return row;
+          }
+        }
+        return null;
+      }
+      function _clearProcessSelectionState(options) {
+        var opts = options || {};
+        S.processDetailSeq++;
+        S.processActiveKey = '';
+        S.processLoading = false;
+        S.processError = null;
+        S.processDetail = null;
+        if (opts.clearLastRequest !== false) S.processLastRequest = null;
+        _resetProcessChatState();
+        if (opts.render !== false) {
+          _renderProcessList();
+          _renderProcessModalBody(null, null);
+        } else {
+          _syncProcessListActiveState();
+        }
       }
       function _buildProcessActionMarkup(row) {
         if (!_isProcessTrackingEnabled()) return '';
@@ -8384,18 +8907,18 @@
           return;
         }
         if (S.processProductsLoading) {
-          meta.textContent = 'Loading...';
+          meta.textContent = 'Đang tải...';
           return;
         }
         if (S.processProductsMeta && typeof S.processProductsMeta.total === 'number') {
-          meta.textContent = String(S.processProductsMeta.total) + ' in queue';
+          meta.textContent = String(S.processProductsMeta.total) + ' mã';
           return;
         }
         if (S.processProductsError) {
-          meta.textContent = 'Retry';
+          meta.textContent = 'Thử lại';
           return;
         }
-        meta.textContent = 'Open queue';
+        meta.textContent = 'Mở danh sách';
       }
       function copyProcessKey(key, evt) {
         if (evt && evt.stopPropagation) evt.stopPropagation();
@@ -8434,15 +8957,19 @@
         var overlay = document.getElementById('processOverlay');
         return !!(overlay && overlay.classList.contains('open'));
       }
-      function _openProcessModal() {
+      function _openProcessModal(options) {
+        var opts = options || {};
         var overlay = document.getElementById('processOverlay');
         if (!overlay) return;
+        var wasOpen = overlay.classList.contains('open');
         overlay.classList.add('open');
         S.processModalOpen = true;
-        setTimeout(function () {
-          var input = document.getElementById('processSearchInput');
-          if (input) input.focus();
-        }, 0);
+        if (opts.focusSearch === true && !wasOpen) {
+          setTimeout(function () {
+            var input = document.getElementById('processSearchInput');
+            if (input) input.focus();
+          }, 0);
+        }
       }
       function _buildEmptyProcessTimeline() {
         return [
@@ -8464,11 +8991,14 @@
         if (!detail.imageOriginalUrl) detail.imageOriginalUrl = fallback.imageOriginalUrl || '';
         if (!detail.imageUrl) detail.imageUrl = fallback.imageUrl || '';
         if (!detail.currentSheet) detail.currentSheet = fallback.currentSheet || '';
+        if (!detail.storedSheet) detail.storedSheet = detail.currentSheet || fallback.storedSheet || '';
+        if (!detail.effectiveSheet) detail.effectiveSheet = fallback.effectiveSheet || (detail.flowState && detail.flowState.effectiveSheet) || '';
         if (!detail.currentStatus) detail.currentStatus = fallback.currentStatus || '';
         if (!detail.displayStageLabel) detail.displayStageLabel = fallback.displayStageLabel || '';
         if (!detail.lastSeen) detail.lastSeen = fallback.lastSeen || '';
+        if (!detail.flowState && fallback.flowState) detail.flowState = fallback.flowState;
         if (!Array.isArray(detail.stageTimeline) || !detail.stageTimeline.length) {
-          detail.stageTimeline = _buildEmptyProcessTimeline();
+          detail.stageTimeline = detail.flowState && Array.isArray(detail.flowState.stageTimeline) ? detail.flowState.stageTimeline : _buildEmptyProcessTimeline();
         }
         return detail;
       }
@@ -8494,33 +9024,663 @@
         }
         return html;
       }
+      function _decodeChatVisibleText(value) {
+        var raw = String(value == null ? '' : value).replace(/\r\n?/g, '\n');
+        if (!raw) return '';
+
+        if (!/%[0-9A-Fa-f]{2}/.test(raw)) return raw;
+
+        var firstPass = raw;
+        try {
+          firstPass = decodeURIComponent(raw);
+        } catch (err) {
+          return raw;
+        }
+
+        if (!/%[0-9A-Fa-f]{2}/.test(firstPass)) return firstPass;
+        if (!/%(?:C[2-9A-F]|D[0-9A-F]|E[0-9A-F]|F[0-4])[0-9A-F]/i.test(firstPass)) return firstPass;
+
+        try {
+          return decodeURIComponent(firstPass);
+        } catch (secondErr) {
+          return firstPass;
+        }
+      }
+      function _normalizeProductChatHistoryItem(item, index) {
+        var entry = item || {};
+        var type = String(entry.type || 'message').toLowerCase();
+        if (type === 'legacy') {
+          return {
+            type: 'legacy',
+            id: String(entry.id || ('legacy-' + index)),
+            content: _decodeChatVisibleText(entry.content || ''),
+            readOnly: true
+          };
+        }
+        return {
+          type: 'message',
+          id: String(entry.id || ''),
+          pic: String(entry.pic || ''),
+          content: _decodeChatVisibleText(entry.content || ''),
+          timestamp: String(entry.timestamp || ''),
+          isOwn: entry.isOwn === true
+        };
+      }
+      function _normalizeProductChatHistoryPayload(data) {
+        var history = data || {};
+        var items = Array.isArray(history.items)
+          ? history.items.map(function (item, index) { return _normalizeProductChatHistoryItem(item, index); })
+          : [];
+        var messages = [];
+        var legacy = [];
+        for (var i = 0; i < items.length; i++) {
+          if (items[i].type === 'legacy') legacy.push(items[i]);
+          else messages.push(items[i]);
+        }
+        return {
+          newProductId: String(history.newProductId || ''),
+          canWrite: history.canWrite === true,
+          actorEmail: String(history.actorEmail || '').toLowerCase(),
+          items: items,
+          messages: messages,
+          legacy: legacy
+        };
+      }
+      function _chatActionAttr(fnName, arg) {
+        var call = 'App.' + fnName + '(';
+        if (arguments.length > 1) call += JSON.stringify(String(arg || ''));
+        call += ')';
+        return esc(call).replace(/'/g, '&#39;');
+      }
+      function _buildProductChatThreadHtml(opts) {
+        var cfg = opts || {};
+        var history = cfg.history || _normalizeProductChatHistoryPayload(null);
+        var productKey = String(cfg.productKey || '').trim();
+        var canWrite = cfg.canWrite === true && history.canWrite !== false;
+        var html = ''
+          + '<div class="process-chat-head">'
+          + '  <div><div class="process-chat-title">' + esc(cfg.title || 'Hội thoại nội bộ') + '</div><div class="process-chat-sub">' + esc(cfg.subtitle || productKey || '') + '</div></div>'
+          + (cfg.loading ? '<div class="process-chat-sub">Đang tải</div>' : '')
+          + '</div>';
+
+        if (!productKey) {
+          return html + '<div class="process-chat-muted">Chưa có mã sản phẩm để mở hội thoại.</div>';
+        }
+
+        if (cfg.error) {
+          html += '<div class="process-error" style="min-height:120px;padding:16px"><strong>Không thể tải hội thoại</strong><p>' + esc(cfg.error.message || 'Hội thoại hiện chưa khả dụng.') + '</p>'
+            + '<div class="process-actions"><button class="btn btn-ghost btn-sm" type="button" onclick="' + _chatActionAttr(cfg.retryFn || 'retryProcessChat') + '">Thử lại</button></div></div>';
+        } else if (cfg.loading && !history.items.length) {
+          html += '<div class="process-chat-muted">' + esc(cfg.loadingText || 'Đang tải hội thoại...') + '</div>';
+        } else if (!history.items.length) {
+          html += '<div class="process-chat-muted">' + esc(cfg.emptyText || 'Chưa có tin nhắn.') + '</div>';
+        } else {
+          html += '<div class="process-chat-list">';
+          history.items.forEach(function (item) {
+            if (!item) return;
+            if (item.type === 'legacy') {
+              html += '<div class="process-chat-message is-legacy">'
+                + '<div class="process-chat-meta"><span class="process-chat-pic">Ghi chú cũ</span><span>Chỉ xem</span></div>'
+                + '<div class="process-chat-text">' + esc(item.content || '').replace(/\n/g, '<br>') + '</div>'
+                + '</div>';
+              return;
+            }
+            var isOwn = item.isOwn === true;
+            var isEditing = cfg.editId && cfg.editId === item.id;
+            html += '<div class="process-chat-message' + (isOwn ? ' is-own' : '') + '">'
+              + '<div class="process-chat-meta"><span class="process-chat-pic">' + esc(item.pic || '') + '</span><span>' + esc(item.timestamp || '') + '</span></div>';
+            if (isEditing) {
+              var editValue = cfg.editDraft || item.content || '';
+              html += '<div class="process-chat-edit"><textarea id="' + esc(cfg.editInputId || 'processChatEditInput') + '">' + esc(editValue) + '</textarea></div>'
+                + '<div class="process-chat-actions">'
+                + '<button class="process-chat-action" type="button" onclick="' + _chatActionAttr(cfg.saveEditFn, item.id || '') + '">Lưu</button>'
+                + '<button class="process-chat-action" type="button" onclick="' + _chatActionAttr(cfg.cancelEditFn) + '">Hủy</button>'
+                + '</div>';
+            } else {
+              html += '<div class="process-chat-text">' + esc(item.content || '').replace(/\n/g, '<br>') + '</div>';
+              if (isOwn && canWrite) {
+                html += '<div class="process-chat-actions">'
+                  + '<button class="process-chat-action" type="button" onclick="' + _chatActionAttr(cfg.startEditFn, item.id || '') + '">Sửa</button>'
+                  + '<button class="process-chat-action" type="button" onclick="' + _chatActionAttr(cfg.deleteFn, item.id || '') + '">Xóa</button>'
+                  + '</div>';
+              }
+            }
+            html += '</div>';
+          });
+          html += '</div>';
+        }
+
+        if (canWrite) {
+          html += '<div class="process-chat-composer">'
+            + '<textarea id="' + esc(cfg.inputId || 'processChatInput') + '" placeholder="' + esc(cfg.placeholder || 'Nhập tin nhắn') + '"' + (cfg.busy ? ' disabled' : '') + '>' + esc(cfg.draft || '') + '</textarea>'
+            + '<button class="btn btn-green btn-sm" type="button" onclick="' + _chatActionAttr(cfg.sendFn) + '"' + (cfg.busy ? ' disabled' : '') + '>' + (cfg.busy ? 'Đang gửi' : 'Gửi') + '</button>'
+            + '</div>';
+        } else {
+          html += '<div class="process-chat-muted" style="margin-top:10px">' + esc(cfg.readOnlyText || 'Bạn đang ở chế độ chỉ xem.') + '</div>';
+        }
+        return html;
+      }
+      function _resetProcessChatState() {
+        S.processChatSeq++;
+        S.processChatKey = '';
+        S.processChatLoading = false;
+        S.processChatError = null;
+        S.processChatHistory = null;
+        S.processChatBusy = false;
+        S.processChatEditId = '';
+        S.processChatDraft = '';
+        S.processChatEditDraft = '';
+      }
+      function _getProcessChatPayload(extra) {
+        var detail = S.processDetail || {};
+        var lastPayload = S.processLastRequest && S.processLastRequest.payload ? S.processLastRequest.payload : {};
+        var payload = Object.assign({
+          token: AUTH_TOKEN,
+          newProductId: detail.key || '',
+          sheetContext: SELECTED_SHEET_NAME || (SELECTED_VIEW === 'MAN' ? 'Manager' : 'Category'),
+          viewContext: 'INDEX_PROCESS_MODAL'
+        }, extra || {});
+        if (lastPayload.rowNumber) payload.rowNumber = lastPayload.rowNumber;
+        var effectiveSheet = _getEffectiveBusinessCurrentSheet(detail);
+        if (effectiveSheet || detail.currentSheet) payload.currentProductSheet = effectiveSheet || detail.currentSheet;
+        if (detail.currentSheet) payload.currentSheet = detail.currentSheet;
+        if (detail.currentStatus) payload.currentStatus = detail.currentStatus;
+        if (detail.flowState) payload.flowState = detail.flowState;
+        return payload;
+      }
+      function _buildProcessChatHtml() {
+        var detail = S.processDetail || {};
+        if (!detail.key) {
+          return '<div class="process-chat-muted">Chọn một mã để mở hội thoại.</div>';
+        }
+        return _buildProductChatThreadHtml({
+          title: 'Chat trong Process',
+          subtitle: ((_getEffectiveBusinessCurrentSheet(detail) || detail.currentSheet) ? ((_getEffectiveBusinessCurrentSheet(detail) || detail.currentSheet) + ' · ') : '') + (detail.key || ''),
+          productKey: detail.key || '',
+          history: S.processChatHistory || _normalizeProductChatHistoryPayload(null),
+          loading: S.processChatLoading,
+          error: S.processChatError,
+          busy: S.processChatBusy,
+          draft: S.processChatDraft,
+          editId: S.processChatEditId,
+          editDraft: S.processChatEditDraft,
+          canWrite: USER_CAN_EDIT,
+          inputId: 'processChatInput',
+          editInputId: 'processChatEditInput',
+          retryFn: 'retryProcessChat',
+          sendFn: 'sendProcessChatMessage',
+          startEditFn: 'startProcessChatEdit',
+          cancelEditFn: 'cancelProcessChatEdit',
+          saveEditFn: 'saveProcessChatEdit',
+          deleteFn: 'deleteProcessChatMessage',
+          emptyText: 'Chưa có tin nhắn trong Process.',
+          readOnlyText: 'Bạn đang ở chế độ chỉ xem trong view này.'
+        });
+      }
+      function _renderProcessChatOnly() {
+        var panel = document.getElementById('processChatPanel');
+        if (panel) panel.innerHTML = _buildProcessChatHtml();
+      }
+      function _requestProductChatHistory(detail) {
+        var key = String(detail && detail.key || '').trim();
+        if (!key) return;
+        var seq = ++S.processChatSeq;
+        S.processChatKey = key;
+        S.processChatLoading = true;
+        S.processChatError = null;
+        S.processChatHistory = null;
+        S.processChatEditId = '';
+        _renderProcessChatOnly();
+
+        google.script.run
+          .withSuccessHandler(function (res) {
+            if (seq !== S.processChatSeq || S.processChatKey !== key) return;
+            S.processChatLoading = false;
+            if (!res || !res.ok) {
+              if (handleAuthIssue(res)) return;
+              S.processChatError = res && res.error ? res.error : { code: 'CHAT_READ_ERROR', message: 'Không thể tải chat.' };
+              _renderProcessChatOnly();
+              return;
+            }
+            S.processChatHistory = _normalizeProductChatHistoryPayload(res.data);
+            S.processChatError = null;
+            _renderProcessChatOnly();
+          })
+          .withFailureHandler(function (e) {
+            if (seq !== S.processChatSeq || S.processChatKey !== key) return;
+            if (handleAuthIssue(e)) return;
+            S.processChatLoading = false;
+            S.processChatError = { code: 'CHAT_READ_ERROR', message: (e && e.message) || 'Không thể tải chat.' };
+            _renderProcessChatOnly();
+          })
+          .getProductChatHistory(_getProcessChatPayload({ newProductId: key }));
+      }
+      function requestProcessChat(detail) {
+        _requestProductChatHistory(detail || S.processDetail || {});
+      }
+      function retryProcessChat() {
+        if (S.processDetail && S.processDetail.key) requestProcessChat(S.processDetail);
+      }
+      function _applyProcessChatResult(res, fallbackMessage) {
+        if (!res || !res.ok) {
+          if (handleAuthIssue(res)) return false;
+          var msg = (res && res.error && res.error.message) || fallbackMessage || 'Không thể cập nhật chat.';
+          toast(msg, 'error');
+          _renderProcessChatOnly();
+          return false;
+        }
+        S.processChatHistory = _normalizeProductChatHistoryPayload(res.data && (res.data.history || res.data));
+        S.processChatError = null;
+        S.processChatEditId = '';
+        S.processChatDraft = '';
+        S.processChatEditDraft = '';
+        _renderProcessChatOnly();
+        return true;
+      }
+      function sendProcessChatMessage() {
+        if (!USER_CAN_EDIT) { toast('Bạn đang ở chế độ chỉ xem.', 'info'); return; }
+        if (!S.processDetail || !S.processDetail.key || S.processChatBusy) return;
+        var input = document.getElementById('processChatInput');
+        var content = String(input && input.value || '').trim();
+        if (!content) { if (input) input.focus(); return; }
+        var key = S.processDetail.key;
+        S.processChatDraft = content;
+        S.processChatBusy = true;
+        _renderProcessChatOnly();
+        google.script.run
+          .withSuccessHandler(function (res) {
+            S.processChatBusy = false;
+            if (_normalizeProcessSearchKey(S.processDetail && S.processDetail.key) !== _normalizeProcessSearchKey(key)) return;
+            if (_applyProcessChatResult(res, 'Không thể gửi chat.')) toast('Đã gửi chat', 'success');
+          })
+          .withFailureHandler(function (e) {
+            S.processChatBusy = false;
+            if (handleAuthIssue(e)) return;
+            toast('Lỗi: ' + (e && e.message ? e.message : 'Không rõ'), 'error');
+            _renderProcessChatOnly();
+          })
+          .addProductChatMessage(_getProcessChatPayload({ newProductId: key, content: content }));
+      }
+      function startProcessChatEdit(messageId) {
+        S.processChatEditId = String(messageId || '');
+        S.processChatEditDraft = '';
+        _renderProcessChatOnly();
+      }
+      function cancelProcessChatEdit() {
+        S.processChatEditId = '';
+        S.processChatEditDraft = '';
+        _renderProcessChatOnly();
+      }
+      function saveProcessChatEdit(messageId) {
+        if (!USER_CAN_EDIT || !S.processDetail || !S.processDetail.key || S.processChatBusy) return;
+        var input = document.getElementById('processChatEditInput');
+        var content = String(input && input.value || '').trim();
+        if (!content) { if (input) input.focus(); return; }
+        var key = S.processDetail.key;
+        S.processChatEditDraft = content;
+        S.processChatBusy = true;
+        _renderProcessChatOnly();
+        google.script.run
+          .withSuccessHandler(function (res) {
+            S.processChatBusy = false;
+            if (_normalizeProcessSearchKey(S.processDetail && S.processDetail.key) !== _normalizeProcessSearchKey(key)) return;
+            if (_applyProcessChatResult(res, 'Không thể sửa chat.')) toast('Đã sửa chat', 'success');
+          })
+          .withFailureHandler(function (e) {
+            S.processChatBusy = false;
+            if (handleAuthIssue(e)) return;
+            toast('Lỗi: ' + (e && e.message ? e.message : 'Không rõ'), 'error');
+            _renderProcessChatOnly();
+          })
+          .editProductChatMessage(_getProcessChatPayload({ newProductId: key, messageId: messageId, content: content }));
+      }
+      function deleteProcessChatMessage(messageId) {
+        if (!USER_CAN_EDIT || !S.processDetail || !S.processDetail.key || S.processChatBusy) return;
+        if (!window.confirm('Xóa tin nhắn này?')) return;
+        var key = S.processDetail.key;
+        S.processChatBusy = true;
+        _renderProcessChatOnly();
+        google.script.run
+          .withSuccessHandler(function (res) {
+            S.processChatBusy = false;
+            if (_normalizeProcessSearchKey(S.processDetail && S.processDetail.key) !== _normalizeProcessSearchKey(key)) return;
+            if (_applyProcessChatResult(res, 'Không thể xóa chat.')) toast('Đã xóa chat', 'success');
+          })
+          .withFailureHandler(function (e) {
+            S.processChatBusy = false;
+            if (handleAuthIssue(e)) return;
+            toast('Lỗi: ' + (e && e.message ? e.message : 'Không rõ'), 'error');
+            _renderProcessChatOnly();
+          })
+          .deleteProductChatMessage(_getProcessChatPayload({ newProductId: key, messageId: messageId }));
+      }
+      function _resetWorkspaceChatState(mode) {
+        S.workspaceChatSeq++;
+        S.workspaceChatKey = '';
+        S.workspaceChatRowNumber = null;
+        S.workspaceChatLoading = false;
+        S.workspaceChatError = null;
+        S.workspaceChatHistory = null;
+        S.workspaceChatBusy = false;
+        S.workspaceChatEditId = '';
+        S.workspaceChatDraft = '';
+        S.workspaceChatEditDraft = '';
+        S.workspaceChatMode = mode || 'empty';
+        S.workspaceChatCurrentSheet = '';
+      }
+      function _getWorkspaceChatPayload(extra) {
+        var row = _getSelectedRowSnapshot(S.modalRow) || {};
+        var lookup = _getProcessLookupEntryByRow(row) || {};
+        var payload = Object.assign({
+          token: AUTH_TOKEN,
+          newProductId: S.workspaceChatKey || _getRowProcessPrimaryKey(row),
+          sheetContext: SELECTED_SHEET_NAME || (SELECTED_VIEW === 'MAN' ? 'Manager' : 'Category'),
+          viewContext: 'INDEX_WORKSPACE_MODAL',
+          rowNumber: S.workspaceChatRowNumber || S.modalRow || '',
+          currentProductSheet: S.workspaceChatCurrentSheet || _getRowBusinessCurrentSheet(row),
+          currentSheet: lookup.currentSheet || row.currentSheet || row['Current Sheet'] || '',
+          currentStatus: lookup.currentStatus || row.currentStatus || row['Current Status'] || row.Status || ''
+        }, extra || {});
+        if (lookup.flowState) payload.flowState = lookup.flowState;
+        return payload;
+      }
+      function _buildWorkspaceChatHandoffHtml(row) {
+        var key = _getRowProcessPrimaryKey(row);
+        var currentSheet = _getRowBusinessCurrentSheet(row) || 'bước khác trong flow';
+        var selectedSheet = _getSelectedBusinessSheetName();
+        if (!key) {
+          return '<div class="process-chat-muted">Chưa có mã sản phẩm để mở hội thoại.</div>';
+        }
+        return '<div class="workspace-chat-handoff">'
+          + '<div><div class="workspace-chat-handoff-title">Mã này hiện đang được xử lý ở bước ' + esc(currentSheet) + '</div>'
+          + '<div class="workspace-chat-handoff-copy">Vui lòng tiếp tục trao đổi trong Process. Hội thoại được đồng bộ theo mã sản phẩm và giữ đúng ngữ cảnh ' + esc(selectedSheet || 'view hiện tại') + '.</div>'
+          + '<div class="workspace-chat-handoff-sheet">' + esc(key) + '</div></div>'
+          + '<button class="btn btn-primary btn-sm" type="button" onclick="App.openModalProcessThread()">Mở Process</button>'
+          + '</div>';
+      }
+      function _buildWorkspaceChatHtml() {
+        var row = _getSelectedRowSnapshot(S.modalRow);
+        if (!row) return '<div class="process-chat-muted">Mở một sản phẩm để bắt đầu hội thoại tại Workspace.</div>';
+        if (S.workspaceChatMode === 'resolving') {
+          return '<div class="process-chat-head">'
+            + '<div><div class="process-chat-title">Chat nội bộ</div><div class="process-chat-sub">' + esc(_getRowProcessPrimaryKey(row) || '') + '</div></div>'
+            + '<div class="process-chat-sub">Đang xác định bước xử lý</div>'
+            + '</div><div class="process-chat-muted">Đang kiểm tra bước nghiệp vụ trước khi mở hội thoại...</div>';
+        }
+        if (!_shouldRenderWorkspaceChat(row)) return _buildWorkspaceChatHandoffHtml(row);
+        var key = _getRowProcessPrimaryKey(row);
+        return _buildProductChatThreadHtml({
+          title: 'Chat tại Workspace',
+          subtitle: (_getSelectedBusinessSheetName() || 'Workspace') + ' · ' + (key || ''),
+          productKey: key,
+          history: S.workspaceChatHistory || _normalizeProductChatHistoryPayload(null),
+          loading: S.workspaceChatLoading,
+          error: S.workspaceChatError,
+          busy: S.workspaceChatBusy,
+          draft: S.workspaceChatDraft,
+          editId: S.workspaceChatEditId,
+          editDraft: S.workspaceChatEditDraft,
+          canWrite: USER_CAN_EDIT,
+          inputId: 'workspaceChatInput',
+          editInputId: 'workspaceChatEditInput',
+          retryFn: 'retryWorkspaceChat',
+          sendFn: 'sendWorkspaceChatMessage',
+          startEditFn: 'startWorkspaceChatEdit',
+          cancelEditFn: 'cancelWorkspaceChatEdit',
+          saveEditFn: 'saveWorkspaceChatEdit',
+          deleteFn: 'deleteWorkspaceChatMessage',
+          emptyText: 'Chưa có tin nhắn tại Workspace.',
+          readOnlyText: 'Bạn đang ở chế độ chỉ xem trong Workspace.'
+        });
+      }
+      function _renderWorkspaceChatOnly() {
+        var panel = document.getElementById('workspaceChatPanel');
+        if (panel) panel.innerHTML = _buildWorkspaceChatHtml();
+      }
+      function _syncWorkspaceChatForModalRow(row) {
+        if (!row || !S.modalRow) {
+          _resetWorkspaceChatState('empty');
+          _renderWorkspaceChatOnly();
+          return;
+        }
+        var key = _getRowProcessPrimaryKey(row);
+        var rn = row._rowNumber;
+        if (_isProcessTrackingEnabled() && key && !S.processLookupLoaded && !_getProcessLookupEntryByRow(row)) {
+          S.workspaceChatSeq++;
+          S.workspaceChatKey = key;
+          S.workspaceChatRowNumber = rn || null;
+          S.workspaceChatCurrentSheet = '';
+          S.workspaceChatLoading = true;
+          S.workspaceChatError = null;
+          S.workspaceChatHistory = null;
+          S.workspaceChatBusy = false;
+          S.workspaceChatEditId = '';
+          S.workspaceChatDraft = '';
+          S.workspaceChatEditDraft = '';
+          S.workspaceChatMode = 'resolving';
+          _renderWorkspaceChatOnly();
+          return;
+        }
+        var currentSheet = _getRowBusinessCurrentSheet(row);
+        if (!key || !_shouldRenderWorkspaceChat(row)) {
+          S.workspaceChatSeq++;
+          S.workspaceChatKey = key || '';
+          S.workspaceChatRowNumber = rn || null;
+          S.workspaceChatCurrentSheet = currentSheet || '';
+          S.workspaceChatLoading = false;
+          S.workspaceChatError = null;
+          S.workspaceChatHistory = null;
+          S.workspaceChatBusy = false;
+          S.workspaceChatEditId = '';
+          S.workspaceChatDraft = '';
+          S.workspaceChatEditDraft = '';
+          S.workspaceChatMode = key ? 'process' : 'empty';
+          _renderWorkspaceChatOnly();
+          return;
+        }
+        if (S.workspaceChatMode === 'workspace'
+          && S.workspaceChatKey === key
+          && parseInt(S.workspaceChatRowNumber, 10) === parseInt(rn, 10)
+          && !S.workspaceChatError
+          && (S.workspaceChatLoading || S.workspaceChatHistory)) {
+          S.workspaceChatCurrentSheet = currentSheet || '';
+          _renderWorkspaceChatOnly();
+          return;
+        }
+        _requestWorkspaceChatHistory(row);
+      }
+      function _requestWorkspaceChatHistory(row) {
+        row = row || _getSelectedRowSnapshot(S.modalRow);
+        var key = _getRowProcessPrimaryKey(row);
+        var rn = row && row._rowNumber;
+        if (!key || !rn) {
+          _resetWorkspaceChatState('empty');
+          _renderWorkspaceChatOnly();
+          return;
+        }
+        var seq = ++S.workspaceChatSeq;
+        S.workspaceChatKey = key;
+        S.workspaceChatRowNumber = rn;
+        S.workspaceChatCurrentSheet = _getRowBusinessCurrentSheet(row);
+        S.workspaceChatMode = 'workspace';
+        S.workspaceChatLoading = true;
+        S.workspaceChatError = null;
+        S.workspaceChatHistory = null;
+        S.workspaceChatEditId = '';
+        S.workspaceChatDraft = '';
+        S.workspaceChatEditDraft = '';
+        _renderWorkspaceChatOnly();
+
+        google.script.run
+          .withSuccessHandler(function (res) {
+            if (seq !== S.workspaceChatSeq || S.workspaceChatKey !== key || parseInt(S.workspaceChatRowNumber, 10) !== parseInt(rn, 10)) return;
+            S.workspaceChatLoading = false;
+            if (!res || !res.ok) {
+              if (handleAuthIssue(res)) return;
+              S.workspaceChatError = res && res.error ? res.error : { code: 'CHAT_READ_ERROR', message: 'Không thể tải chat workspace.' };
+              _renderWorkspaceChatOnly();
+              return;
+            }
+            S.workspaceChatHistory = _normalizeProductChatHistoryPayload(res.data);
+            S.workspaceChatError = null;
+            _renderWorkspaceChatOnly();
+          })
+          .withFailureHandler(function (e) {
+            if (seq !== S.workspaceChatSeq || S.workspaceChatKey !== key || parseInt(S.workspaceChatRowNumber, 10) !== parseInt(rn, 10)) return;
+            if (handleAuthIssue(e)) return;
+            S.workspaceChatLoading = false;
+            S.workspaceChatError = { code: 'CHAT_READ_ERROR', message: (e && e.message) || 'Không thể tải chat workspace.' };
+            _renderWorkspaceChatOnly();
+          })
+          .getProductChatHistory(_getWorkspaceChatPayload({ newProductId: key, rowNumber: rn }));
+      }
+      function retryWorkspaceChat() {
+        var row = _getSelectedRowSnapshot(S.modalRow);
+        if (row) _syncWorkspaceChatForModalRow(row);
+      }
+      function _applyWorkspaceChatResult(res, fallbackMessage) {
+        if (!res || !res.ok) {
+          if (handleAuthIssue(res)) return false;
+          var msg = (res && res.error && res.error.message) || fallbackMessage || 'Không thể cập nhật chat.';
+          toast(msg, 'error');
+          _renderWorkspaceChatOnly();
+          return false;
+        }
+        S.workspaceChatHistory = _normalizeProductChatHistoryPayload(res.data && (res.data.history || res.data));
+        S.workspaceChatError = null;
+        S.workspaceChatEditId = '';
+        S.workspaceChatDraft = '';
+        S.workspaceChatEditDraft = '';
+        _renderWorkspaceChatOnly();
+        return true;
+      }
+      function sendWorkspaceChatMessage() {
+        if (!USER_CAN_EDIT) { toast('Bạn đang ở chế độ chỉ xem.', 'info'); return; }
+        if (!S.modalRow || !S.workspaceChatKey || S.workspaceChatBusy) return;
+        var input = document.getElementById('workspaceChatInput');
+        var content = String(input && input.value || '').trim();
+        if (!content) { if (input) input.focus(); return; }
+        var key = S.workspaceChatKey;
+        var rn = S.workspaceChatRowNumber;
+        S.workspaceChatDraft = content;
+        S.workspaceChatBusy = true;
+        _renderWorkspaceChatOnly();
+        google.script.run
+          .withSuccessHandler(function (res) {
+            S.workspaceChatBusy = false;
+            if (S.workspaceChatKey !== key || parseInt(S.workspaceChatRowNumber, 10) !== parseInt(rn, 10)) return;
+            if (_applyWorkspaceChatResult(res, 'Không thể gửi chat workspace.')) toast('Đã gửi chat', 'success');
+          })
+          .withFailureHandler(function (e) {
+            S.workspaceChatBusy = false;
+            if (handleAuthIssue(e)) return;
+            toast('Lỗi: ' + (e && e.message ? e.message : 'Không rõ'), 'error');
+            _renderWorkspaceChatOnly();
+          })
+          .addProductChatMessage(_getWorkspaceChatPayload({ newProductId: key, rowNumber: rn, content: content }));
+      }
+      function startWorkspaceChatEdit(messageId) {
+        S.workspaceChatEditId = String(messageId || '');
+        S.workspaceChatEditDraft = '';
+        _renderWorkspaceChatOnly();
+      }
+      function cancelWorkspaceChatEdit() {
+        S.workspaceChatEditId = '';
+        S.workspaceChatEditDraft = '';
+        _renderWorkspaceChatOnly();
+      }
+      function saveWorkspaceChatEdit(messageId) {
+        if (!USER_CAN_EDIT || !S.modalRow || !S.workspaceChatKey || S.workspaceChatBusy) return;
+        var input = document.getElementById('workspaceChatEditInput');
+        var content = String(input && input.value || '').trim();
+        if (!content) { if (input) input.focus(); return; }
+        var key = S.workspaceChatKey;
+        var rn = S.workspaceChatRowNumber;
+        S.workspaceChatEditDraft = content;
+        S.workspaceChatBusy = true;
+        _renderWorkspaceChatOnly();
+        google.script.run
+          .withSuccessHandler(function (res) {
+            S.workspaceChatBusy = false;
+            if (S.workspaceChatKey !== key || parseInt(S.workspaceChatRowNumber, 10) !== parseInt(rn, 10)) return;
+            if (_applyWorkspaceChatResult(res, 'Không thể sửa chat workspace.')) toast('Đã sửa chat', 'success');
+          })
+          .withFailureHandler(function (e) {
+            S.workspaceChatBusy = false;
+            if (handleAuthIssue(e)) return;
+            toast('Lỗi: ' + (e && e.message ? e.message : 'Không rõ'), 'error');
+            _renderWorkspaceChatOnly();
+          })
+          .editProductChatMessage(_getWorkspaceChatPayload({ newProductId: key, rowNumber: rn, messageId: messageId, content: content }));
+      }
+      function deleteWorkspaceChatMessage(messageId) {
+        if (!USER_CAN_EDIT || !S.modalRow || !S.workspaceChatKey || S.workspaceChatBusy) return;
+        if (!window.confirm('Xóa tin nhắn này?')) return;
+        var key = S.workspaceChatKey;
+        var rn = S.workspaceChatRowNumber;
+        S.workspaceChatBusy = true;
+        _renderWorkspaceChatOnly();
+        google.script.run
+          .withSuccessHandler(function (res) {
+            S.workspaceChatBusy = false;
+            if (S.workspaceChatKey !== key || parseInt(S.workspaceChatRowNumber, 10) !== parseInt(rn, 10)) return;
+            if (_applyWorkspaceChatResult(res, 'Không thể xóa chat workspace.')) toast('Đã xóa chat', 'success');
+          })
+          .withFailureHandler(function (e) {
+            S.workspaceChatBusy = false;
+            if (handleAuthIssue(e)) return;
+            toast('Lỗi: ' + (e && e.message ? e.message : 'Không rõ'), 'error');
+            _renderWorkspaceChatOnly();
+          })
+          .deleteProductChatMessage(_getWorkspaceChatPayload({ newProductId: key, rowNumber: rn, messageId: messageId }));
+      }
+      function openWorkspaceFromProcess() {
+        var payload = S.processLastRequest && S.processLastRequest.payload ? S.processLastRequest.payload : {};
+        var rn = parseInt(payload.rowNumber, 10);
+        if (!rn) return;
+        closeProcessModal();
+        openModal(rn);
+      }
       function _buildProcessListItemHtml(item) {
         var data = _normalizeProcessCardSummary(item);
         var hasImage = !!data.imageUrl;
+        var active = _isProcessQueueSelectionCurrent(data.key);
         return ''
-          + '<div class="process-list-item">'
+          + '<div class="process-list-item' + (active ? ' is-active' : '') + '" data-process-key="' + esc(data.key || '') + '" onclick=\'App.selectProcessQueueItem(' + JSON.stringify(data.key || '') + ')\'>'
           + '  <div class="process-list-thumb">'
-          +       (hasImage ? ('<img src="' + esc(data.imageUrl) + '" alt="' + esc(data.productName || 'Product image') + '" onerror="this.style.display=\'none\';if(this.nextElementSibling){this.nextElementSibling.style.display=\'flex\';}">') : '')
-          + '    <div class="process-list-thumb-empty" style="' + (hasImage ? 'display:none' : '') + '"><div style="font-size:18px">🖼️</div><div>No image</div></div>'
+          +       (hasImage ? ('<img src="' + esc(data.imageUrl) + '" alt="' + esc(data.productName || 'Ảnh sản phẩm') + '" onerror="this.style.display=\'none\';if(this.nextElementSibling){this.nextElementSibling.style.display=\'flex\';}">') : '')
+          + '    <div class="process-list-thumb-empty" style="' + (hasImage ? 'display:none' : '') + '"><div style="font-size:18px">🖼️</div><div>Chưa có ảnh</div></div>'
           + '  </div>'
           + '  <div class="process-list-content">'
           + '    <div class="process-list-topline">'
-          + '      <div class="process-list-key">' + esc(data.key || 'NO KEY') + '</div>'
-          + '      <button class="process-copy-btn" type="button" onclick=\'App.copyProcessKey(' + JSON.stringify(data.key || '') + ', event)\'>Copy</button>'
+          + '      <div class="process-list-key">' + esc(data.key || 'CHƯA CÓ MÃ') + '</div>'
+          + '      <button class="process-copy-btn" type="button" onclick=\'App.copyProcessKey(' + JSON.stringify(data.key || '') + ', event)\'>Sao chép</button>'
           + '    </div>'
-          + '    <div class="process-list-title">' + esc(data.productName || 'Unnamed product') + '</div>'
-          + '    <div class="process-list-sub">' + esc(data.barcodeOrUom || 'No Barcode / UOM Information available.') + '</div>'
+          + '    <div class="process-list-title">' + esc(data.productName || 'Chưa có tên sản phẩm') + '</div>'
+          + '    <div class="process-list-sub">' + esc(data.barcodeOrUom || 'Chưa có Barcode / UOM Information.') + '</div>'
           + '    <div class="process-list-chiprow">'
-          + '      <span class="process-group-chip">' + esc(data.productGroup || 'Product Group unavailable') + '</span>'
-          + '      <span class="process-stage-chip">' + esc(data.displayStageLabel || 'Process tracking') + '</span>'
+          + '      <span class="process-group-chip">' + esc(data.productGroup || 'Chưa có Product Group') + '</span>'
+          + '      <span class="process-stage-chip">' + esc(data.displayStageLabel || 'Đang theo dõi Process') + '</span>'
           + '    </div>'
           + '    <div class="process-list-foot"></div>'
           + '  </div>'
           + '</div>';
       }
-      function _renderProcessList() {
+      function _syncProcessListActiveState() {
         var body = document.getElementById('processListBody');
         if (!body) return;
+        var activeKey = _normalizeProcessSearchKey(S.processActiveKey || (S.processDetail && S.processDetail.key) || '');
+        var items = body.querySelectorAll('.process-list-item[data-process-key]');
+        for (var i = 0; i < items.length; i++) {
+          var key = _normalizeProcessSearchKey(items[i].getAttribute('data-process-key') || '');
+          items[i].classList.toggle('is-active', !!activeKey && key === activeKey);
+        }
+      }
+      function _renderProcessList(options) {
+        var opts = options || {};
+        var body = document.getElementById('processListBody');
+        if (!body) return;
+        var prevScrollTop = body.scrollTop;
 
         var meta = S.processProductsMeta || {};
         var allowedGroups = Array.isArray(meta.allowedGroups) ? meta.allowedGroups : [];
@@ -8536,17 +9696,19 @@
           note = (meta.total ? (meta.total + ' mã đang process') : 'Hiện chưa có mã nào đang process') + (allowedGroups.length ? (' · ' + allowedGroups.join(', ')) : '');
         }
         if (meta.query) {
-          note = 'Filter "' + meta.query + '" · ' + note;
+          note = 'Đang lọc "' + meta.query + '" · ' + note;
         }
         _setProcessListNote(note);
 
         if (S.processProductsLoading) {
-          body.innerHTML = '<div class="process-loading"><strong>Loading processing products...</strong><p>Đang đọc sheet <b>Process</b> và lọc theo Product Group hợp lệ cho tài khoản hiện tại.</p></div>';
+          body.innerHTML = '<div class="process-loading"><strong>Đang tải danh sách đang xử lý...</strong><p>Đang đọc Process và lọc theo Product Group hợp lệ cho tài khoản hiện tại.</p></div>';
+          if (opts.resetScroll === true) body.scrollTop = 0;
           return;
         }
 
         if (S.processProductsError) {
-          body.innerHTML = '<div class="process-error"><strong>Unable to load processing products</strong><p>' + esc(S.processProductsError.message || 'Không thể tải danh sách process.') + '</p><div class="process-actions"><button class="btn btn-ghost btn-sm" onclick="App.searchProcess()">Retry</button></div></div>';
+          body.innerHTML = '<div class="process-error"><strong>Không thể tải danh sách đang xử lý</strong><p>' + esc(S.processProductsError.message || 'Không thể tải danh sách Process.') + '</p><div class="process-actions"><button class="btn btn-ghost btn-sm" onclick="App.searchProcessQueue()">Thử lại</button></div></div>';
+          if (opts.resetScroll === true) body.scrollTop = 0;
           return;
         }
 
@@ -8554,76 +9716,82 @@
           var emptyMsg = S.processSearchValue
             ? 'Không có mã process nào khớp với từ khóa vừa lọc trong Product Group hiện tại.'
             : 'Hiện chưa có mã nào đang process trong Product Group bạn phụ trách.';
-          body.innerHTML = '<div class="process-empty"><strong>No processing product in scope</strong><p>' + esc(emptyMsg) + '</p><div class="process-actions"><button class="btn btn-ghost btn-sm" onclick="App.openProcess()">Reload queue</button></div></div>';
+          body.innerHTML = '<div class="process-empty"><strong>Chưa có mã đang xử lý trong scope</strong><p>' + esc(emptyMsg) + '</p><div class="process-actions"><button class="btn btn-ghost btn-sm" onclick="App.searchProcessQueue()">Tải lại danh sách</button></div></div>';
+          if (opts.resetScroll === true) body.scrollTop = 0;
           return;
         }
 
         body.innerHTML = '<div class="process-card-grid">' + S.processProducts.map(_buildProcessListItemHtml).join('') + '</div>';
+        _syncProcessListActiveState();
+        if (opts.resetScroll === true) body.scrollTop = 0;
+        else body.scrollTop = prevScrollTop;
       }
       function _renderProcessModalBody(fallbackRow, fallbackSummary) {
         var body = document.getElementById('processModalBody');
         if (!body) return;
 
         if (S.processLoading) {
-          _setProcessToolbarNote('Đang đọc detail từ sheet Process và xác minh quyền hiển thị.');
-          body.innerHTML = '<div class="process-loading"><strong>Loading process detail...</strong><p>Dashboard chính vẫn hoạt động bình thường trong lúc detail được tải ở panel bên phải.</p></div>';
+          _setProcessToolbarNote('Đang đọc chi tiết Process và xác minh quyền hiển thị.');
+          body.innerHTML = '<div class="process-loading"><strong>Đang tải chi tiết tiến trình...</strong><p>Dashboard chính vẫn hoạt động bình thường trong lúc panel bên phải được tải.</p></div>';
           return;
         }
 
         if (S.processError) {
           var errorCode = String(S.processError.code || '').toUpperCase();
-          var errorMessage = S.processError.message || 'Không thể tải process detail.';
+          var errorMessage = S.processError.message || 'Không thể tải chi tiết Process.';
           if (errorCode === 'PROCESS_NOT_FOUND' || errorCode === 'MISSING_QUERY') {
-            _setProcessToolbarNote('Không tìm thấy process detail phù hợp cho exact code vừa tra.');
-            body.innerHTML = '<div class="process-empty"><strong>No process detail found</strong><p>' + esc(errorMessage) + '</p><div class="process-actions"><button class="btn btn-ghost btn-sm" onclick="App.searchProcess(\'exact\')">Search exact code</button></div></div>';
+            _setProcessToolbarNote('Không tìm thấy chi tiết Process phù hợp cho mã vừa tra.');
+            body.innerHTML = '<div class="process-empty"><strong>Không tìm thấy chi tiết Process</strong><p>' + esc(errorMessage) + '</p><div class="process-actions"><button class="btn btn-ghost btn-sm" onclick="App.lookupProcessExactCode()">Tra mã chính xác</button></div></div>';
             return;
           }
-          _setProcessToolbarNote('Process detail hiện chưa tải được. Bạn có thể thử lại hoặc dùng exact code lookup.');
-          body.innerHTML = '<div class="process-error"><strong>Unable to load process detail</strong><p>' + esc(errorMessage) + '</p><div class="process-actions"><button class="btn btn-ghost btn-sm" onclick="App.retryProcessDetail()">Retry</button><button class="btn btn-ghost btn-sm" onclick="App.searchProcess(\'exact\')">Exact code</button></div></div>';
+          _setProcessToolbarNote('Chi tiết Process hiện chưa tải được. Bạn có thể thử lại hoặc tra mã chính xác.');
+          body.innerHTML = '<div class="process-error"><strong>Không thể tải chi tiết Process</strong><p>' + esc(errorMessage) + '</p><div class="process-actions"><button class="btn btn-ghost btn-sm" onclick="App.retryProcessDetail()">Thử lại</button><button class="btn btn-ghost btn-sm" onclick="App.lookupProcessExactCode()">Tra mã chính xác</button></div></div>';
           return;
         }
 
         if (!S.processDetail) {
           var fallback = _mergeProcessFallback(fallbackRow, fallbackSummary);
-          _setProcessToolbarNote('Chọn một mã ở panel bên trái để xem timeline, hoặc dùng exact code lookup nếu mã không còn trong danh sách hiện tại.');
-          body.innerHTML = '<div class="process-empty"><strong>Select a processing product</strong><p>Panel bên trái ưu tiên hiển thị sẵn các mã đang process theo đúng Product Group của bạn.' + (fallback.key ? (' Bạn cũng có thể tra nhanh mã <b>' + esc(fallback.key) + '</b>.') : '') + '</p><div class="process-actions"><button class="btn btn-ghost btn-sm" onclick="App.searchProcess()">Refresh list</button><button class="btn btn-ghost btn-sm" onclick="App.searchProcess(\'exact\')">Exact code lookup</button></div></div>';
+          _setProcessToolbarNote('Chọn một mã ở panel bên trái để xem timeline, hoặc tra mã chính xác nếu mã không còn trong danh sách hiện tại.');
+          body.innerHTML = '<div class="process-empty"><strong>Chọn một mã đang xử lý</strong><p>Panel bên trái ưu tiên hiển thị sẵn các mã đang process theo đúng Product Group của bạn.' + (fallback.key ? (' Bạn cũng có thể tra nhanh mã <b>' + esc(fallback.key) + '</b>.') : '') + '</p><div class="process-actions"><button class="btn btn-ghost btn-sm" onclick="App.searchProcess()">Làm mới danh sách</button><button class="btn btn-ghost btn-sm" onclick="App.lookupProcessExactCode()">Tra mã chính xác</button></div></div>';
           return;
         }
 
         var detail = S.processDetail;
         var hasImage = !!detail.imageUrl;
-        _setProcessToolbarNote(detail.displayStageLabel || 'Process detail loaded.');
+        var effectiveCurrentSheet = _getEffectiveBusinessCurrentSheet(detail) || detail.currentSheet || '';
+        _setProcessToolbarNote(detail.displayStageLabel || 'Đã tải chi tiết Process.');
         body.innerHTML = ''
           + '<div class="process-card">'
           + '  <aside class="process-hero">'
           + '    <div class="process-image-frame">'
-          +        (hasImage ? ('<img src="' + esc(detail.imageUrl) + '" alt="' + esc(detail.productName || 'Product image') + '" onerror="this.style.display=\'none\';if(this.nextElementSibling){this.nextElementSibling.style.display=\'flex\';}">') : '')
-          + '      <div class="process-image-empty" style="' + (hasImage ? 'display:none' : '') + '"><div style="font-size:28px">🖼️</div><div>' + (hasImage ? 'Preview unavailable' : 'No image available') + '</div></div>'
+          +        (hasImage ? ('<img src="' + esc(detail.imageUrl) + '" alt="' + esc(detail.productName || 'Ảnh sản phẩm') + '" onerror="this.style.display=\'none\';if(this.nextElementSibling){this.nextElementSibling.style.display=\'flex\';}">') : '')
+          + '      <div class="process-image-empty" style="' + (hasImage ? 'display:none' : '') + '"><div style="font-size:28px">🖼️</div><div>' + (hasImage ? 'Không xem trước được ảnh' : 'Chưa có ảnh') + '</div></div>'
           + '    </div>'
           + '    <div class="process-hero-meta">'
-          + '      <div class="process-keychip">' + esc(detail.key || 'No key') + '</div>'
-          + '      <div class="process-hero-note">Source of truth is sheet <b>Process</b>. Webapp chỉ đọc, chuẩn hóa, và hiển thị trạng thái hiện tại.</div>'
-          +        (detail.imageOriginalUrl ? ('<a class="process-link" href="' + esc(detail.imageOriginalUrl) + '" target="_blank" rel="noopener noreferrer">Open original image</a>') : '')
+          + '      <div class="process-keychip">' + esc(detail.key || 'Chưa có mã') + '</div>'
+          + '      <div class="process-hero-note">Trạng thái Process và hội thoại nội bộ được đồng bộ theo mã sản phẩm.</div>'
+          +        (detail.imageOriginalUrl ? ('<a class="process-link" href="' + esc(detail.imageOriginalUrl) + '" target="_blank" rel="noopener noreferrer">Mở ảnh gốc</a>') : '')
           + '    </div>'
           + '  </aside>'
           + '  <section class="process-summary">'
-          + '    <div class="process-stage-pill">' + esc(detail.displayStageLabel || 'Process detail') + '</div>'
-          + '    <div class="process-product-name">' + esc(detail.productName || 'Unnamed product') + '</div>'
-          + '    <div class="process-barcode">' + esc(detail.barcodeOrUom || 'No Barcode / UOM Information available.') + '</div>'
+          + '    <div class="process-stage-pill">' + esc(detail.displayStageLabel || 'Chi tiết Process') + '</div>'
+          + '    <div class="process-product-name">' + esc(detail.productName || 'Chưa có tên sản phẩm') + '</div>'
+          + '    <div class="process-barcode">' + esc(detail.barcodeOrUom || 'Chưa có Barcode / UOM Information.') + '</div>'
           + '    <div class="process-meta-grid">'
-          + '      <div class="process-meta-card"><div class="process-meta-label">Main Key</div><div class="process-meta-value">' + esc(detail.key || '—') + '</div></div>'
+          + '      <div class="process-meta-card"><div class="process-meta-label">Mã chính</div><div class="process-meta-value">' + esc(detail.key || '—') + '</div></div>'
           + '      <div class="process-meta-card"><div class="process-meta-label">Product Group</div><div class="process-meta-value">' + esc(detail.productGroup || '—') + '</div></div>'
-          + '      <div class="process-meta-card"><div class="process-meta-label">Last Seen</div><div class="process-meta-value">' + esc(detail.lastSeen || '—') + '</div></div>'
-          + '      <div class="process-meta-card"><div class="process-meta-label">Current Sheet</div><div class="process-meta-value">' + esc(detail.currentSheet || '—') + '</div></div>'
-          + '      <div class="process-meta-card"><div class="process-meta-label">Current Status</div><div class="process-meta-value">' + esc(detail.currentStatus || '—') + '</div></div>'
-          + '      <div class="process-meta-card"><div class="process-meta-label">Progress</div><div class="process-meta-value">' + esc(detail.displayStageLabel || '—') + '</div></div>'
+          + '      <div class="process-meta-card"><div class="process-meta-label">Lần cập nhật</div><div class="process-meta-value">' + esc(detail.lastSeen || '—') + '</div></div>'
+          + '      <div class="process-meta-card"><div class="process-meta-label">Bước hiện tại</div><div class="process-meta-value">' + esc(effectiveCurrentSheet || '—') + '</div></div>'
+          + '      <div class="process-meta-card"><div class="process-meta-label">Trạng thái hiện tại</div><div class="process-meta-value">' + esc(detail.currentStatus || '—') + '</div></div>'
+          + '      <div class="process-meta-card"><div class="process-meta-label">Tiến trình</div><div class="process-meta-value">' + esc(detail.displayStageLabel || '—') + '</div></div>'
           + '    </div>'
           + '    <div class="process-timeline-wrap">'
           + '      <div class="process-timeline-head">'
-          + '        <div><div class="process-timeline-title">6-step timeline</div><div class="process-timeline-sub">Category → Manager → Director → Present List → Final Information → Setup Product ID</div></div>'
+          + '        <div><div class="process-timeline-title">Timeline 6 bước</div><div class="process-timeline-sub">Category → Manager → Director → Present List → Final Information → Setup Product ID</div></div>'
           + '      </div>'
           + '      <div class="process-timeline">' + _buildProcessTimelineHtml(detail.stageTimeline) + '</div>'
           + '    </div>'
+          + '    <div class="process-chat-wrap" id="processChatPanel">' + _buildProcessChatHtml() + '</div>'
           + '  </section>'
           + '</div>';
       }
@@ -8637,6 +9805,7 @@
           S.processLookupByRow = {};
           S.processLookupByKey = {};
           S.processLookupWarning = null;
+          S.processLookupLoaded = true;
           _refreshProcessTriggerState();
           render();
           return;
@@ -8645,13 +9814,14 @@
           S.processLookupByRow = {};
           S.processLookupByKey = {};
           S.processLookupWarning = null;
+          S.processLookupLoaded = false;
         }
         var seq = ++S.processLookupSeq;
         google.script.run
           .withSuccessHandler(function (res) {
             if (seq !== S.processLookupSeq) return;
             if (!res) {
-              S.processLookupWarning = { code: 'PROCESS_LOOKUP_NULL', message: 'Process lookup returned null.' };
+              S.processLookupWarning = { code: 'PROCESS_LOOKUP_NULL', message: 'Process lookup không trả dữ liệu.' };
               _refreshProcessTriggerState();
               render();
               return;
@@ -8666,13 +9836,16 @@
             S.processLookupByRow = (res.data && res.data.byRowNumber) || {};
             S.processLookupByKey = (res.data && res.data.byKey) || {};
             S.processLookupWarning = res.data && res.data.warning ? res.data.warning : null;
+            S.processLookupLoaded = true;
             _refreshProcessTriggerState();
+            if (S.modalRow) _syncWorkspaceChatForModalRow(_getSelectedRowSnapshot(S.modalRow));
             render();
           })
           .withFailureHandler(function (e) {
             if (seq !== S.processLookupSeq) return;
             if (handleAuthIssue(e)) return;
             S.processLookupWarning = { code: 'PROCESS_LOOKUP_ERROR', message: (e && e.message) || 'Không thể tải process lookup.' };
+            S.processLookupLoaded = true;
             _refreshProcessTriggerState();
             render();
           })
@@ -8688,8 +9861,8 @@
         var seq = ++S.processProductsSeq;
         S.processProductsLoading = true;
         S.processProductsError = null;
-        if (opts.reset !== false) S.processProducts = [];
-        _renderProcessList();
+        if (opts.reset === true) S.processProducts = [];
+        _renderProcessList({ resetScroll: opts.resetScroll === true });
         _refreshProcessTriggerState();
 
         google.script.run
@@ -8698,10 +9871,10 @@
             if (!res || !res.ok) {
               if (handleAuthIssue(res)) return;
               S.processProductsLoading = false;
-              S.processProductsError = res && res.error ? res.error : { code: 'PROCESS_PRODUCTS_ERROR', message: 'Không thể tải danh sách process.' };
+              S.processProductsError = res && res.error ? res.error : { code: 'PROCESS_PRODUCTS_ERROR', message: 'Không thể tải danh sách Process.' };
               S.processProductsMeta = null;
               S.processProductsLoaded = true;
-              _renderProcessList();
+              _renderProcessList({ resetScroll: opts.resetScroll === true });
               _refreshProcessTriggerState();
               return;
             }
@@ -8711,114 +9884,274 @@
             S.processProductsMeta = res.data || {};
             S.processProductsLoaded = true;
             if (opts.preferKey) S.processActiveKey = _normalizeProcessSearchKey(opts.preferKey);
-            _renderProcessList();
+            var activeKey = _normalizeProcessSearchKey(S.processActiveKey || '');
+            var shouldClearSelection = opts.clearSelectionWhenMissing === true
+              && !!activeKey
+              && !_hasProcessProductInQueue(activeKey);
+            if (shouldClearSelection) {
+              _clearProcessSelectionState({ render: false });
+            }
+            _renderProcessList({ resetScroll: opts.resetScroll === true });
+            if (shouldClearSelection) _renderProcessModalBody(null, null);
             _refreshProcessTriggerState();
           })
           .withFailureHandler(function (e) {
             if (seq !== S.processProductsSeq) return;
             if (handleAuthIssue(e)) return;
             S.processProductsLoading = false;
-            S.processProductsError = { code: 'PROCESS_PRODUCTS_ERROR', message: (e && e.message) || 'Không thể tải danh sách process.' };
+            S.processProductsError = { code: 'PROCESS_PRODUCTS_ERROR', message: (e && e.message) || 'Không thể tải danh sách Process.' };
             S.processProductsMeta = null;
             S.processProductsLoaded = true;
-            _renderProcessList();
+            _renderProcessList({ resetScroll: opts.resetScroll === true });
             _refreshProcessTriggerState();
           })
           .getProcessingProducts({ token: AUTH_TOKEN, query: query, limit: 80 });
       }
+      function _isProcessDetailRequestCurrent(seq, expectedKey) {
+        if (seq !== S.processDetailSeq) return false;
+        var expected = _normalizeProcessSearchKey(expectedKey || '');
+        if (!expected) return true;
+        return _normalizeProcessSearchKey(S.processActiveKey || '') === expected;
+      }
       function _requestProcessDetail(payload, context) {
+        var requestPayload = payload || {};
         var ctx = context || {};
         var fallbackRow = ctx.fallbackRow || null;
         var fallbackSummary = _normalizeProcessCardSummary(ctx.fallbackSummary || null);
-        var searchValue = String(ctx.searchValue == null ? '' : ctx.searchValue).trim();
+        var expectedKey = _normalizeProcessSearchKey(
+          ctx.expectedKey
+          || requestPayload.query
+          || fallbackSummary.key
+          || (fallbackRow ? _getRowProcessPrimaryKey(fallbackRow) : '')
+        );
         var seq = ++S.processDetailSeq;
         S.processLoading = true;
         S.processError = null;
-        S.processDetail = null;
-        if (payload && payload.rowNumber && fallbackRow) {
-          S.processActiveKey = _normalizeProcessSearchKey(_getRowProcessPrimaryKey(fallbackRow));
-        } else if (payload && payload.query) {
-          S.processActiveKey = _normalizeProcessSearchKey(payload.query);
-        }
+        if (ctx.clearDetailOnLoad === true) S.processDetail = null;
+        if (ctx.resetChatOnLoad !== false) _resetProcessChatState();
+        if (expectedKey) S.processActiveKey = expectedKey;
         S.processLastRequest = {
-          payload: Object.assign({}, payload || {}),
+          payload: Object.assign({}, requestPayload),
           fallbackRowNumber: fallbackRow ? fallbackRow._rowNumber : null,
           fallbackSummary: fallbackSummary,
-          searchValue: searchValue,
-          syncInput: ctx.syncInput !== false
+          expectedKey: expectedKey,
+          source: String(ctx.source || 'detail').trim() || 'detail'
         };
-        if (ctx.syncInput !== false && searchValue) _setProcessSearchValue(searchValue);
         _renderProcessModalBody(fallbackRow, fallbackSummary);
-        _renderProcessList();
+        _syncProcessListActiveState();
 
         google.script.run
           .withSuccessHandler(function (res) {
-            if (seq !== S.processDetailSeq) return;
+            if (!_isProcessDetailRequestCurrent(seq, expectedKey)) return;
             if (!res || !res.ok) {
               if (handleAuthIssue(res)) return;
               S.processLoading = false;
-              S.processError = res && res.error ? res.error : { code: 'PROCESS_DETAIL_ERROR', message: 'Không thể tải process detail.' };
+              S.processError = res && res.error ? res.error : { code: 'PROCESS_DETAIL_ERROR', message: 'Không thể tải chi tiết Process.' };
               _renderProcessModalBody(fallbackRow, fallbackSummary);
-              _renderProcessList();
+              _syncProcessListActiveState();
               return;
             }
             S.processLoading = false;
             S.processError = null;
             S.processDetail = _normalizeProcessDetail(res.data, fallbackRow, fallbackSummary);
             if (S.processDetail && S.processDetail.key) S.processActiveKey = _normalizeProcessSearchKey(S.processDetail.key);
-            if (ctx.syncInput !== false && S.processDetail && S.processDetail.key) _setProcessSearchValue(S.processDetail.key);
             _renderProcessModalBody(fallbackRow, fallbackSummary);
-            _renderProcessList();
+            _syncProcessListActiveState();
+            requestProcessChat(S.processDetail);
           })
           .withFailureHandler(function (e) {
-            if (seq !== S.processDetailSeq) return;
+            if (!_isProcessDetailRequestCurrent(seq, expectedKey)) return;
             if (handleAuthIssue(e)) return;
             S.processLoading = false;
-            S.processError = { code: 'PROCESS_DETAIL_ERROR', message: (e && e.message) || 'Không thể tải process detail.' };
+            S.processError = { code: 'PROCESS_DETAIL_ERROR', message: (e && e.message) || 'Không thể tải chi tiết Process.' };
             _renderProcessModalBody(fallbackRow, fallbackSummary);
-            _renderProcessList();
+            _syncProcessListActiveState();
           })
-          .getProcessDetail(Object.assign({ token: AUTH_TOKEN }, payload || {}));
+          .getProcessDetail(Object.assign({ token: AUTH_TOKEN }, requestPayload));
+      }
+      function requestProcessDetail(payload, context) {
+        return _requestProcessDetail(payload, context);
+      }
+      function selectProcessProduct(key, options) {
+        if (!_isProcessTrackingEnabled()) return;
+        var opts = (options && typeof options === 'object') ? options : {};
+        var rawKey = String(key == null ? '' : key).trim();
+        if (!rawKey) return;
+
+        if (!_isProcessModalOpen()) {
+          openProcessModal({ focusSearch: opts.focusSearch === true });
+        }
+
+        var normalizedKey = _normalizeProcessSearchKey(rawKey);
+        var previousActiveKey = _normalizeProcessSearchKey(S.processActiveKey || '');
+        if (normalizedKey) {
+          S.processActiveKey = normalizedKey;
+          _syncProcessListActiveState();
+        }
+
+        if (!opts.forceReload && normalizedKey && normalizedKey === previousActiveKey && S.processLoading) {
+          return;
+        }
+
+        var currentDetailKey = _normalizeProcessSearchKey(S.processDetail && S.processDetail.key);
+        if (!opts.forceReload && normalizedKey && normalizedKey === currentDetailKey && !S.processLoading && !S.processError) {
+          _syncProcessListActiveState();
+          return;
+        }
+
+        var row = null;
+        if (opts.rowNumber) row = _findAnyRowByRn(opts.rowNumber) || _getSelectedRowSnapshot(opts.rowNumber);
+        if (!row) row = _findAnyRowByProcessKey(rawKey);
+        var summary = _findProcessSummaryByKey(rawKey);
+
+        var payload = {};
+        if (row && row._rowNumber) payload.rowNumber = row._rowNumber;
+        else payload.query = rawKey;
+
+        requestProcessDetail(payload, {
+          source: opts.source || 'queue-select',
+          fallbackRow: row,
+          fallbackSummary: summary,
+          expectedKey: normalizedKey,
+          clearDetailOnLoad: true,
+          resetChatOnLoad: true
+        });
+      }
+      function selectProcessQueueItem(key, options) {
+        var opts = Object.assign({ source: 'queue-select', focusSearch: false }, options || {});
+        return selectProcessProduct(key, opts);
+      }
+      function openProcessModal(options) {
+        _openProcessModal(options || {});
+      }
+      function searchProcessQueue(query, options) {
+        if (!_isProcessTrackingEnabled()) return;
+        var opts = (options && typeof options === 'object') ? options : {};
+        openProcessModal({ focusSearch: opts.focusSearch === true });
+
+        var input = document.getElementById('processSearchInput');
+        var resolvedQuery = String(
+          query == null
+            ? (input && input.value ? input.value : S.processSearchValue || '')
+            : query
+        ).trim();
+        _setProcessSearchValue(resolvedQuery);
+
+        _requestProcessingProducts({
+          query: resolvedQuery,
+          syncInput: true,
+          reset: opts.reset !== false,
+          clearSelectionWhenMissing: opts.clearSelectionWhenMissing === true,
+          resetScroll: opts.resetScroll === true,
+          preferKey: opts.preferKey || ''
+        });
       }
       function openProcess(options) {
         if (!_isProcessTrackingEnabled()) return;
         var opts = (options && typeof options === 'object') ? options : {};
         var row = opts.rowNumber ? (_findAnyRowByRn(opts.rowNumber) || _getSelectedRowSnapshot(opts.rowNumber)) : null;
-        var query = String(opts.query || opts.key || (row ? _getRowProcessPrimaryKey(row) : '')).trim();
-        if (!query && opts.keepSearchValue !== true) _setProcessSearchValue('');
-        if (query) _setProcessSearchValue(query);
-        _openProcessModal();
-        S.processLoading = false;
-        S.processError = null;
-        S.processDetail = null;
-        S.processLastRequest = null;
-        S.processActiveKey = '';
-        _requestProcessingProducts({
-          query: query,
-          syncInput: false
-        });
+        openProcessModal({ focusSearch: opts.focusSearch === true });
+
+        if (opts.reloadQueue === true || (!S.processProductsLoaded && !S.processProductsLoading)) {
+          searchProcessQueue(S.processSearchValue || '', {
+            reset: opts.reloadQueue === true,
+            clearSelectionWhenMissing: false,
+            resetScroll: opts.reloadQueue === true,
+            focusSearch: false
+          });
+        } else {
+          _renderProcessList();
+        }
+
+        if (row) {
+          var rowKey = _getRowProcessPrimaryKey(row);
+          if (rowKey) {
+            selectProcessProduct(rowKey, {
+              rowNumber: row._rowNumber,
+              source: 'open-row',
+              forceReload: opts.forceReload === true
+            });
+            return;
+          }
+        }
+
+        var explicitKey = String(opts.key || opts.query || '').trim();
+        if (explicitKey) {
+          selectProcessProduct(explicitKey, {
+            source: 'open-key',
+            forceReload: opts.forceReload === true
+          });
+          return;
+        }
+
+        if (!S.processDetail && !S.processLoading && !S.processError) {
+          _resetProcessChatState();
+          _renderProcessModalBody(null, null);
+        }
       }
       function openProcessKey(key) {
-        openProcess({ query: String(key || '').trim(), keepSearchValue: true });
+        selectProcessProduct(String(key || '').trim(), { source: 'legacy-openProcessKey' });
       }
-      function searchProcess() {
+      function openModalProcessThread() {
+        if (S.modalRow) openProcess({ rowNumber: S.modalRow, forceReload: true, focusSearch: false });
+        else openProcess();
+      }
+      function lookupProcessExactCode(value) {
         if (!_isProcessTrackingEnabled()) return;
-        _openProcessModal();
+        openProcessModal({ focusSearch: true });
         var input = document.getElementById('processSearchInput');
-        var query = String(input && input.value ? input.value : S.processSearchValue || '').trim();
+        var query = String(value == null ? (input && input.value ? input.value : S.processSearchValue || '') : value).trim();
         _setProcessSearchValue(query);
-        S.processDetail = null;
-        S.processError = null;
-        S.processLoading = false;
-        S.processLastRequest = null;
-        S.processActiveKey = '';
-        _requestProcessingProducts({
-          query: query,
-          syncInput: true
+        if (!query) {
+          toast('Nhập mã trước khi tra mã chính xác.', 'info');
+          return;
+        }
+        selectProcessProduct(query, {
+          source: 'exact-lookup',
+          forceReload: true
+        });
+      }
+      function searchProcess(mode) {
+        if (!_isProcessTrackingEnabled()) return;
+        var action = String(mode || '').trim().toLowerCase();
+        if (action === 'exact') {
+          lookupProcessExactCode();
+          return;
+        }
+
+        searchProcessQueue(null, {
+          focusSearch: true,
+          reset: true,
+          clearSelectionWhenMissing: true,
+          resetScroll: true
         });
       }
       function retryProcessDetail() {
-        searchProcess();
+        var last = S.processLastRequest || null;
+        if (last && last.payload) {
+          var fallbackRow = null;
+          if (last.fallbackRowNumber) {
+            fallbackRow = _findAnyRowByRn(last.fallbackRowNumber) || _getSelectedRowSnapshot(last.fallbackRowNumber);
+          }
+          if (!fallbackRow && last.expectedKey) fallbackRow = _findAnyRowByProcessKey(last.expectedKey);
+          requestProcessDetail(last.payload, {
+            source: 'detail-retry',
+            fallbackRow: fallbackRow,
+            fallbackSummary: last.fallbackSummary || null,
+            expectedKey: last.expectedKey || '',
+            clearDetailOnLoad: true,
+            resetChatOnLoad: true
+          });
+          return;
+        }
+        if (S.processActiveKey) {
+          selectProcessProduct(S.processActiveKey, {
+            source: 'detail-retry',
+            forceReload: true
+          });
+          return;
+        }
+        lookupProcessExactCode();
       }
       function closeProcessModal(evt) {
         if (evt && evt.currentTarget && evt.target !== evt.currentTarget) return;
@@ -8826,6 +10159,8 @@
         if (!overlay) return;
         overlay.classList.remove('open');
         S.processModalOpen = false;
+        S.processDetailSeq++;
+        S.processChatSeq++;
       }
       function _extractRefProductId(raw) {
         var s = String(raw === null || raw === undefined ? '' : raw).trim();
@@ -9474,8 +10809,8 @@
           modeBadge.style.background = USER_CAN_EDIT ? '#eff6ff' : '#f8fafc';
           modeBadge.style.borderColor = USER_CAN_EDIT ? '#bfdbfe' : '#cbd5e1';
           modeBadgeLabel.style.color = USER_CAN_EDIT ? '#1d4ed8' : '#475569';
-          modeBadgeLabel.textContent = SELECTED_VIEW_NAME + ' · ' + (USER_CAN_EDIT ? 'Editable' : 'Read only');
-          modeBadge.title = 'Sheet: ' + (S.meta.sheetName || SELECTED_SHEET_NAME || '-') + (SELECTED_EDIT_RULE ? (' | Edit rule: ' + SELECTED_EDIT_RULE) : ' | Edit rule: read only');
+          modeBadgeLabel.textContent = SELECTED_VIEW_NAME + ' · ' + (USER_CAN_EDIT ? 'Có thể sửa' : 'Chỉ xem');
+          modeBadge.title = 'Sheet: ' + (S.meta.sheetName || SELECTED_SHEET_NAME || '-') + (SELECTED_EDIT_RULE ? (' | Quyền sửa: ' + SELECTED_EDIT_RULE) : ' | Quyền sửa: chỉ xem');
         }
         if (!USER_CAN_EDIT) {
           S.pending = {};
@@ -9519,15 +10854,13 @@
         _syncModalReadonlyState_();
         var step2Btn = document.getElementById('mStepBtn2');
         if (step2Btn) step2Btn.disabled = !USER_CAN_EDIT;
-        var ssvCard = document.getElementById('mc_ssvnote');
-        if (ssvCard) ssvCard.style.opacity = USER_CAN_EDIT ? '1' : '.65';
         document.querySelectorAll('#overlay button[onclick="App.saveModal()"], #overlay button[onclick="App.saveAll()"], #overlay button[onclick="App.resetModal()"]').forEach(function (btn) {
           btn.disabled = !USER_CAN_EDIT;
           btn.title = USER_CAN_EDIT ? '' : 'View hiện tại đang ở chế độ chỉ xem';
         });
         var saveMeta = document.getElementById('mSaveTime');
         if (!USER_CAN_EDIT && saveMeta) {
-          saveMeta.textContent = 'Read only mode - this workspace does not allow editing.';
+          saveMeta.textContent = 'Chế độ chỉ xem - workspace hiện tại không cho phép chỉnh sửa.';
         }
         if (!USER_CAN_EDIT && S.detailStep === 2) setDetailStep(1);
       }
@@ -9976,8 +11309,7 @@
         'PricingStrategy': PRICING_STRATEGY_FIELD,
         'Comp': 'Competitors (Retail Price) <Tên đối thủ: Giá tiền>',
         'FCUPSD': 'FC UPSD of NEW SKU',
-        'Pattern': 'Pattern',
-        'SSVNote': 'SSV Note Product'
+        'Pattern': 'Pattern'
       };
 
       var BF_LABELS = {
@@ -9988,7 +11320,7 @@
           'RetailT6': 'Price T6', 'DisplayArea': 'Display Aera',
           'LogisticS': 'Logistics S', 'LogisticN': 'Logistics N',
           'WhyList': 'Why List', 'PICName': 'PIC Name', 'RefID': 'Ref ID', 'SamePrice': 'Same Price',
-            'Desc': 'Desc', 'OtherIncome': 'Other Income', 'PricingStrategy': 'Pricing Strategy', 'Comp': 'Competitors', 'FCUPSD': 'FC UPSD', 'Pattern': 'Pattern', 'SSVNote': 'SSV Note'
+            'Desc': 'Desc', 'OtherIncome': 'Other Income', 'PricingStrategy': 'Pricing Strategy', 'Comp': 'Competitors', 'FCUPSD': 'FC UPSD', 'Pattern': 'Pattern'
       };
 
       var REQUIRED_PRODUCT_FIELDS = [
@@ -10235,7 +11567,7 @@
         if (bw) baseLines.push('BaseWeight: ' + bw);
         var bd = _buildDimensionText(base.l, base.w, base.h);
         if (bd) baseLines.push('Base Dimension: ' + bd);
-        if (_trimSafe(base.imageUrl)) baseLines.push('Product Image: ' + _trimSafe(base.imageUrl));
+        if (_trimSafe(base.imageUrl)) baseLines.push('Ảnh sản phẩm: ' + _trimSafe(base.imageUrl));
         if (baseLines.length) blocks.push(baseLines.join('\n'));
 
         (Array.isArray(s.extras) ? s.extras : []).forEach(function (item, i) {
@@ -10403,7 +11735,7 @@
         }
         if (dirtyKeys.length) {
           if (selRns.length && affectedCount === 0) warnings.push('Current template matches every selected product. Nothing new would be applied.');
-          if (selRns.length >= 15 && dirtyKeys.length >= 6) warnings.push('High-impact batch. Review scope and impact carefully before apply.');
+          if (selRns.length >= 15 && dirtyKeys.length >= 6) warnings.push('Batch có ảnh hưởng lớn. Vui lòng kiểm tra kỹ phạm vi và tác động trước khi áp dụng.');
         }
         warnings = _dedupeMessages(warnings);
 
@@ -10423,7 +11755,7 @@
         } else if (dirtyKeys.length) {
           stateClass = 'state-ready';
           stateLabel = 'Ready to apply';
-          stateNote = dirtyKeys.length + ' field(s) will update ' + affectedCount + ' of ' + selRns.length + ' selected product(s).';
+          stateNote = dirtyKeys.length + ' trường sẽ cập nhật ' + affectedCount + ' / ' + selRns.length + ' sản phẩm đã chọn.';
         }
 
         return {
@@ -11357,7 +12689,7 @@
         'Display area (POG CONCEPT) Bắt Buộc', 'Logistics Group South',
         'Logistics Group North', 'Why Do We List This Product?',
         'Other Income + Listing Fee', 'Pricing Strategy',
-        'FC UPSD of NEW SKU', 'SAME PRICE PRODUCT', 'Pattern', 'SSV Note Product'
+        'FC UPSD of NEW SKU', 'SAME PRICE PRODUCT', 'Pattern'
       ];
 
       /* Reverse map: sheet field → bf_ key */
@@ -11441,7 +12773,6 @@
         'Other Income + Listing Fee': 'Other_Income_Listing_Fee',
         'Pattern': 'Pattern',
         'SAME PRICE PRODUCT': 'Same_Price_Product',
-        'SSV Note Product': 'ssv_note',
         'Logistics Group South': 'Logistics_South', 'Logistics Group North': 'Logistics_North',
         'FC UPSD of NEW SKU': 'FC_UPSD', 'Display area (POG CONCEPT) Bắt Buộc': 'Display_area',
         'Inventory Type': 'Inventory_Type',
@@ -12625,14 +13956,6 @@
             { field: 'UOM Information', multiline: true }
           ]
         },
-        {
-          title: 'Internal Notes',
-          subtitle: 'Operational notes captured for internal execution and follow-up.',
-          wide: true,
-          fields: [
-            { field: 'SSV Note Product', multiline: true }
-          ]
-        }
       ];
 
       function _getOverviewContextValue(values, row, field, rowKeys) {
@@ -12710,7 +14033,7 @@
         if (['PRIMARY USAGE SEGMENT', 'TARGET STORE TYPES', 'TARGET CUSTOMER STORE TYPES'].indexOf(field) >= 0) return 'Store & Customer Targeting';
         if (['Retail Price (+VAT) in Tier 6', 'FC UPSD of NEW SKU', 'Competitors (Retail Price) <Tên đối thủ: Giá tiền>', OTHER_INCOME_FIELD].indexOf(field) >= 0) return 'Commercial & Pricing';
         if ([PRICING_STRATEGY_FIELD, POG_PRODUCT_FIELD, POG_ACTION_FIELD].indexOf(field) >= 0) return 'Pricing & POG Decision';
-        if (['Display area (POG CONCEPT) Bắt Buộc', 'Inventory Type', 'Preservation temperature', 'Logistics Group South', 'Logistics Group North', 'Pattern', 'SSV Note Product'].indexOf(field) >= 0) return 'Operations & Logistics';
+        if (['Display area (POG CONCEPT) Bắt Buộc', 'Inventory Type', 'Preservation temperature', 'Logistics Group South', 'Logistics Group North', 'Pattern'].indexOf(field) >= 0) return 'Operations & Logistics';
         if (field === 'UOM Information') return 'UOM / Packaging / Barcode / Image';
         return 'Review';
       }
@@ -12789,8 +14112,7 @@
           OTHER_INCOME_FIELD,
           POG_PRODUCT_FIELD,
           POG_ACTION_FIELD,
-          'UOM Information',
-          'SSV Note Product'
+          'UOM Information'
         ].indexOf(field) >= 0;
       }
 
@@ -12839,7 +14161,7 @@
               if (isKey) rowClasses.push('is-key');
 
               var tags = ['<span class="s1-state-tag is-workspace">Workspace</span>'];
-              if (isEdited) tags.push('<span class="s1-state-tag is-edited">Edited</span>');
+              if (isEdited) tags.push('<span class="s1-state-tag is-edited">Đã sửa</span>');
               if (isEmpty) tags.push('<span class="s1-state-tag is-empty">Pending input</span>');
               if (isKey) tags.push('<span class="s1-state-tag is-key">' + (multiline ? 'Long text' : 'Key field') + '</span>');
               tagsHtml = '<div class="s1-field-tags">' + tags.join('') + '</div>';
@@ -12996,7 +14318,7 @@
           tone = 'warn';
           label = missingFields.length ? 'Needs input' : 'Review warnings';
           hint = missingFields.length
-            ? ('Complete ' + missingFields.length + ' required field(s) in this step.')
+            ? ('Hoàn tất ' + missingFields.length + ' trường bắt buộc trong bước này.')
             : warningList[0];
         } else if (diffList.length) {
           tone = 'ready';
@@ -13046,7 +14368,7 @@
         if (state.changesCount) {
           items.push({
             tone: 'ready',
-            text: state.changesCount + ' field(s) updated in this step.'
+            text: state.changesCount + ' trường đã cập nhật trong bước này.'
           });
         }
         state.missingFields.slice(0, 2).forEach(function (field) {
@@ -13287,7 +14609,7 @@
         if (linkEl) {
           var shouldShowImageLink = !!rawUrl && previewUrl !== rawUrl;
           if (shouldShowImageLink) {
-            linkEl.textContent = 'Open original image';
+            linkEl.textContent = 'Mở ảnh gốc';
             linkEl.href = rawUrl;
             linkEl.style.display = 'inline-flex';
           } else {
@@ -13370,7 +14692,7 @@
       var MG_FIELDS = {
         1: ['Status', 'Present Date', 'New product type', 'Sub Category', 'PIC input Product Name (Dưới 40 kí tự)', 'REFERENCE PRODUCT ID (Nếu không có điền NO)', 'SAME PRICE PRODUCT'],
         2: ['Premium products', 'Branded', 'Why Do We List This Product?', 'Product description (Dưới 250 Kí tự)', OTHER_INCOME_FIELD, 'PRIMARY USAGE SEGMENT', 'TARGET STORE TYPES', 'TARGET CUSTOMER STORE TYPES', 'Retail Price (+VAT) in Tier 6', 'FC UPSD of NEW SKU', 'Competitors (Retail Price) <Tên đối thủ: Giá tiền>'],
-        3: ['Display area (POG CONCEPT) Bắt Buộc', 'Inventory Type', 'Preservation temperature', 'Logistics Group South', 'Logistics Group North', 'Pattern', PRICING_STRATEGY_FIELD, POG_PRODUCT_FIELD, POG_ACTION_FIELD, 'UOM Information', 'SSV Note Product']
+        3: ['Display area (POG CONCEPT) Bắt Buộc', 'Inventory Type', 'Preservation temperature', 'Logistics Group South', 'Logistics Group North', 'Pattern', PRICING_STRATEGY_FIELD, POG_PRODUCT_FIELD, POG_ACTION_FIELD, 'UOM Information']
       };
       /* MC id map for dirty marking */
       var MC_FIELD_MAP = {
@@ -13401,8 +14723,7 @@
         'Logistics Group North': 'mc_logn',
         'Pattern': 'mc_pattern',
         'POG_Choose Reduce product facing': 'mc_pogmodule',
-        'POG_Choose type Reduce product facing': 'mc_pogmodule',
-        'SSV Note Product': 'mc_ssvnote'
+        'POG_Choose type Reduce product facing': 'mc_pogmodule'
       };
 
       function refreshDirtyState(row) {
@@ -13557,6 +14878,7 @@
         updateStats();
         // Save time
         var st = document.getElementById('mSaveTime'); if (st) st.textContent = '';
+        _syncWorkspaceChatForModalRow(row);
       }
       function trackChanges() {
         function refreshCurrentRowDirty() {
@@ -13594,6 +14916,7 @@
         ov.style.opacity = '0';
         setTimeout(function () { ov.classList.remove('open'); ov.style.opacity = ''; ov.style.transition = ''; }, 160);
         S.modalRow = null;
+        _resetWorkspaceChatState('empty');
       }
       function resetModal() {
         var rn = S.modalRow; if (!rn) return;
@@ -13907,6 +15230,7 @@
         S.processLookupByRow = {};
         S.processLookupByKey = {};
         S.processLookupWarning = null;
+        S.processLookupLoaded = false;
         S.processProducts = [];
         S.processProductsMeta = null;
         S.processProductsLoading = false;
@@ -13918,6 +15242,16 @@
         S.processLastRequest = null;
         S.processActiveKey = '';
         S.processSearchValue = '';
+        S.processChatSeq++;
+        S.processChatKey = '';
+        S.processChatLoading = false;
+        S.processChatError = null;
+        S.processChatHistory = null;
+        S.processChatBusy = false;
+        S.processChatEditId = '';
+        S.processChatDraft = '';
+        S.processChatEditDraft = '';
+        _resetWorkspaceChatState('empty');
         if (_isProcessModalOpen()) closeProcessModal();
         document.getElementById('skArea').style.display = ''; document.getElementById('mainArea').style.display = 'none';
 
@@ -14049,8 +15383,19 @@
         goSection: goSection, clearActiveProduct: clearActiveProduct, openViewSelector: openViewSelector,
         selectBatchPreviewProduct: selectBatchPreviewProduct,
         openSelectedModal: openSelectedModal, previewSelected: previewSelected,
-        openProcess: openProcess, openProcessKey: openProcessKey, copyProcessKey: copyProcessKey, closeProcessModal: closeProcessModal, searchProcess: searchProcess,
-        retryProcessLookup: retryProcessLookup, retryProcessDetail: retryProcessDetail
+        openProcess: openProcess, openProcessModal: openProcessModal, openProcessKey: openProcessKey,
+        searchProcess: searchProcess, searchProcessQueue: searchProcessQueue,
+        selectProcessProduct: selectProcessProduct, selectProcessQueueItem: selectProcessQueueItem,
+        requestProcessDetail: requestProcessDetail, requestProcessChat: requestProcessChat,
+        openModalProcessThread: openModalProcessThread, openWorkspaceFromProcess: openWorkspaceFromProcess,
+        lookupProcessExactCode: lookupProcessExactCode,
+        copyProcessKey: copyProcessKey, closeProcessModal: closeProcessModal,
+        retryProcessLookup: retryProcessLookup, retryProcessDetail: retryProcessDetail, retryProcessChat: retryProcessChat,
+        sendProcessChatMessage: sendProcessChatMessage, startProcessChatEdit: startProcessChatEdit, cancelProcessChatEdit: cancelProcessChatEdit,
+        saveProcessChatEdit: saveProcessChatEdit, deleteProcessChatMessage: deleteProcessChatMessage,
+        retryWorkspaceChat: retryWorkspaceChat, sendWorkspaceChatMessage: sendWorkspaceChatMessage,
+        startWorkspaceChatEdit: startWorkspaceChatEdit, cancelWorkspaceChatEdit: cancelWorkspaceChatEdit,
+        saveWorkspaceChatEdit: saveWorkspaceChatEdit, deleteWorkspaceChatMessage: deleteWorkspaceChatMessage
       };
     })();
   </script>

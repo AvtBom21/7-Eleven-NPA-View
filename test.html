@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Highlands to Coast | Vietnamese Specialties</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.33/dist/lenis.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Urbanist:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body { 
+            font-family: 'Urbanist', sans-serif; 
+            background-color: #060a07; 
+            color: #fff;
+            overflow-x: hidden;
+        }
+        h1, h2, .font-luxury { font-family: 'Marcellus', serif; }
+
+        /* The Animated Path */
+        .journey-track {
+            position: fixed;
+            left: 50px;
+            top: 15%;
+            height: 70%;
+            width: 2px;
+            background: rgba(255,255,255,0.1);
+            z-index: 100;
+        }
+        #journey-progress {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            background: #eab308; /* Yellow-500 */
+            height: 0%;
+        }
+        .journey-icon {
+            position: absolute;
+            left: -14px;
+            width: 30px;
+            height: 30px;
+            background: #060a07;
+            border: 2px solid #eab308;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #eab308;
+            transition: 0.3s;
+        }
+
+        /* Section Backgrounds */
+        .section-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 110%;
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+            filter: brightness(0.6);
+        }
+
+        .food-img-float {
+            filter: drop-shadow(0 20px 50px rgba(0,0,0,0.8));
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .food-img-float:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .glass-ui {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDE JOURNEY PROCESS -->
+    <div class="journey-track hidden lg:block">
+        <div id="journey-progress"></div>
+        <div class="journey-icon" style="top: 0%" id="icon-mountain"><i class="fa-solid fa-mountain"></i></div>
+        <div class="journey-icon" style="top: 100%" id="icon-sea"><i class="fa-solid fa-water"></i></div>
+    </div>
+
+    <!-- HEADER -->
+    <nav class="fixed w-full z-50 p-10 flex justify-between items-center">
+        <div class="text-2xl font-bold tracking-widest font-luxury">VIET<span class="text-yellow-500">SELECT</span></div>
+        <div class="space-x-12 uppercase text-xs tracking-[0.3em] font-bold">
+            <a href="#gia-lai" class="hover:text-yellow-500 transition">Gia Lai</a>
+            <a href="#binh-dinh" class="hover:text-yellow-500 transition">Binh Dinh</a>
+            <button class="bg-yellow-500 text-black px-6 py-2 rounded-full"><i class="fa-solid fa-cart-shopping"></i></button>
+        </div>
+    </nav>
+
+    <!-- GIA LAI SECTION: MOUNTAIN & BEEF -->
+    <section id="gia-lai" class="relative min-h-screen flex items-center px-20 overflow-hidden">
+        <!-- Mountain Background (No Sea) -->
+        <div class="section-bg" style="background-image: url('https://images.unsplash.com/photo-1580910542947-d35270183350?q=80&w=2070&auto=format&fit=crop');"></div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-20 items-center z-10 w-full">
+            <div class="reveal-left">
+                <h4 class="text-yellow-500 tracking-[0.4em] font-bold mb-4">HIGHLAND SPECIALTY</h4>
+                <h1 class="text-8xl font-luxury mb-6">Gia Lai <br> <span class="text-outline">Forests</span></h1>
+                <p class="text-gray-300 text-lg max-w-md mb-8">Home to the "Bò Một Nắng" (One-sun beef) and Muối Kiến Vàng. Authentic flavors from the volcanic red soil mountains.</p>
+                <div class="flex gap-4">
+                    <button class="border border-yellow-500 px-8 py-4 rounded-full text-yellow-500 hover:bg-yellow-500 hover:text-black transition">VIEW ALL FOOD</button>
+                </div>
+            </div>
+            
+            <div class="relative flex justify-center reveal-right">
+                <img src="https://vcdn1-dulich.vnecdn.net/2022/04/14/kho-bo-3-7864-1649931327.jpg?w=1200" alt="Gia Lai Beef" class="w-[450px] food-img-float rounded-2xl">
+                <div class="absolute -bottom-10 -left-10 glass-ui p-6 rounded-xl">
+                    <p class="text-xs text-yellow-500 font-bold uppercase mb-1">Top Rated</p>
+                    <p class="font-luxury text-xl">Sun-Dried Beef</p>
+                    <p class="text-gray-400">$22.00</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TRANSITION / PROCESS INTERMISSION -->
+    <div class="h-64 flex items-center justify-center bg-zinc-950">
+        <div class="text-center">
+            <div class="h-20 w-[1px] bg-yellow-500 mx-auto mb-6"></div>
+            <p class="text-xs tracking-[0.5em] text-gray-500 uppercase">Descending from the Highlands</p>
+        </div>
+    </div>
+
+    <!-- BINH DINH SECTION: MOUNTAIN + SEA -->
+    <section id="binh-dinh" class="relative min-h-screen flex items-center px-20 overflow-hidden">
+        <!-- Binh Dinh Background (Mountain meets Sea) -->
+        <div class="section-bg opacity-80" style="background-image: url('https://vcdn1-dulich.vnecdn.net/2021/04/23/VnExpress-EoGio-2-1619163273.jpg?w=1200&h=0&q=100&dpr=1&fit=crop&s=U_A01G8m7n42W2Y7-r_jLw');"></div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-20 items-center z-10 w-full">
+            <div class="relative flex justify-center order-2 md:order-1 reveal-left">
+                <img src="https://static.vinwonders.com/production/banh-xeo-tom-nhay-quy-nhon-2.jpg" alt="Binh Dinh Pancake" class="w-[450px] food-img-float rounded-2xl">
+                <div class="absolute -top-10 -right-10 glass-ui p-6 rounded-xl border-blue-400/30">
+                    <p class="text-xs text-blue-400 font-bold uppercase mb-1">Coastal Favorite</p>
+                    <p class="font-luxury text-xl">Jumping Shrimp Pancake</p>
+                    <p class="text-gray-400">$14.00</p>
+                </div>
+            </div>
+
+            <div class="text-right order-1 md:order-2 reveal-right">
+                <h4 class="text-blue-400 tracking-[0.4em] font-bold mb-4">OCEAN & CLIFFS</h4>
+                <h1 class="text-8xl font-luxury mb-6">Binh Dinh <br> <span class="text-outline">Coastal</span></h1>
+                <p class="text-gray-300 text-lg max-w-md ml-auto mb-8">Where the mountains touch the East Sea. Famous for Bánh Xèo, Nem Chợ Huyện, and the freshest seafood in Central Vietnam.</p>
+                <button class="bg-blue-600 px-8 py-4 rounded-full text-white hover:bg-white hover:text-blue-600 transition">TASTE THE OCEAN</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="py-20 bg-black text-center relative overflow-hidden">
+        <h2 class="text-5xl font-luxury mb-8">The Journey of Flavor</h2>
+        <div class="flex justify-center gap-10 opacity-50">
+            <p>GIA LAI</p>
+            <div class="w-20 h-[1px] bg-white my-auto"></div>
+            <p>BINH DINH</p>
+        </div>
+    </footer>
+
+    <script>
+        // 1. Smooth Scroll
+        const lenis = new Lenis();
+        function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+
+        // 2. GSAP Animations
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Journey Path Automation
+        gsap.to("#journey-progress", {
+            height: "100%",
+            ease: "none",
+            scrollTrigger: {
+                trigger: "body",
+                start: "top top",
+                end: "bottom bottom",
+                scrub: 0.3
+            }
+        });
+
+        // Icon State Automation
+        ScrollTrigger.create({
+            trigger: "#binh-dinh",
+            start: "top center",
+            onEnter: () => {
+                gsap.to("#icon-mountain", { opacity: 0.3, scale: 0.8 });
+                gsap.to("#icon-sea", { backgroundColor: "#3b82f6", scale: 1.2, borderColor: "#3b82f6", color: "#fff" });
+                gsap.to("body", { backgroundColor: "#020617", duration: 1.5 });
+            },
+            onLeaveBack: () => {
+                gsap.to("#icon-mountain", { opacity: 1, scale: 1.2 });
+                gsap.to("#icon-sea", { backgroundColor: "#060a07", scale: 1, borderColor: "#eab308", color: "#eab308" });
+                gsap.to("body", { backgroundColor: "#060a07", duration: 1.5 });
+            }
+        });
+
+        // Content Reveal
+        const revealLeft = document.querySelectorAll(".reveal-left");
+        revealLeft.forEach(el => {
+            gsap.from(el, {
+                x: -100, opacity: 0, duration: 1.5,
+                scrollTrigger: { trigger: el, start: "top 80%" }
+            });
+        });
+
+        const revealRight = document.querySelectorAll(".reveal-right");
+        revealRight.forEach(el => {
+            gsap.from(el, {
+                x: 100, opacity: 0, duration: 1.5,
+                scrollTrigger: { trigger: el, start: "top 80%" }
+            });
+        });
+
+        // Parallax Backgrounds
+        gsap.to(".section-bg", {
+            yPercent: 15,
+            ease: "none",
+            scrollTrigger: {
+                trigger: "section",
+                scrub: true
+            }
+        });
+    </script>
+</body>
+</html>

@@ -10,6 +10,9 @@ var CONFIG = {
   DROPDOWN_SHEET: 'Dropdown_Master',
   USER_MASTER_SHEET: 'User_Master',
   AUDIT_LOG_SHEET: 'Audit_Log',
+  SHEET_NAME_DATABASE: 'Database',
+  CHAT_LOG_SHEET: 'Log_Chat',
+  CHAT_FIELD_NAME: 'SSV Note Product',
   UOM_IMAGE_FOLDER_ID: '1WDIup4xssu-HLNGTOND3G9bIFIJfQF0g',
   MAX_LOG_ENTRIES: 20,
   PAGE_SIZE: 50,
@@ -511,7 +514,6 @@ var PIC_EDITABLE_FIELDS = [
   'Competitors (Retail Price) <Tên đối thủ: Giá tiền>',
   'Product description (Dưới 250 Kí tự)',
   'Pattern',
-  'SSV Note Product',
   'Logistics Group South',
   'Logistics Group North',
   'FC UPSD of NEW SKU',
@@ -1365,6 +1367,12 @@ function _findHeaderIndexLoose_(headers, fieldName) {
   return -1;
 }
 
+function _isProtectedChatField_(fieldName) {
+  var target = String(CONFIG.CHAT_FIELD_NAME || 'SSV Note Product').trim().replace(/\s+/g, ' ').toLowerCase();
+  var candidate = String(fieldName || '').trim().replace(/\s+/g, ' ').toLowerCase();
+  return !!target && candidate === target;
+}
+
 // ========================================
 // PROCESS TRACKING API
 // ========================================
@@ -1514,14 +1522,7 @@ function _normalizeProcessSheetName_(value) {
 }
 
 function _normalizeProcessStatus_(value) {
-  var raw = String(value == null ? '' : value).trim();
-  var loose = _normalizeProcessLooseText_(raw);
-  var compact = loose.replace(/\s+/g, '');
-  if (!compact) return '';
-  if (compact.indexOf('reject') >= 0) return 'Rejected';
-  if (compact === 'processing' || compact === 'pending' || compact === 'inprogress' || compact === 'process') return 'Processing';
-  if (compact === 'done' || compact === 'completed' || compact === 'complete') return 'Done';
-  return raw;
+  return _normalizeBusinessFlowStatus_(value).statusNormalized;
 }
 
 function _getProcessStageOrder_(sheetName) {
@@ -1532,71 +1533,161 @@ function _getProcessStageOrder_(sheetName) {
   return -1;
 }
 
-function _getDisplayedProcessLabel_(sheetName, status) {
-  var canonicalSheet = _normalizeProcessSheetName_(sheetName);
-  var displaySheet = canonicalSheet || String(sheetName || '').trim();
-  var normalizedStatus = _normalizeProcessStatus_(status);
-  var displayStatus = String(normalizedStatus || status || '').trim();
-  var order = _getProcessStageOrder_(canonicalSheet);
+function _normalizeBusinessFlowStatus_(value) {
+  var raw = String(value == null ? '' : value).replace(/\s+/g, ' ').trim();
+  var loose = _normalizeProcessLooseText_(raw);
+  var compact = loose.replace(/\s+/g, '');
+  var normalized = raw;
+  var category = 'OTHER';
+
+  if (!compact) {
+    normalized = '';
+    category = 'BLANK';
+  } else if (compact.indexOf('reject') >= 0) {
+    normalized = 'Rejected';
+    category = 'REJECTED';
+  } else if (compact === 'processing' || compact === 'process' || compact === 'inprogress' || compact === 'inprocess' || compact === 'progressing') {
+    normalized = 'Processing';
+    category = 'PROCESSING_FORWARD';
+  } else if (compact === 'done' || compact === 'complete' || compact === 'completed') {
+    normalized = 'Done';
+    category = 'DONE';
+  } else if (compact === 'pending' || compact === 'wait' || compact === 'waiting') {
+    normalized = 'Pending';
+    category = 'PENDING';
+  } else if (compact === 'approved' || compact === 'approve') {
+    normalized = 'Approved';
+    category = 'APPROVED';
+  }
+
+  return {
+    raw: raw,
+    statusNormalized: normalized,
+    statusCategory: category
+  };
+}
+
+function _getSelectedBusinessSheetForAccess_(access) {
+  var selected = String(access && access.selectedSheetName ? access.selectedSheetName : '').trim();
+  if (selected) return _normalizeProcessSheetName_(selected) || selected;
+  var viewCode = _getSelectedViewCode_(access);
+  if (viewCode === 'MAN') return 'Manager';
+  if (viewCode === 'DIR') return 'Director';
+  return 'Category';
+}
+
+function _resolveBusinessFlowState_(storedSheet, status, options) {
+  var opts = options || {};
+  var rawStoredSheet = String(storedSheet == null ? '' : storedSheet).replace(/\s+/g, ' ').trim();
+  var normalizedStoredSheet = _normalizeProcessSheetName_(rawStoredSheet);
+  var stored = normalizedStoredSheet || rawStoredSheet;
+  var statusInfo = _normalizeBusinessFlowStatus_(status);
+  var storedIndex = _getProcessStageOrder_(stored);
   var lastIndex = PROCESS_TRACKING_STAGES.length - 1;
+  var nextSheet = (storedIndex >= 0 && storedIndex < lastIndex) ? PROCESS_TRACKING_STAGES[storedIndex + 1] : '';
+  var isRejected = statusInfo.statusCategory === 'REJECTED';
+  var isProcessingForward = statusInfo.statusCategory === 'PROCESSING_FORWARD';
+  var effectiveSheet = stored;
+  var effectiveIndex = storedIndex;
+  var warnings = [];
 
-  if (normalizedStatus === 'Rejected') {
-    return displaySheet ? ('Rejected at ' + displaySheet) : 'Rejected';
+  if (!stored) {
+    warnings.push('MISSING_STORED_SHEET');
+  } else if (storedIndex < 0) {
+    warnings.push('UNKNOWN_STORED_SHEET');
   }
 
-  if (order >= 0) {
-    if (order === lastIndex) {
-      if (normalizedStatus === 'Done') return 'Setup Product ID Done';
-      if (normalizedStatus === 'Processing') return 'Setup Product ID Pending';
-    } else if (normalizedStatus === 'Processing' || normalizedStatus === 'Done') {
-      return PROCESS_TRACKING_STAGES[order + 1] + ' Pending';
-    }
+  if (isProcessingForward && nextSheet) {
+    effectiveSheet = nextSheet;
+    effectiveIndex = storedIndex + 1;
+  } else if (isProcessingForward && !nextSheet) {
+    warnings.push('PROCESSING_AT_LAST_STAGE');
   }
 
-  if (displaySheet && displayStatus) return displaySheet + ' | ' + displayStatus;
-  if (displaySheet) return displaySheet;
-  if (displayStatus) return displayStatus;
+  var selectedSheet = String(opts.selectedSheet == null ? '' : opts.selectedSheet).replace(/\s+/g, ' ').trim();
+  selectedSheet = _normalizeProcessSheetName_(selectedSheet) || selectedSheet;
+  var selectedMatchesEffective = !!(selectedSheet && effectiveSheet && _normalizeCategoryKey_(selectedSheet) === _normalizeCategoryKey_(effectiveSheet));
+
+  var state = {
+    storedSheet: stored,
+    storedSheetRaw: rawStoredSheet,
+    storedStageIndex: storedIndex,
+    effectiveSheet: effectiveSheet,
+    effectiveStageIndex: effectiveIndex,
+    statusRaw: statusInfo.raw,
+    statusNormalized: statusInfo.statusNormalized,
+    statusCategory: statusInfo.statusCategory,
+    isRejected: isRejected,
+    isProcessingForward: isProcessingForward,
+    isTerminal: isRejected || statusInfo.statusCategory === 'DONE' || (isProcessingForward && !nextSheet),
+    nextSheet: nextSheet,
+    selectedSheet: selectedSheet,
+    shouldUseWorkspaceChat: selectedMatchesEffective,
+    shouldUseProcessChat: selectedSheet ? !selectedMatchesEffective : false,
+    warnings: warnings
+  };
+  state.displayStageLabel = _getBusinessFlowDisplayLabel_(state);
+  state.stageTimeline = _buildBusinessFlowStageTimeline_(state);
+  return state;
+}
+
+function _getBusinessFlowDisplayLabel_(state) {
+  var st = state || {};
+  var sheet = st.effectiveSheet || st.storedSheet || '';
+  if (st.isRejected) return st.storedSheet ? ('Rejected at ' + st.storedSheet) : 'Rejected';
+  if (st.isProcessingForward && st.nextSheet) return st.nextSheet + ' Pending';
+  if (st.isProcessingForward && !st.nextSheet) return st.storedSheet ? (st.storedSheet + ' Processing') : 'Processing';
+  if (st.statusCategory === 'DONE') return st.storedSheet ? (st.storedSheet + ' Done') : 'Done';
+  if (st.statusCategory === 'PENDING') return sheet ? (sheet + ' Pending') : 'Pending';
+  if (sheet && st.statusNormalized) return sheet + ' | ' + st.statusNormalized;
+  if (sheet) return sheet;
+  if (st.statusNormalized) return st.statusNormalized;
   return 'Process unavailable';
 }
 
-function _buildProcessStageTimeline_(sheetName, status) {
-  var canonicalSheet = _normalizeProcessSheetName_(sheetName);
-  var normalizedStatus = _normalizeProcessStatus_(status);
-  var order = _getProcessStageOrder_(canonicalSheet);
-  var lastIndex = PROCESS_TRACKING_STAGES.length - 1;
+function _buildBusinessFlowStageTimeline_(state) {
+  var st = state || {};
   var timeline = [];
-  var i;
-
-  for (i = 0; i < PROCESS_TRACKING_STAGES.length; i++) {
-    timeline.push({
-      name: PROCESS_TRACKING_STAGES[i],
-      state: 'pending'
-    });
+  for (var i = 0; i < PROCESS_TRACKING_STAGES.length; i++) {
+    timeline.push({ name: PROCESS_TRACKING_STAGES[i], state: 'pending' });
   }
 
-  if (order < 0) return timeline;
+  var storedIndex = parseInt(st.storedStageIndex, 10);
+  if (isNaN(storedIndex) || storedIndex < 0 || storedIndex >= timeline.length) return timeline;
 
-  if (normalizedStatus === 'Rejected') {
-    for (i = 0; i < order; i++) timeline[i].state = 'done';
-    timeline[order].state = 'rejected';
+  if (st.isRejected) {
+    for (i = 0; i < storedIndex; i++) timeline[i].state = 'done';
+    timeline[storedIndex].state = 'rejected';
     return timeline;
   }
 
-  if (normalizedStatus === 'Processing' || normalizedStatus === 'Done') {
-    if (order === lastIndex) {
-      for (i = 0; i < order; i++) timeline[i].state = 'done';
-      timeline[order].state = normalizedStatus === 'Done' ? 'done' : 'current';
-      return timeline;
+  if (st.isProcessingForward) {
+    for (i = 0; i <= storedIndex; i++) timeline[i].state = 'done';
+    var effectiveIndex = parseInt(st.effectiveStageIndex, 10);
+    if (!isNaN(effectiveIndex) && effectiveIndex > storedIndex && effectiveIndex < timeline.length) {
+      timeline[effectiveIndex].state = 'current';
+    } else {
+      timeline[storedIndex].state = 'current';
     }
-
-    for (i = 0; i <= order; i++) timeline[i].state = 'done';
-    timeline[order + 1].state = 'current';
     return timeline;
   }
 
-  for (i = 0; i < order; i++) timeline[i].state = 'done';
-  timeline[order].state = 'current';
+  if (st.statusCategory === 'DONE') {
+    for (i = 0; i <= storedIndex; i++) timeline[i].state = 'done';
+    return timeline;
+  }
+
+  for (i = 0; i < storedIndex; i++) timeline[i].state = 'done';
+  timeline[storedIndex].state = 'current';
   return timeline;
+}
+
+function _getDisplayedProcessLabel_(sheetName, status) {
+  return _resolveBusinessFlowState_(sheetName, status).displayStageLabel;
+}
+
+function _buildProcessStageTimeline_(sheetName, status) {
+  return _resolveBusinessFlowState_(sheetName, status).stageTimeline;
 }
 
 function _extractGoogleDriveFileId_(url) {
@@ -1679,6 +1770,7 @@ function _buildProcessRecordFromRow_(rowValues, rowNumber) {
   var normalizedStatus = _normalizeProcessStatus_(rowValues[3]);
   var displaySheet = normalizedSheet || String(rowValues[1] == null ? '' : rowValues[1]).trim();
   var displayStatus = normalizedStatus || String(rowValues[3] == null ? '' : rowValues[3]).trim();
+  var flowState = _resolveBusinessFlowState_(displaySheet, displayStatus);
   var imageOriginalUrl = _extractPrimaryImageUrl_(rowValues[6]);
   var productGroup = String(rowValues[7] == null ? '' : rowValues[7]).trim();
 
@@ -1696,8 +1788,11 @@ function _buildProcessRecordFromRow_(rowValues, rowNumber) {
     imageUrl: _buildProcessPreviewImageUrl_(imageOriginalUrl),
     productGroup: productGroup,
     productGroupNorm: _normalizeProcessProductGroup_(productGroup),
-    displayStageLabel: _getDisplayedProcessLabel_(displaySheet, displayStatus),
-    stageTimeline: _buildProcessStageTimeline_(displaySheet, displayStatus)
+    storedSheet: flowState.storedSheet || displaySheet,
+    effectiveSheet: flowState.effectiveSheet || displaySheet,
+    flowState: flowState,
+    displayStageLabel: flowState.displayStageLabel,
+    stageTimeline: flowState.stageTimeline
   };
 }
 
@@ -2077,6 +2172,8 @@ function _getProcessRowFallbackSummary_(rowObj) {
 function _buildProcessCardSummary_(record, fallback) {
   var base = fallback || {};
   var current = record || {};
+  var fallbackFlowState = base.flowState || null;
+  var currentFlowState = current.flowState || null;
   return {
     key: current.key || base.key || '',
     productName: current.productName || base.productName || '',
@@ -2085,9 +2182,12 @@ function _buildProcessCardSummary_(record, fallback) {
     barcodeOrUom: current.barcodeOrUom || base.barcodeOrUom || '',
     productGroup: current.productGroup || base.productGroup || '',
     currentSheet: current.currentSheet || '',
+    storedSheet: current.storedSheet || current.currentSheet || '',
+    effectiveSheet: current.effectiveSheet || (currentFlowState && currentFlowState.effectiveSheet) || (fallbackFlowState && fallbackFlowState.effectiveSheet) || '',
     currentStatus: current.currentStatus || '',
-    displayStageLabel: current.displayStageLabel || base.displayStageLabel || '',
-    lastSeen: current.lastSeen || ''
+    displayStageLabel: current.displayStageLabel || (currentFlowState && currentFlowState.displayStageLabel) || base.displayStageLabel || (fallbackFlowState && fallbackFlowState.displayStageLabel) || '',
+    lastSeen: current.lastSeen || '',
+    flowState: currentFlowState || fallbackFlowState || null
   };
 }
 
@@ -2101,53 +2201,81 @@ function _buildProcessDetailModel_(record, fallback) {
     barcodeOrUom: summary.barcodeOrUom,
     productGroup: summary.productGroup,
     currentSheet: summary.currentSheet,
+    storedSheet: summary.storedSheet,
+    effectiveSheet: summary.effectiveSheet,
     currentStatus: summary.currentStatus,
     displayStageLabel: summary.displayStageLabel,
     lastSeen: summary.lastSeen,
-    stageTimeline: record ? record.stageTimeline : _buildProcessStageTimeline_('', '')
+    stageTimeline: record ? record.stageTimeline : (summary.flowState ? summary.flowState.stageTimeline : _buildProcessStageTimeline_('', '')),
+    flowState: summary.flowState || null
   };
 }
 
-function _buildProcessLookupEntry_(record, rowSnapshot, primaryKey) {
+function _buildProcessLookupEntry_(record, rowSnapshot, primaryKey, access) {
   var fallback = rowSnapshot ? _getProcessRowFallbackSummary_(rowSnapshot) : {};
+  var selectedSheet = _getSelectedBusinessSheetForAccess_(access);
   if (primaryKey && !fallback.key) fallback.key = primaryKey;
   if (!record) {
+    fallback.flowState = _resolveBusinessFlowState_(selectedSheet, '', { selectedSheet: selectedSheet });
+    fallback.displayStageLabel = fallback.flowState.displayStageLabel;
     var emptySummary = _buildProcessCardSummary_(null, fallback);
     return {
       exists: false,
       key: emptySummary.key,
-      label: '',
-      currentSheet: '',
+      label: emptySummary.displayStageLabel || '',
+      currentSheet: emptySummary.currentSheet || selectedSheet || '',
+      storedSheet: emptySummary.storedSheet || selectedSheet || '',
+      effectiveSheet: emptySummary.effectiveSheet || selectedSheet || '',
       currentStatus: '',
       lastSeen: '',
       imageUrl: emptySummary.imageUrl,
       imageOriginalUrl: emptySummary.imageOriginalUrl,
       productName: emptySummary.productName,
       barcodeOrUom: emptySummary.barcodeOrUom,
-      productGroup: emptySummary.productGroup
+      productGroup: emptySummary.productGroup,
+      flowState: emptySummary.flowState || null
     };
   }
 
   var summary = _buildProcessCardSummary_(record, fallback);
+  var selectedFlowState = _resolveBusinessFlowState_(summary.currentSheet, summary.currentStatus, { selectedSheet: selectedSheet });
   return {
     exists: true,
     key: summary.key || primaryKey || '',
-    label: record.displayStageLabel || '',
+    label: selectedFlowState.displayStageLabel || record.displayStageLabel || '',
     currentSheet: summary.currentSheet || '',
+    storedSheet: summary.storedSheet || summary.currentSheet || '',
+    effectiveSheet: selectedFlowState.effectiveSheet || summary.effectiveSheet || summary.currentSheet || '',
     currentStatus: summary.currentStatus || '',
     lastSeen: summary.lastSeen || '',
     imageUrl: summary.imageUrl || '',
     imageOriginalUrl: summary.imageOriginalUrl || '',
     productName: summary.productName || '',
     barcodeOrUom: summary.barcodeOrUom || '',
-    productGroup: summary.productGroup || ''
+    productGroup: summary.productGroup || '',
+    flowState: selectedFlowState
   };
 }
 
-function _buildProcessDetailPayload_(record, rowSnapshot, primaryKey) {
+function _buildProcessDetailPayload_(record, rowSnapshot, primaryKey, access) {
   var fallback = rowSnapshot ? _getProcessRowFallbackSummary_(rowSnapshot) : {};
   if (primaryKey && !fallback.key) fallback.key = primaryKey;
-  return _buildProcessDetailModel_(record, fallback);
+  if (!record) {
+    var selectedSheet = _getSelectedBusinessSheetForAccess_(access);
+    fallback.flowState = _resolveBusinessFlowState_(selectedSheet, '', { selectedSheet: selectedSheet });
+    fallback.displayStageLabel = fallback.flowState.displayStageLabel;
+  }
+  var model = _buildProcessDetailModel_(record, fallback);
+  var selectedSheet = _getSelectedBusinessSheetForAccess_(access);
+  if (model.currentSheet || selectedSheet) {
+    var flowState = _resolveBusinessFlowState_(model.currentSheet || selectedSheet, model.currentStatus || '', { selectedSheet: selectedSheet });
+    model.flowState = flowState;
+    model.storedSheet = flowState.storedSheet || model.currentSheet || '';
+    model.effectiveSheet = flowState.effectiveSheet || model.currentSheet || '';
+    model.displayStageLabel = flowState.displayStageLabel || model.displayStageLabel || '';
+    model.stageTimeline = flowState.stageTimeline || model.stageTimeline || [];
+  }
+  return model;
 }
 
 function _isProcessListEligible_(record) {
@@ -2233,8 +2361,15 @@ function getProcessingProducts(params) {
 
     var total = deduped.length;
     var limit = _getProcessingProductsLimit_(params.limit);
+    var selectedSheet = _getSelectedBusinessSheetForAccess_(accessRes.data);
     var items = deduped.slice(0, limit).map(function(record) {
-      return _buildProcessCardSummary_(record, null);
+      var item = _buildProcessCardSummary_(record, null);
+      var flowState = _resolveBusinessFlowState_(item.currentSheet, item.currentStatus, { selectedSheet: selectedSheet });
+      item.flowState = flowState;
+      item.storedSheet = flowState.storedSheet || item.currentSheet || '';
+      item.effectiveSheet = flowState.effectiveSheet || item.currentSheet || '';
+      item.displayStageLabel = flowState.displayStageLabel || item.displayStageLabel || '';
+      return item;
     });
 
     return _ok({
@@ -2304,7 +2439,7 @@ function getProcessLookup(params) {
       }
 
       var matched = _findBestProcessMatch_(candidates, keyInfo.list);
-      var entry = _buildProcessLookupEntry_(matched, rowSnapshot, keyInfo.primary);
+      var entry = _buildProcessLookupEntry_(matched, rowSnapshot, keyInfo.primary, accessRes.data);
       byRowNumber[String(rn)] = entry;
       if (entry.key) {
         var existing = byKey[entry.key];
@@ -2330,18 +2465,18 @@ function getProcessDetail(params) {
 
     var processTable = _readProcessRecords_();
     if (processTable.warning) {
-      return _err(processTable.warning.code || 'PROCESS_SHEET_NOT_FOUND', processTable.warning.message || 'Process sheet is not available.');
+      return _err(processTable.warning.code || 'PROCESS_SHEET_NOT_FOUND', processTable.warning.message || 'Không thể đọc sheet Process.');
     }
 
     if (params.rowNumber) {
       var rowNumber = parseInt(params.rowNumber, 10);
-      if (!rowNumber) return _err('INVALID_ROW', 'Row number is invalid.');
+      if (!rowNumber) return _err('INVALID_ROW', 'Số dòng không hợp lệ.');
 
       var sheet = _openSheet(accessRes.data);
       var headers = _trimTrailingEmptyHeaders_(_getHeaders(sheet));
       var lastRow = sheet.getLastRow();
       if (!headers.length || rowNumber < CONFIG.DATA_START_ROW || rowNumber > lastRow) {
-        return _err('INVALID_ROW', 'Row number is out of range.');
+        return _err('INVALID_ROW', 'Số dòng nằm ngoài phạm vi dữ liệu.');
       }
 
       var rowSnapshot = _getRowSnapshotByNumber_(sheet, headers, rowNumber);
@@ -2363,7 +2498,7 @@ function getProcessDetail(params) {
         return _err('PROCESS_NOT_FOUND', 'Khong tim thay du lieu process cho ma: ' + rowKeys.primary);
       }
 
-      return _ok(_buildProcessDetailPayload_(matchedRowRecord, rowSnapshot, rowKeys.primary));
+      return _ok(_buildProcessDetailPayload_(matchedRowRecord, rowSnapshot, rowKeys.primary, accessRes.data));
     }
 
     var query = String(params.query || '').trim();
@@ -2392,7 +2527,7 @@ function getProcessDetail(params) {
       return _err('FORBIDDEN_SCOPE', 'Khong the hien thi process cho ma nay trong pham vi quyen hien tai.');
     }
 
-    return _ok(_buildProcessDetailPayload_(matchedQueryRecord, null, query));
+    return _ok(_buildProcessDetailPayload_(matchedQueryRecord, null, query, accessRes.data));
   } catch (err) {
     Logger.log('getProcessDetail ERROR: ' + err.toString());
     return _err('PROCESS_DETAIL_ERROR', err.message, err.stack);
@@ -2427,6 +2562,10 @@ function _writeChangesToSheet_(sheet, headers, rowNumber, changes, allowedFields
 
   for (var field in changes) {
     if (!changes.hasOwnProperty(field)) continue;
+    if (_isProtectedChatField_(field)) {
+      Logger.log('Skipping protected chat field from product save API: ' + field);
+      continue;
+    }
     if (!allowedMap[field]) {
       Logger.log('Skipping non-editable: ' + field);
       continue;
@@ -2466,7 +2605,7 @@ function updateRow(payload) {
   try {
     Logger.log('updateRow: row=' + payload.rowNumber + ' changes=' + JSON.stringify(payload.changes));
 
-    if (!payload || !payload.rowNumber || !payload.changes) return _err('INVALID_PAYLOAD', 'Missing rowNumber or changes');
+    if (!payload || !payload.rowNumber || !payload.changes) return _err('INVALID_PAYLOAD', 'Thiếu rowNumber hoặc dữ liệu thay đổi.');
 
     var accessRes = _requireWriteAccess_(payload.token);
     if (!accessRes.ok) return accessRes;
@@ -2479,7 +2618,7 @@ function updateRow(payload) {
 
     var lastRow = sheet.getLastRow();
     if (payload.rowNumber < CONFIG.DATA_START_ROW || payload.rowNumber > lastRow) {
-      return _err('INVALID_ROW', 'Row ' + payload.rowNumber + ' is out of range (' +
+      return _err('INVALID_ROW', 'Dòng ' + payload.rowNumber + ' nằm ngoài phạm vi (' +
         CONFIG.DATA_START_ROW + '-' + lastRow + ')');
     }
 
@@ -2514,7 +2653,7 @@ function updateRow(payload) {
 // ========================================
 function updateBatch(payload) {
   try {
-    if (!payload || !Array.isArray(payload.updates)) return _err('INVALID_PAYLOAD', 'Missing updates array');
+    if (!payload || !Array.isArray(payload.updates)) return _err('INVALID_PAYLOAD', 'Thiếu danh sách cập nhật.');
 
     var accessRes = _requireWriteAccess_(payload.token);
     if (!accessRes.ok) return accessRes;

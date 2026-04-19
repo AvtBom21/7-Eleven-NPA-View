@@ -2643,6 +2643,117 @@
       font-size: 11px;
     }
 
+    .director-chat-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .director-chat-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 300px;
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .director-chat-message {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 11px;
+      animation: fadeUp .25s ease both;
+    }
+
+    .director-chat-message.is-own {
+      background: var(--bluebg);
+      border-color: #bfdbfe;
+    }
+
+    .director-chat-message.is-legacy {
+      background: var(--amberbg);
+      border-color: #fde68a;
+    }
+
+    .director-chat-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text3);
+    }
+
+    .director-chat-pic {
+      color: var(--text);
+      overflow-wrap: anywhere;
+    }
+
+    .director-chat-text {
+      margin-top: 6px;
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.55;
+      overflow-wrap: anywhere;
+    }
+
+    .director-chat-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .director-chat-action {
+      height: 28px;
+      border: 1px solid var(--border2);
+      border-radius: 999px;
+      background: var(--card);
+      color: var(--text2);
+      padding: 0 10px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .director-chat-composer {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: end;
+    }
+
+    .director-chat-composer textarea,
+    .director-chat-edit textarea {
+      width: 100%;
+      min-height: 66px;
+      resize: vertical;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      padding: 10px 11px;
+      font-size: 15px;
+      color: var(--text);
+      outline: none;
+      line-height: 1.5;
+    }
+
+    .director-chat-composer textarea:focus,
+    .director-chat-edit textarea:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(232, 160, 0, .12);
+    }
+
+    .director-chat-empty {
+      border: 1px dashed var(--border2);
+      border-radius: 10px;
+      padding: 14px;
+      text-align: center;
+      color: var(--text3);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
     /* ══════════════════════════════════════════════════════
    BOTTOM NAV
 ══════════════════════════════════════════════════════ */
@@ -3434,12 +3545,12 @@
         <div class="login-field">
           <label class="login-label" for="login-email">Username</label>
           <input class="login-input" id="login-email" type="text" autocomplete="username"
-            placeholder="Enter Username" oninput="setLoginMessage('')">
+            placeholder="Nhập username" oninput="setLoginMessage('')">
         </div>
         <div class="login-field">
-          <label class="login-label" for="login-password">Password</label>
+          <label class="login-label" for="login-password">Mật khẩu</label>
           <input class="login-input" id="login-password" type="password" autocomplete="current-password"
-            placeholder="Enter password" oninput="setLoginMessage('')">
+            placeholder="Nhập mật khẩu" oninput="setLoginMessage('')">
         </div>
         <div class="login-message" id="login-message"></div>
         <div class="btn-enter-wrap">
@@ -3514,7 +3625,7 @@
         </button>
         <div class="user-menu-panel" id="user-menu-panel">
           <button class="user-menu-item" type="button" id="switch-view-item" onclick="openViewSelector()" style="display:none">Switch View</button>
-          <button class="user-menu-item" type="button" onclick="openPasswordModal()">Change Password</button>
+          <button class="user-menu-item" type="button" onclick="openPasswordModal()">Đổi mật khẩu</button>
           <button class="user-menu-item danger" type="button" onclick="switchUser()">Log Out</button>
         </div>
       </div>
@@ -3539,7 +3650,7 @@
             <circle cx="11" cy="11" r="8" />
             <path d="m21 21-4.35-4.35" />
           </svg>
-          <input class="filter-input" type="text" placeholder="Search products, brands..." id="search-input"
+          <input class="filter-input" type="text" placeholder="Tìm sản phẩm, thương hiệu..." id="search-input"
             oninput="applyFilters()">
         </div>
         <div class="filter-selects">
@@ -3552,8 +3663,8 @@
         </div>
         <div class="filter-tabs">
           <button class="filter-tab active" id="tab-all" onclick="setTab('all')">All</button>
-          <button class="filter-tab" id="tab-pending" onclick="setTab('pending')">⏳ Pending</button>
-          <button class="filter-tab" id="tab-voted" onclick="setTab('voted')">✅ Reviewed</button>
+          <button class="filter-tab" id="tab-pending" onclick="setTab('pending')">⏳ Đang chờ</button>
+          <button class="filter-tab" id="tab-voted" onclick="setTab('voted')">✅ Đã review</button>
         </div>
       </div>
 
@@ -3585,13 +3696,13 @@
             <circle cx="12" cy="12" r="10" />
             <path d="M12 6v6l4 2" />
           </svg>
-          <span class="bnav-label">Pending</span>
+          <span class="bnav-label">Đang chờ</span>
         </button>
         <button class="bottom-nav-btn" id="nav-voted" onclick="setTab('voted');setActiveNav('voted')">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M20 6 9 17l-5-5" />
           </svg>
-          <span class="bnav-label">Reviewed</span>
+        <span class="bnav-label">Đã review</span>
         </button>
       </div>
     </div>
@@ -3625,7 +3736,7 @@
     <div class="sync-panel">
       <div class="sync-head">
         <span class="sync-chip">LIVE SYNC</span>
-        <h3>Syncing 7-Eleven Review Data</h3>
+        <h3>Đang đồng bộ dữ liệu review 7-Eleven</h3>
         <p>Refreshing products, approvals, and KPI insights from the latest sheet snapshot.</p>
       </div>
 
@@ -3659,23 +3770,23 @@
           <tbody>
             <tr>
               <td class="sync-step-name">Connect</td>
-              <td><span class="sync-state pending" id="sync-state-connect">Pending</span></td>
+              <td><span class="sync-state pending" id="sync-state-connect">Đang chờ</span></td>
               <td class="sync-step-note" id="sync-note-connect">Open secure connection</td>
             </tr>
             <tr>
               <td class="sync-step-name">Fetch</td>
-              <td><span class="sync-state pending" id="sync-state-fetch">Pending</span></td>
+              <td><span class="sync-state pending" id="sync-state-fetch">Đang chờ</span></td>
               <td class="sync-step-note" id="sync-note-fetch">Read latest rows from source</td>
             </tr>
             <tr>
               <td class="sync-step-name">Rebuild</td>
-              <td><span class="sync-state pending" id="sync-state-rebuild">Pending</span></td>
+              <td><span class="sync-state pending" id="sync-state-rebuild">Đang chờ</span></td>
               <td class="sync-step-note" id="sync-note-rebuild">Refresh cards and statistics</td>
             </tr>
             <tr>
               <td class="sync-step-name">Complete</td>
-              <td><span class="sync-state pending" id="sync-state-complete">Pending</span></td>
-              <td class="sync-step-note" id="sync-note-complete">Final delivery check</td>
+              <td><span class="sync-state pending" id="sync-state-complete">Đang chờ</span></td>
+              <td class="sync-step-note" id="sync-note-complete">Kiểm tra cuối cùng</td>
             </tr>
           </tbody>
         </table>
@@ -3685,26 +3796,26 @@
 
   <div class="password-overlay hidden" id="password-overlay" onclick="closePasswordModalOutside(event)">
     <div class="password-panel">
-      <div class="password-title">Change Password</div>
+      <div class="password-title">Đổi mật khẩu</div>
       <div class="password-sub">Account: <strong id="password-email-label">—</strong></div>
 
       <div class="password-field">
-        <label class="password-label" for="pwd-current">Current Password</label>
-        <input class="password-input" id="pwd-current" type="password" autocomplete="current-password" placeholder="Enter current password">
+        <label class="password-label" for="pwd-current">Mật khẩu hiện tại</label>
+        <input class="password-input" id="pwd-current" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu hiện tại">
       </div>
       <div class="password-field">
-        <label class="password-label" for="pwd-new">New Password</label>
-        <input class="password-input" id="pwd-new" type="password" autocomplete="new-password" placeholder="Enter new password">
+        <label class="password-label" for="pwd-new">Mật khẩu mới</label>
+        <input class="password-input" id="pwd-new" type="password" autocomplete="new-password" placeholder="Nhập mật khẩu mới">
       </div>
       <div class="password-field">
-        <label class="password-label" for="pwd-confirm">Confirm New Password</label>
-        <input class="password-input" id="pwd-confirm" type="password" autocomplete="new-password" placeholder="Re-enter new password">
+        <label class="password-label" for="pwd-confirm">Xác nhận mật khẩu mới</label>
+        <input class="password-input" id="pwd-confirm" type="password" autocomplete="new-password" placeholder="Nhập lại mật khẩu mới">
       </div>
 
       <div class="password-message" id="password-message"></div>
       <div class="password-actions">
-        <button class="btn-ghost" type="button" onclick="closePasswordModal()">Cancel</button>
-        <button class="btn-primary" type="button" id="pwd-save-btn" onclick="submitPasswordChange()">Update Password</button>
+        <button class="btn-ghost" type="button" onclick="closePasswordModal()">Hủy</button>
+        <button class="btn-primary" type="button" id="pwd-save-btn" onclick="submitPasswordChange()">Cập nhật mật khẩu</button>
       </div>
     </div>
   </div>
@@ -3715,6 +3826,7 @@
     /* ══ State ══════════════════════════════════════ */
     let currentUser = '', currentEmail = '', allProducts = [], otherProducts = [], existingResults = [], activeTab = 'all', selectedStatus = '';
     let authToken = '', currentCanEdit = false, availableViews = [];
+    let directorChatSeq = 0, directorChatProductId = '', directorChatHistory = null, directorChatLoading = false, directorChatError = null, directorChatBusy = false, directorChatEditId = '', directorChatDraft = '', directorChatEditDraft = '';
     const REQUEST_TOKEN = String((new URLSearchParams(window.location.search || '')).get('token') || '').trim();
     function readServerUser() {
       const el = document.getElementById('app-user-json');
@@ -3771,7 +3883,7 @@
     }
 
     function toErrorText(err, fallback) {
-      const fb = fallback || 'Unknown error';
+      const fb = fallback || 'Lỗi không xác định';
       try {
         if (err === null || err === undefined) return fb;
         if (typeof err === 'string') return err;
@@ -3803,7 +3915,7 @@
     }
 
     function setSyncStep(step, state, note) {
-      const statusMap = { pending: 'Pending', running: 'Running', done: 'Done', error: 'Error' };
+      const statusMap = { pending: 'Đang chờ', running: 'Đang chạy', done: 'Hoàn tất', error: 'Lỗi' };
       const stateEl = document.getElementById('sync-state-' + step);
       const noteEl = document.getElementById('sync-note-' + step);
       if (stateEl) {
@@ -3821,7 +3933,7 @@
         { delay: 520, step: 'fetch', state: 'done', note: 'Rows loaded successfully' },
         { delay: 380, step: 'rebuild', state: 'running', note: 'Recomputing product cards and KPI chips', progress: 63, caption: 'Rebuilding dashboard layers...' },
         { delay: 520, step: 'rebuild', state: 'done', note: 'Interface data model rebuilt' },
-        { delay: 360, step: 'complete', state: 'running', note: 'Final integrity and freshness check', progress: 82, caption: 'Performing final quality checks...' },
+        { delay: 360, step: 'complete', state: 'running', note: 'Kiểm tra toàn vẹn và độ mới dữ liệu', progress: 82, caption: 'Đang kiểm tra chất lượng cuối cùng...' },
       ];
       let index = 0;
 
@@ -3856,7 +3968,7 @@
       setSyncStep('connect', 'pending', 'Open secure connection');
       setSyncStep('fetch', 'pending', 'Read latest rows from source');
       setSyncStep('rebuild', 'pending', 'Refresh cards and statistics');
-      setSyncStep('complete', 'pending', 'Final delivery check');
+      setSyncStep('complete', 'pending', 'Kiểm tra cuối cùng');
       setSyncProgress(4, 'Initializing sync pipeline...');
       runSyncStoryboard();
     }
@@ -3870,13 +3982,13 @@
         setSyncStep('connect', 'done', 'Secure connection established');
         setSyncStep('fetch', 'done', 'Latest rows loaded');
         setSyncStep('rebuild', 'done', 'Cards and KPIs refreshed');
-        setSyncStep('complete', 'done', 'Sync package delivered');
-        setSyncProgress(100, 'Sync complete. Dashboard is up to date.');
+        setSyncStep('complete', 'done', 'Gói đồng bộ đã sẵn sàng');
+        setSyncProgress(100, 'Đồng bộ hoàn tất. Dashboard đã được cập nhật.');
         syncOverlayHideTimer = setTimeout(() => { overlay.classList.add('hidden'); overlay.classList.remove('active'); }, 760);
       } else {
-        const err = message || 'Unable to complete synchronization';
+        const err = message || 'Không thể hoàn tất đồng bộ.';
         setSyncStep('complete', 'error', err);
-        setSyncProgress(100, 'Sync failed. Please retry.');
+        setSyncProgress(100, 'Đồng bộ thất bại. Vui lòng thử lại.');
         syncOverlayHideTimer = setTimeout(() => { overlay.classList.add('hidden'); overlay.classList.remove('active'); }, 1200);
       }
     }
@@ -3906,12 +4018,12 @@
       emailInput.value = email;
 
       if (!email) {
-        setLoginMessage('Please enter username.', 'error');
+        setLoginMessage('Vui lòng nhập username.', 'error');
         emailInput.focus();
         return;
       }
       if (!password) {
-        setLoginMessage('Please enter password.', 'error');
+        setLoginMessage('Vui lòng nhập mật khẩu.', 'error');
         passwordInput.focus();
         return;
       }
@@ -3924,7 +4036,7 @@
           const role = String((res && res.role) || '').trim().toUpperCase();
           if (!res || !res.ok || role !== ROLE_DIRECTOR) {
             setLoginButtonBusy(false);
-            setLoginMessage((res && res.message) || 'Only DIRECTOR account can access this portal.', 'error');
+            setLoginMessage((res && res.message) || 'Chỉ tài khoản DIRECTOR mới được truy cập màn hình này.', 'error');
             passwordInput.focus();
             passwordInput.select();
             return;
@@ -3942,7 +4054,7 @@
         })
         .withFailureHandler(err => {
           setLoginButtonBusy(false);
-          setLoginMessage('System error: ' + toErrorText(err, 'Unknown error'), 'error');
+          setLoginMessage('Lỗi hệ thống: ' + toErrorText(err, 'Lỗi không xác định'), 'error');
         })
         .authenticateAccount(email, password);
     }
@@ -3968,7 +4080,7 @@
         new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
       const viewStatus = document.getElementById('view-status-display');
       if (viewStatus) {
-        viewStatus.textContent = 'Director View · ' + (currentCanEdit ? 'Editable' : 'Read only');
+        viewStatus.textContent = 'Director View · ' + (currentCanEdit ? 'Có thể sửa' : 'Chỉ xem');
       }
 
       loadData();
@@ -4040,7 +4152,7 @@
       const btn = document.getElementById('pwd-save-btn');
       if (!btn) return;
       btn.disabled = !!busy;
-      btn.textContent = busy ? 'Updating...' : 'Update Password';
+      btn.textContent = busy ? 'Đang cập nhật...' : 'Cập nhật mật khẩu';
       btn.style.opacity = busy ? '.7' : '1';
       btn.style.cursor = busy ? 'wait' : 'pointer';
     }
@@ -4048,7 +4160,7 @@
     function openPasswordModal() {
       closeUserMenu();
       if (!currentEmail) {
-        showToast('Please sign in again.', 'error');
+        showToast('Vui lòng đăng nhập lại.', 'error');
         return;
       }
       const overlay = document.getElementById('password-overlay');
@@ -4079,7 +4191,7 @@
 
     function submitPasswordChange() {
       if (!currentEmail) {
-        setPasswordMessage('Please sign in again.', 'error');
+        setPasswordMessage('Vui lòng đăng nhập lại.', 'error');
         return;
       }
       const currentPwd = String(document.getElementById('pwd-current').value || '').trim();
@@ -4087,34 +4199,34 @@
       const confirmPwd = String(document.getElementById('pwd-confirm').value || '').trim();
 
       if (!currentPwd || !newPwd || !confirmPwd) {
-        setPasswordMessage('Please fill all fields.', 'error');
+        setPasswordMessage('Vui lòng nhập đầy đủ thông tin.', 'error');
         return;
       }
       if (newPwd.length < 4) {
-        setPasswordMessage('New password must be at least 4 characters.', 'error');
+        setPasswordMessage('Mật khẩu mới phải có ít nhất 4 ký tự.', 'error');
         return;
       }
       if (newPwd !== confirmPwd) {
-        setPasswordMessage('Confirm password does not match.', 'error');
+        setPasswordMessage('Mật khẩu xác nhận không khớp.', 'error');
         return;
       }
 
       setPasswordButtonBusy(true);
-      setPasswordMessage('Updating password...', '');
+      setPasswordMessage('Đang cập nhật mật khẩu...', '');
       google.script.run
         .withSuccessHandler(res => {
           setPasswordButtonBusy(false);
           if (!res || !res.ok) {
-            setPasswordMessage((res && res.message) || 'Unable to update password.', 'error');
+            setPasswordMessage((res && res.message) || 'Không thể cập nhật mật khẩu.', 'error');
             return;
           }
-          setPasswordMessage((res && res.message) || 'Password updated successfully.', 'ok');
-          showToast('Password updated', 'success');
+          setPasswordMessage((res && res.message) || 'Đã cập nhật mật khẩu.', 'ok');
+          showToast('Đã cập nhật mật khẩu', 'success');
           setTimeout(() => closePasswordModal(), 700);
         })
         .withFailureHandler(err => {
           setPasswordButtonBusy(false);
-          setPasswordMessage('System error: ' + toErrorText(err, 'Unknown error'), 'error');
+          setPasswordMessage('Lỗi hệ thống: ' + toErrorText(err, 'Lỗi không xác định'), 'error');
         })
         .changeAccountPassword(currentEmail, currentPwd, newPwd);
     }
@@ -4169,7 +4281,7 @@
         .catch(err => {
           if (handleSessionError(err)) return;
           document.getElementById('loading').innerHTML =
-            `<div style="color:var(--red);text-align:center;padding:20px">❌ ${escHtml(toErrorText(err, 'Unable to load data'))}</div>`;
+            `<div style="color:var(--red);text-align:center;padding:20px">❌ ${escHtml(toErrorText(err, 'Không thể tải dữ liệu'))}</div>`;
         });
     }
 
@@ -4203,6 +4315,269 @@
         if (normKey(r.newProductId) === k) return r;
       }
       return null;
+    }
+    function decodeChatVisibleText(value) {
+      const raw = safeText(value, '').replace(/\r\n?/g, '\n');
+      if (!raw) return '';
+
+      if (!/%[0-9A-Fa-f]{2}/.test(raw)) return raw;
+
+      let firstPass = raw;
+      try {
+        firstPass = decodeURIComponent(raw);
+      } catch (err) {
+        return raw;
+      }
+
+      if (!/%[0-9A-Fa-f]{2}/.test(firstPass)) return firstPass;
+      if (!/%(?:C[2-9A-F]|D[0-9A-F]|E[0-9A-F]|F[0-4])[0-9A-F]/i.test(firstPass)) return firstPass;
+
+      try {
+        return decodeURIComponent(firstPass);
+      } catch (secondErr) {
+        return firstPass;
+      }
+    }
+    function normalizeDirectorChatItem(item, index) {
+      const entry = item || {};
+      const type = safeText(entry.type, 'message').toLowerCase();
+      if (type === 'legacy') {
+        return {
+          type: 'legacy',
+          id: safeText(entry.id, 'legacy-' + index),
+          content: decodeChatVisibleText(entry.content),
+          readOnly: true
+        };
+      }
+      return {
+        type: 'message',
+        id: safeText(entry.id, ''),
+        pic: safeText(entry.pic, ''),
+        content: decodeChatVisibleText(entry.content),
+        timestamp: safeText(entry.timestamp, ''),
+        isOwn: entry.isOwn === true
+      };
+    }
+    function normalizeDirectorChatHistory(data) {
+      const h = data || {};
+      const items = Array.isArray(h.items) ? h.items.map((item, index) => normalizeDirectorChatItem(item, index)) : [];
+      const messages = items.filter(item => item.type !== 'legacy');
+      const legacy = items.filter(item => item.type === 'legacy');
+      return {
+        newProductId: safeText(h.newProductId, ''),
+        canWrite: h.canWrite === true,
+        actorEmail: safeText(h.actorEmail, '').toLowerCase(),
+        items,
+        messages,
+        legacy
+      };
+    }
+    function resetDirectorChatState(productId) {
+      directorChatSeq++;
+      directorChatProductId = safeText(productId, '').trim();
+      directorChatHistory = null;
+      directorChatLoading = false;
+      directorChatError = null;
+      directorChatBusy = false;
+      directorChatEditId = '';
+      directorChatDraft = '';
+      directorChatEditDraft = '';
+    }
+    function directorChatPayload(extra) {
+      return Object.assign({
+        token: authToken,
+        newProductId: directorChatProductId,
+        sheetContext: 'Director',
+        viewContext: 'DIRECTOR_PRODUCT_MODAL'
+      }, extra || {});
+    }
+    function renderDirectorChat() {
+      const panel = document.getElementById('director-chat-panel');
+      if (!panel) return;
+      if (!directorChatProductId) {
+        panel.innerHTML = '<div class="director-chat-empty">Chưa có New Product ID để mở hội thoại.</div>';
+        return;
+      }
+      const history = directorChatHistory || normalizeDirectorChatHistory(null);
+      let html = '';
+      if (directorChatError) {
+        html += `<div class="director-chat-empty">${escHtml(directorChatError.message || 'Không thể tải hội thoại.')}<div style="margin-top:10px"><button class="director-chat-action" onclick="loadDirectorProductChatById()">Thử lại</button></div></div>`;
+      } else if (directorChatLoading && !history.items.length) {
+        html += '<div class="director-chat-empty">Đang tải hội thoại...</div>';
+      } else if (!history.items.length) {
+        html += '<div class="director-chat-empty">Chưa có tin nhắn.</div>';
+      } else {
+        html += '<div class="director-chat-list">';
+        history.items.forEach(item => {
+          if (!item) return;
+          if (item.type === 'legacy') {
+            html += `<div class="director-chat-message is-legacy">
+  <div class="director-chat-meta"><span class="director-chat-pic">Ghi chú cũ</span><span>Chỉ xem</span></div>
+  <div class="director-chat-text">${escHtml(item.content || '').replace(/\n/g, '<br>')}</div>
+</div>`;
+            return;
+          }
+          const own = item.isOwn === true;
+          const editing = directorChatEditId && directorChatEditId === item.id;
+          html += `<div class="director-chat-message${own ? ' is-own' : ''}">
+  <div class="director-chat-meta"><span class="director-chat-pic">${escHtml(item.pic || '')}</span><span>${escHtml(item.timestamp || '')}</span></div>`;
+          if (editing) {
+            const editValue = directorChatEditDraft || item.content || '';
+            const actionId = JSON.stringify(item.id || '');
+            html += `<div class="director-chat-edit"><textarea id="director-chat-edit-input">${escHtml(editValue)}</textarea></div>
+  <div class="director-chat-actions">
+    <button class="director-chat-action" onclick='saveDirectorChatEdit(${actionId})'>Lưu</button>
+    <button class="director-chat-action" onclick="cancelDirectorChatEdit()">Hủy</button>
+  </div>`;
+          } else {
+            html += `<div class="director-chat-text">${escHtml(item.content || '').replace(/\n/g, '<br>')}</div>`;
+            if (own && currentCanEdit) {
+              const actionId = JSON.stringify(item.id || '');
+              html += `<div class="director-chat-actions">
+    <button class="director-chat-action" onclick='startDirectorChatEdit(${actionId})'>Sửa</button>
+    <button class="director-chat-action" onclick='deleteDirectorChatMessage(${actionId})'>Xóa</button>
+  </div>`;
+            }
+          }
+          html += '</div>';
+        });
+        html += '</div>';
+      }
+
+      if (currentCanEdit && history.canWrite !== false) {
+        html += `<div class="director-chat-composer">
+  <textarea id="director-chat-input" placeholder="Nhập tin nhắn"${directorChatBusy ? ' disabled' : ''}>${escHtml(directorChatDraft)}</textarea>
+  <button class="btn-submit" style="width:auto;min-width:88px;margin-top:0" onclick="sendDirectorChatMessage()"${directorChatBusy ? ' disabled' : ''}>${directorChatBusy ? 'Đang gửi' : 'Gửi'}</button>
+</div>`;
+      } else {
+        html += '<div class="director-chat-empty">Bạn đang ở chế độ chỉ xem.</div>';
+      }
+      panel.innerHTML = html;
+    }
+    function applyDirectorChatResult(res, fallbackMessage) {
+      if (!res || !res.ok) {
+        const msg = (res && res.error && res.error.message) || fallbackMessage || 'Không thể cập nhật chat.';
+        showToast('❌ ' + msg, 'error');
+        renderDirectorChat();
+        return false;
+      }
+      directorChatHistory = normalizeDirectorChatHistory((res.data && (res.data.history || res.data)) || {});
+      directorChatError = null;
+      directorChatEditId = '';
+      directorChatDraft = '';
+      directorChatEditDraft = '';
+      renderDirectorChat();
+      return true;
+    }
+    function loadDirectorProductChat(product) {
+      const productId = safeText(product && product.newProductId, '').trim();
+      resetDirectorChatState(productId);
+      renderDirectorChat();
+      loadDirectorProductChatById();
+    }
+    function loadDirectorProductChatById() {
+      const productId = directorChatProductId;
+      if (!productId) return;
+      const seq = ++directorChatSeq;
+      directorChatLoading = true;
+      directorChatError = null;
+      renderDirectorChat();
+      google.script.run
+        .withSuccessHandler(res => {
+          if (seq !== directorChatSeq || productId !== directorChatProductId) return;
+          directorChatLoading = false;
+          if (!res || !res.ok) {
+            directorChatError = res && res.error ? res.error : { message: 'Không thể tải hội thoại.' };
+            renderDirectorChat();
+            return;
+          }
+          directorChatHistory = normalizeDirectorChatHistory(res.data);
+          renderDirectorChat();
+        })
+        .withFailureHandler(err => {
+          if (seq !== directorChatSeq || productId !== directorChatProductId) return;
+          if (handleSessionError(err)) return;
+          directorChatLoading = false;
+          directorChatError = { message: toErrorText(err, 'Không thể tải hội thoại.') };
+          renderDirectorChat();
+        })
+        .getProductChatHistory(directorChatPayload({ newProductId: productId }));
+    }
+    function sendDirectorChatMessage() {
+      if (!currentCanEdit || directorChatBusy || !directorChatProductId) return;
+      const input = document.getElementById('director-chat-input');
+      const content = safeText(input && input.value, '').trim();
+      if (!content) { if (input) input.focus(); return; }
+      const productId = directorChatProductId;
+      directorChatDraft = content;
+      directorChatBusy = true;
+      renderDirectorChat();
+      google.script.run
+        .withSuccessHandler(res => {
+          directorChatBusy = false;
+          if (productId !== directorChatProductId) return;
+          if (applyDirectorChatResult(res, 'Không thể gửi tin nhắn.')) showToast('Đã gửi tin nhắn', 'success');
+        })
+        .withFailureHandler(err => {
+          if (handleSessionError(err)) return;
+          directorChatBusy = false;
+          showToast('❌ ' + toErrorText(err, 'Gửi tin nhắn thất bại'), 'error');
+          renderDirectorChat();
+        })
+        .addProductChatMessage(directorChatPayload({ newProductId: productId, content }));
+    }
+    function startDirectorChatEdit(messageId) {
+      directorChatEditId = safeText(messageId, '');
+      directorChatEditDraft = '';
+      renderDirectorChat();
+    }
+    function cancelDirectorChatEdit() {
+      directorChatEditId = '';
+      directorChatEditDraft = '';
+      renderDirectorChat();
+    }
+    function saveDirectorChatEdit(messageId) {
+      if (!currentCanEdit || directorChatBusy || !directorChatProductId) return;
+      const input = document.getElementById('director-chat-edit-input');
+      const content = safeText(input && input.value, '').trim();
+      if (!content) { if (input) input.focus(); return; }
+      const productId = directorChatProductId;
+      directorChatEditDraft = content;
+      directorChatBusy = true;
+      renderDirectorChat();
+      google.script.run
+        .withSuccessHandler(res => {
+          directorChatBusy = false;
+          if (productId !== directorChatProductId) return;
+          if (applyDirectorChatResult(res, 'Không thể sửa tin nhắn.')) showToast('Đã sửa tin nhắn', 'success');
+        })
+        .withFailureHandler(err => {
+          if (handleSessionError(err)) return;
+          directorChatBusy = false;
+          showToast('❌ ' + toErrorText(err, 'Sửa tin nhắn thất bại'), 'error');
+          renderDirectorChat();
+        })
+        .editProductChatMessage(directorChatPayload({ newProductId: productId, messageId, content }));
+    }
+    function deleteDirectorChatMessage(messageId) {
+      if (!currentCanEdit || directorChatBusy || !directorChatProductId) return;
+      if (!confirm('Xóa tin nhắn này?')) return;
+      const productId = directorChatProductId;
+      directorChatBusy = true;
+      renderDirectorChat();
+      google.script.run
+        .withSuccessHandler(res => {
+          directorChatBusy = false;
+          if (productId !== directorChatProductId) return;
+          if (applyDirectorChatResult(res, 'Không thể xóa tin nhắn.')) showToast('Đã xóa tin nhắn', 'success');
+        })
+        .withFailureHandler(err => {
+          if (handleSessionError(err)) return;
+          directorChatBusy = false;
+          showToast('❌ ' + toErrorText(err, 'Xóa tin nhắn thất bại'), 'error');
+          renderDirectorChat();
+        })
+        .deleteProductChatMessage(directorChatPayload({ newProductId: productId, messageId }));
     }
     function parseLooseNumber(v) {
       if (v === null || v === undefined || v === '') return NaN;
@@ -4325,9 +4700,9 @@
       const re = mv.filter(r => r.status === 'Rejected').length;
       document.getElementById('stats-row').innerHTML = `
     <div class="stat-chip"><div class="dot dot-blue"></div><strong>${tot.toLocaleString('en-US')}</strong> Total</div>
-    <div class="stat-chip"><div class="dot dot-green"></div><strong>${ap.toLocaleString('en-US')}</strong> Approved</div>
-    <div class="stat-chip"><div class="dot dot-red"></div><strong>${re.toLocaleString('en-US')}</strong> Rejected</div>
-    <div class="stat-chip"><div class="dot dot-amber"></div><strong>${(tot - mv.length).toLocaleString('en-US')}</strong> Pending</div>`;
+    <div class="stat-chip"><div class="dot dot-green"></div><strong>${ap.toLocaleString('en-US')}</strong> Đã duyệt</div>
+    <div class="stat-chip"><div class="dot dot-red"></div><strong>${re.toLocaleString('en-US')}</strong> Từ chối</div>
+    <div class="stat-chip"><div class="dot dot-amber"></div><strong>${(tot - mv.length).toLocaleString('en-US')}</strong> Đang chờ</div>`;
     }
 
     /* ══ Filters ═══════════════════════════════════ */
@@ -4392,7 +4767,7 @@
       const grid = document.getElementById('other-grid');
       if (!grid) return;
       if (!otherProducts.length) {
-        grid.innerHTML = '<div class="empty-state" style="padding:34px 10px"><div class="icon">📝</div><p>No Other products</p></div>';
+        grid.innerHTML = '<div class="empty-state" style="padding:34px 10px"><div class="icon">📝</div><p>Chưa có sản phẩm Other</p></div>';
         return;
       }
 
@@ -4428,7 +4803,7 @@
     function openOtherList() {
       closeUserMenu();
       if (!otherProducts.length) {
-        showToast('No Other products available', '');
+        showToast('Chưa có sản phẩm Other', '');
         return;
       }
       renderOtherList();
@@ -4458,7 +4833,7 @@
       const isExtensionType = npt.includes('ext');
       const sc = v ? (v.status === 'Approved' ? 'approved' : 'rejected') : '';
       const ov = v
-        ? `<div class="voted-overlay"><div class="voted-stamp ${v.status === 'Approved' ? 'approved-stamp' : 'rejected-stamp'}">${v.status}</div></div>`
+        ? `<div class="voted-overlay"><div class="voted-stamp ${v.status === 'Approved' ? 'approved-stamp' : 'rejected-stamp'}">${v.status === 'Approved' ? 'Đã duyệt' : 'Từ chối'}</div></div>`
         : '';
       const delay = (ai % 12) * 0.05;
       return `
@@ -4501,7 +4876,7 @@
       <div style="display:flex;flex-direction:column;gap:3px;flex:1">
         <div class="card-country">🌏 ${p.countryOfOrigin || '—'}</div>
       </div>
-      <button class="btn-review" onclick="event.stopPropagation();openModal(${idx})">${v ? '✓ View' : 'Review →'}</button>
+      <button class="btn-review" onclick="event.stopPropagation();openModal(${idx})">${v ? '✓ Xem' : 'Đánh giá →'}</button>
     </div>
   </div>
 </div>`;
@@ -4574,12 +4949,12 @@
 
       const voteH = allV.length ? `
     <div class="section">
-      <div class="section-title">Review Results</div>
+      <div class="section-title">Kết quả review</div>
       <div style="display:flex;flex-direction:column;gap:6px">
         ${allV.map((r, i) => `
           <div class="vote-item" style="animation-delay:${i * .07}s">
             <span class="vote-pic">${r.pic}</span>
-            <span class="badge ${r.status === 'Approved' ? 'badge-green' : (r.status === 'Rejected' ? 'badge-red' : 'badge-blue')}">${r.status || 'Noted'}</span>
+            <span class="badge ${r.status === 'Approved' ? 'badge-green' : (r.status === 'Rejected' ? 'badge-red' : 'badge-blue')}">${r.status === 'Approved' ? 'Đã duyệt' : (r.status === 'Rejected' ? 'Từ chối' : (r.status || 'Đã ghi chú'))}</span>
             ${r.result ? `<span style="color:var(--gold);font-weight:800;font-size:12px">${r.result}</span>` : ''}
             <span class="vote-note">${r.note || ''}</span>
             <span class="vote-date">${r.date}</span>
@@ -4588,34 +4963,34 @@
     </div>` : '';
 
       const notePrefill = v && v.note ? escHtml(v.note) : '';
-      const readOnlyNotice = `<div class="voted-notice approved-n"><div><strong>Read only</strong></div><div style="font-size:12px;opacity:.85">This Director view does not have edit permission for the current selection.</div></div>`;
+      const readOnlyNotice = `<div class="voted-notice approved-n"><div><strong>Chỉ xem</strong></div><div style="font-size:12px;opacity:.85">Director view hiện tại không có quyền chỉnh sửa lựa chọn này.</div></div>`;
       const dec = !currentCanEdit
         ? readOnlyNotice
         : (otherMode
             ? `<div class="decision-panel">
-        <h4>📝 Note by ${currentUser}</h4>
+        <h4>📝 Ghi chú bởi ${currentUser}</h4>
         <div style="margin-bottom:10px">
-          <textarea class="form-input" id="modal-note" placeholder="Enter note for this Other product..." oninput="toggleOtherNoteSubmit()">${notePrefill}</textarea>
-          <div class="login-hint" style="margin-top:6px">This list is note-only. Approve/Reject is disabled.</div>
+          <textarea class="form-input" id="modal-note" placeholder="Nhập ghi chú cho sản phẩm Other này..." oninput="toggleOtherNoteSubmit()">${notePrefill}</textarea>
+          <div class="login-hint" style="margin-top:6px">Danh sách này chỉ cho phép ghi chú. Approve/Reject đã được khóa.</div>
         </div>
         <button class="btn-submit" id="modal-submit" ${notePrefill ? '' : 'disabled'}
           onclick="submitOtherNote('${esc(productKey(p))}','${esc(p.productName)}')">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9l20-7z"/>
           </svg>
-          Save Note
+          Lưu ghi chú
         </button>
       </div>`
             : (v
                 ? `<div class="voted-notice ${v.status === 'Approved' ? 'approved-n' : 'rejected-n'}">
-        <div><strong>${v.status === 'Approved' ? '✅ Approved' : '❌ Rejected'}</strong>${v.result ? ' — ' + v.result : ''}</div>
+        <div><strong>${v.status === 'Approved' ? '✅ Đã duyệt' : '❌ Từ chối'}</strong>${v.result ? ' — ' + v.result : ''}</div>
         ${v.note ? `<div style="font-size:12px;opacity:.8">📝 ${v.note}</div>` : ''}
       </div>`
                 : `<div class="decision-panel">
         <h4>📋 Decision by ${currentUser}</h4>
         <div class="decision-grid">
-          <button class="status-btn status-btn-approve" id="modal-btn-approve" onclick="setModalStatus('Approved')">✅ Approved</button>
-          <button class="status-btn status-btn-reject"  id="modal-btn-reject"  onclick="setModalStatus('Rejected')">❌ Rejected</button>
+          <button class="status-btn status-btn-approve" id="modal-btn-approve" onclick="setModalStatus('Approved')">✅ Duyệt</button>
+          <button class="status-btn status-btn-reject"  id="modal-btn-reject"  onclick="setModalStatus('Rejected')">❌ Từ chối</button>
         </div>
         <div style="margin-bottom:10px">
           <label class="form-label">Note (optional)</label>
@@ -4703,14 +5078,18 @@
     <div class="desc-block">${whyText}</div>
   </div>` : ''}
 
-  ${(p.ceoNote || p.ssvNote) ? `
+  ${p.ceoNote ? `
   <div class="section">
-    <div class="section-title">Internal Notes</div>
+    <div class="section-title">Ghi chú nội bộ</div>
     <div class="info-grid">
       ${p.ceoNote ? `<div class="info-item full"><div class="info-label">CEO & OPs Note</div><div class="info-val">${p.ceoNote}</div></div>` : ''}
-      ${p.ssvNote ? `<div class="info-item full"><div class="info-label">SSV Note</div><div class="info-val">${p.ssvNote}</div></div>` : ''}
     </div>
   </div>` : ''}
+
+  <div class="section">
+    <div class="section-title">Hội thoại nội bộ</div>
+    <div class="director-chat-panel" id="director-chat-panel"></div>
+  </div>
 
   ${voteH}
 
@@ -4726,6 +5105,7 @@
       setTimeout(() => overlay.classList.remove('entering'), 300);
       document.getElementById('modal-content').scrollTop = 0;
       document.body.style.overflow = 'hidden';
+      loadDirectorProductChat(p);
     }
 
     function closeModal() {
@@ -4734,6 +5114,7 @@
       const passwordHidden = document.getElementById('password-overlay').classList.contains('hidden');
       if (otherHidden && passwordHidden) document.body.style.overflow = '';
       selectedStatus = '';
+      directorChatSeq++;
     }
     function closeModalOutside(e) { if (e.target === document.getElementById('modal-overlay')) closeModal(); }
 
@@ -4754,13 +5135,13 @@
 
     function submitOtherNote(pkey, pname) {
       if (!currentCanEdit) {
-        showToast('This view is read only', 'error');
+        showToast('View hiện tại chỉ được xem.', 'error');
         return;
       }
       const noteInput = document.getElementById('modal-note');
       const note = String(noteInput && noteInput.value || '').trim();
       if (!note) {
-        showToast('Please enter note', 'error');
+        showToast('Vui lòng nhập ghi chú.', 'error');
         if (noteInput) noteInput.focus();
         return;
       }
@@ -4779,10 +5160,10 @@
         })
         .withFailureHandler(err => {
           if (handleSessionError(err)) return;
-          showToast('❌ ' + toErrorText(err, 'Save failed'), 'error');
+          showToast('❌ ' + toErrorText(err, 'Lưu thất bại'), 'error');
           if (btn) {
             btn.disabled = false;
-            btn.innerHTML = 'Save Note';
+            btn.innerHTML = 'Lưu ghi chú';
           }
         })
         .saveOtherNote({ token: authToken, newProductId: pkey, productName: pname, note: note, pic: currentUser });
@@ -4790,13 +5171,13 @@
 
     function submitDecision(pkey, pname) {
       if (!currentCanEdit) {
-        showToast('This view is read only', 'error');
+        showToast('View hiện tại chỉ được xem.', 'error');
         return;
       }
       if (!selectedStatus) return;
       // Guard: prevent double submission (case-insensitive)
       const already = existingResults.find(r => normKey(r.newProductId) === normKey(pkey));
-      if (already) { showToast('You already reviewed this product!', 'error'); closeModal(); return; }
+      if (already) { showToast('Bạn đã review sản phẩm này.', 'error'); closeModal(); return; }
 
       const note = document.getElementById('modal-note').value.trim();
       const result = (ROLE_META[currentUser] && ROLE_META[currentUser].result) || '';
@@ -4812,7 +5193,7 @@
         })
         .withFailureHandler(err => {
           if (handleSessionError(err)) return;
-          showToast('❌ ' + toErrorText(err, 'Save failed'), 'error');
+          showToast('❌ ' + toErrorText(err, 'Lưu thất bại'), 'error');
           btn.disabled = false;
           btn.innerHTML = '→ Submit Decision';
         })
@@ -4891,7 +5272,7 @@
         .catch(err => {
           if (handleSessionError(err)) return;
           if (!silent) {
-            const msg = toErrorText(err, 'Unable to sync data');
+            const msg = toErrorText(err, 'Không thể đồng bộ dữ liệu');
             hideSyncOverlay(false, msg);
             showToast('❌ ' + msg, 'error');
           }

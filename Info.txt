@@ -1,0 +1,305 @@
+NPA_View Project Handoff
+Last updated: 2026-04-20
+Workspace: C:\MY PROJECT\NPA_View
+
+Purpose
+This file is a compact but complete handoff for any AI/engineer entering this project. It records the current business rules, architecture, implemented changes, known risks, and open tasks for the Google Apps Script web app.
+
+Project Overview
+This is a Google Apps Script web app for NPA/New Product Approval style product flow.
+
+Main files:
+- Code.js: Main Apps Script backend for login/access, Category/Manager data APIs, process tracking, updates, audit helpers, shared business flow state machine.
+- Index.html: Main UI for Category and Manager views. Includes product cards/table, edit workspace, batch fill, process tracking modal, workspace/process chat UI.
+- Login.html: Login page.
+- Director_View.html: Director UI.
+- Show_Director.js: Director backend/mobile adapter/update APIs.
+- Chat_Service.js: New stage-aware internal chat backend service.
+- appsscript.json: Apps Script manifest.
+- .clasp.json: clasp deployment config.
+- README.md: currently minimal.
+- test.html: currently untracked; do not delete or overwrite without asking.
+
+Current Git/Workspace State
+As of this handoff, these files are modified:
+- Code.js
+- Index.html
+- Director_View.html
+- Show_Director.js
+
+New/untracked:
+- Chat_Service.js
+- test.html
+
+Do not revert any of these unless the user explicitly asks. Some changes are intentional production work in progress.
+
+Core Business Flow
+Stages are ordered:
+1. Category
+2. Manager
+3. Director
+4. Present List
+5. Final Information
+6. Setup Product ID
+
+Important distinction:
+- storedSheet: the sheet that stores the current process/source row state.
+- effectiveSheet: the stage where the product is considered to be now, by business rules.
+- uiPlacement: whether chat appears in Edit Workspace or Process.
+- storageSource: whether SSV Note Product is physically read/written in Category or Database.
+
+Business Flow State Machine
+Central backend helper is in Code.js:
+- _normalizeBusinessFlowStatus_(value)
+- _resolveBusinessFlowState_(storedSheet, status, options)
+- _buildBusinessFlowStageTimeline_(state)
+
+Rules:
+- Processing / process / in progress / in process / progressing means forward to next stage.
+- Rejected / Reject / any status containing reject means rejected at the stored sheet, do not move forward.
+- Pending does not move forward.
+- Done / Complete / Completed does not move forward under the current confirmed rules.
+- Last stage plus Processing does not go past Setup Product ID.
+- Unknown stage/status should fail safe without crashing; state includes warnings.
+
+Process timeline and labels must use this state machine. Frontend must not reimplement forward/reject rules independently.
+
+Access Model
+Access is token-based via User_Master and server bootstrap.
+Important access fields:
+- selectedView: CAT, MAN, DIR.
+- selectedSheetName: Category, Manager, Director, etc.
+- allowedViews.
+- currentViewCanEdit.
+- scope / categoryScope.
+
+Read/write rules:
+- Read product data/chat only if current access/scope allows it.
+- Write product data only if current view can edit.
+- Chat add requires current view can edit.
+- Chat edit/delete requires current view can edit and actor email must match message PIC exactly.
+
+SSV Note Product / Internal Chat
+SSV Note Product is no longer a normal editable product text field. It is a chat transcript.
+
+Chat storage format per message line:
+PIC|encodedContent|dd-mm-yyyy hh:mm|id
+
+Example:
+trang.ptt@7-eleven.vn|Da%20kiem%20tra%20%7C%20can%20bo%20sung|17-04-2026 15:42|NP0112255C4F-17042026154233123
+
+Encoding:
+- Backend encodes only content with encodeURIComponent.
+- This protects pipe characters, percent signs, and newlines.
+- Parser treats invalid/nonconforming lines as legacy read-only blocks.
+
+ID rule:
+- Generated backend only.
+- Format: NewProductID-ddmmyyyyhhmmssSSS.
+- Collision guard increments timestamp milliseconds under lock.
+
+Chat Backend Public APIs
+Defined in Chat_Service.js:
+- getProductChatHistory(payload)
+- addProductChatMessage(payload)
+- editProductChatMessage(payload)
+- deleteProductChatMessage(payload)
+
+Every mutation:
+- Gets ScriptLock.
+- Re-resolves latest storage target.
+- Re-reads latest cell value.
+- Parses latest transcript.
+- Applies mutation.
+- Writes serialized transcript back.
+- Appends cell note history to the physical target cell.
+- For EDIT/DELETE, writes Log_Chat.
+
+Chat Storage Source Rules
+This was changed after earlier database-only logic. Do not revert to database-only.
+
+Storage resolver:
+- _resolveProductChatStorageTarget_(payload, access, productId) in Chat_Service.js.
+
+Rule:
+- If user is in Category view and product effectiveSheet is Category, read/write Category[SSV Note Product].
+- Otherwise read/write Database[SSV Note Product].
+
+Cases:
+- Category current item: UI in Edit Workspace, storage Category.
+- Category viewing item that has moved to Manager/Director/etc via Process: UI in Process, storage Database.
+- Manager current item: UI in Edit Workspace, storage Database.
+- Manager item moved to Director/etc: UI in Process, storage Database.
+- Director/Present List/Final Information/Setup Product ID: storage Database, never view/formula sheet cells.
+
+Note History
+Existing cell-note history behavior must be preserved.
+
+When chat changes:
+- If storage target is Category, append note to Category[SSV Note Product].
+- If storage target is Database, append note to Database[SSV Note Product].
+
+Note format:
+yyyy-mm-dd hh:mm:ss | Sheet: <business sheet context>
+Old: ...
+New: ...
+By: ...
+
+Important:
+- Sheet in the note is business context from the web view, such as Category or Manager.
+- It is not blindly the physical storage sheet.
+- For example Category user replying via Process to a Manager item stores in Database but note says Sheet: Category.
+
+Log_Chat
+EDIT and DELETE write to Log_Chat. CREATE/add does not require separate Log_Chat if the message append succeeded.
+
+Current required headers:
+- Timestamp
+- Action
+- New Product ID
+- Message ID
+- Message PIC
+- Actor Email
+- Sheet Context
+- View Context
+- Old Raw Entry
+- New Raw Entry
+- Storage Sheet
+- Storage Row
+- Request ID
+
+Chat_Service.js includes light migration for old header Database Row: it inserts Storage Sheet and fills old rows as Database where possible.
+
+Product Save Conflict Guards
+Critical: saveModal/saveAll/updateRow/updateBatch/updateDirectorRow/updateDirectorBatch must not overwrite chat.
+
+Implemented:
+- Code.js removed SSV Note Product from PIC_EDITABLE_FIELDS.
+- Code.js has _isProtectedChatField_(fieldName).
+- _writeChangesToSheet_ skips protected chat field and logs it.
+- Index.html removed SSV Note Product from normal FIELD_MAP/batch/dirty/review/overview save paths.
+- Director aliases no longer resolve approval Note to SSV Note Product.
+
+Frontend Chat UI
+Index.html has two chat layers:
+- Workspace Chat in Edit Workspace when effectiveSheet equals selected sheet.
+- Process Chat in Process modal when effectiveSheet differs from selected sheet.
+
+Important frontend helpers:
+- _getEffectiveBusinessCurrentSheet(summary): should only consume backend flowState/effectiveSheet, not reimplement rules.
+- _shouldRenderWorkspaceChat(row)
+- _shouldRenderProcessChat(detail)
+- _getWorkspaceChatPayload(extra)
+- _getProcessChatPayload(extra)
+- _buildWorkspaceChatHtml()
+- _buildProcessChatHtml()
+
+Workspace chat is outside FIELD_MAP. It must not be collected by saveModal/saveAll.
+
+Director Chat
+Director_View.html uses the same backend chat APIs with:
+- sheetContext: Director
+- viewContext: DIRECTOR_PRODUCT_MODAL
+
+Director storage must resolve to Database. Do not write chat to Director formula/view cells.
+
+Process Tracking
+Process modal has a left Current Processing Queue and a right detail/timeline/chat panel.
+
+Current Process Selection Behavior
+Process Tracking queue-card selection has been separated from search/open-by-query behavior.
+
+Implemented behavior:
+- _buildProcessListItemHtml calls App.selectProcessQueueItem(key).
+- selectProcessQueueItem delegates to selectProcessProduct with source=queue-select and focusSearch=false.
+- Clicking a queue card keeps the modal open, keeps the current queue, keeps the search input unchanged, sets S.processActiveKey, highlights the selected card, loads the right detail panel, and then loads chat for the selected product.
+- Queue selection does not call searchProcess(), searchProcessQueue(), or _requestProcessingProducts().
+- Search only runs when the user clicks the Search button or presses Enter in the search input.
+- Exact code lookup remains a separate fallback via lookupProcessExactCode().
+- Detail and chat requests use sequence/key guards so older responses cannot overwrite a newer selection.
+- When a search/filter is run intentionally, the current selection is kept if it still exists in the returned queue; otherwise selection/detail/chat are cleared deliberately.
+
+UI language note:
+- The Process Tracking and chat text touched in the latest pass has been localized to Vietnamese while keeping sheet/header names such as Product Group and New Product ID where they are real data labels.
+
+Current Process-related functions to audit/fix:
+- _buildProcessListItemHtml(...)
+- openProcess(...)
+- openProcessKey(...)
+- searchProcess(...)
+- _requestProcessingProducts(...)
+- _requestProcessDetail(...)
+- _requestProductChatHistory(...)
+- _renderProcessList(...)
+- _renderProcessModalBody(...)
+
+State separation required:
+- Queue/search state: processProducts, processProductsMeta, processProductsLoading, processProductsError, processSearchValue.
+- Selection/detail state: processActiveKey, processDetail, processLoading, processError.
+- Chat state: processChatKey, processChatHistory, processChatLoading, processChatError, processChatBusy.
+- Request seq state: processProductsSeq, processDetailSeq, processChatSeq.
+
+The queue-card click flow must not reset:
+- S.processProducts
+- S.processProductsMeta
+- S.processSearchValue
+
+Validation Already Run
+Static checks were run after the current chat/state-machine work:
+- node --check Code.js
+- node --check Chat_Service.js
+- node --check Show_Director.js
+- Parsed client script blocks in Index.html and Director_View.html, skipping Apps Script template blocks.
+- git diff --check passed except normal CRLF warnings.
+
+Latest validation after Process queue/state and Vietnamese UI stabilization:
+- node --check Code.js passed.
+- node --check Chat_Service.js passed.
+- node --check Show_Director.js passed.
+- Parsed client script blocks in Index.html and Director_View.html; both parsed successfully, Apps Script template blocks skipped.
+- git diff --check passed with only normal CRLF warnings.
+- Static audit confirms queue cards call App.selectProcessQueueItem(key), not App.openProcessKey(key) or App.openProcess({query:key}).
+- Static audit confirms search queue still runs only through searchProcess/searchProcessQueue paths tied to Search/Enter/reload actions.
+
+Logic tests run locally:
+- Business flow state machine cases:
+  - Category + Processing => effective Manager.
+  - Category + Rejected => effective Category.
+  - Manager + Processing => effective Director.
+  - Manager + Reject => effective Manager.
+  - Director + Processing => effective Present List.
+  - Final Information + Rejected => effective Final Information.
+  - Setup Product ID + Processing => stays Setup Product ID.
+- Chat storage target resolver cases:
+  - Category current item => CATEGORY storage.
+  - Category item moved to Manager => DATABASE storage.
+  - Manager current item => DATABASE storage.
+  - Director => DATABASE storage.
+
+Not Yet Verified Live
+No live Apps Script/spreadsheet execution has been confirmed from this environment.
+Must verify in the actual deployed web app/spreadsheet:
+- Category current row reads/writes Category SSV Note Product.
+- Category Process reply to Manager item reads/writes Database SSV Note Product.
+- Manager current item reads/writes Database.
+- Director reads/writes Database.
+- Cell notes append on the correct physical cell with business Sheet context.
+- Log_Chat gets Storage Sheet and Storage Row.
+- Owner-only edit/delete.
+- View-only rejection.
+- Save product cannot overwrite chat.
+
+Deployment Notes
+- Chat_Service.js is a new Apps Script file. Ensure clasp pushes it.
+- If appsscript deployment is manual, confirm Chat_Service.js exists in Apps Script editor.
+- Do not delete test.html unless user confirms; it is untracked.
+
+Coding Rules For Future Agents
+- Do not put SSV Note Product back into FIELD_MAP, PIC_EDITABLE_FIELDS, batch fill copy maps, dirty field maps, or director note aliases.
+- Do not make Database the only chat source again; Category current item must use Category.
+- Do not let Manager/Director write chat to view/formula sheets.
+- Do not duplicate business flow rules in frontend; consume backend flowState/effectiveSheet where possible.
+- Do not revert user/other-agent changes in dirty worktree.
+- Use rg for search.
+- Use apply_patch for manual edits.
+- Keep changes scoped and production-grade.
