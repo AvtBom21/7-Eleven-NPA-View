@@ -225,6 +225,7 @@ Implemented behavior:
 Chat lookup correction:
 - rowNumber is only a hint for chat storage lookup.
 - If rowNumber does not match the requested product, Chat_Service.js now falls back to scanning by New Product ID instead of throwing a row mismatch error.
+- Index.html Process Chat payloads no longer inherit rowNumber from S.processLastRequest; New Product ID is the stable key, and rowNumber is sent only when a caller explicitly supplies it.
 - Only a full product-id scan miss returns a real *_ROW_NOT_FOUND error.
 
 UI language note:

@@ -9255,16 +9255,12 @@
       }
       function _getProcessChatPayload(extra, detailOverride) {
         var detail = detailOverride || S.processDetail || {};
-        var lastPayload = S.processLastRequest && S.processLastRequest.payload ? S.processLastRequest.payload : {};
         var payload = Object.assign({
           token: AUTH_TOKEN,
           newProductId: detail.key || '',
           sheetContext: SELECTED_SHEET_NAME || (SELECTED_VIEW === 'MAN' ? 'Manager' : 'Category'),
           viewContext: 'INDEX_PROCESS_MODAL'
         }, extra || {});
-        var canUseLastPayload = !detailOverride
-          || _normalizeProcessSearchKey(detail && detail.key) === _normalizeProcessSearchKey(S.processDetail && S.processDetail.key);
-        if (canUseLastPayload && lastPayload.rowNumber) payload.rowNumber = lastPayload.rowNumber;
         var effectiveSheet = _getEffectiveBusinessCurrentSheet(detail);
         if (effectiveSheet || detail.currentSheet) payload.currentProductSheet = effectiveSheet || detail.currentSheet;
         if (detail.currentSheet) payload.currentSheet = detail.currentSheet;
