@@ -1102,6 +1102,7 @@ function getInitData(params) {
     if (accessRes.data) {
       allRows = _applyAccessScopeToRows_(allRows, accessRes.data);
     }
+    allRows = _applyConversationMetaToRows_(allRows, accessRes.data);
 
     var total = allRows.length;
 
@@ -1301,6 +1302,7 @@ function searchRows(params) {
     if (accessRes.data) {
       allRows = _applyAccessScopeToRows_(allRows, accessRes.data);
     }
+    allRows = _applyConversationMetaToRows_(allRows, accessRes.data);
 
     // Apply keyword filter
     var keyword = (params.keyword || '').toLowerCase().trim();
@@ -1373,6 +1375,111 @@ function _isProtectedChatField_(fieldName) {
   return !!target && candidate === target;
 }
 
+function _hasProductChatConversationValue_(value) {
+  var text = String(value == null ? '' : value).replace(/\r\n?/g, '\n');
+  if (!text.replace(/\s+/g, '').length) return false;
+
+  try {
+    var parsed = _parseProductChatTranscript_(text);
+    if (parsed && Array.isArray(parsed.messages) && parsed.messages.length) return true;
+    var legacy = parsed && Array.isArray(parsed.legacy) ? parsed.legacy : [];
+    for (var i = 0; i < legacy.length; i++) {
+      var content = String((legacy[i] && (legacy[i].content || legacy[i].raw)) || '').replace(/\s+/g, '');
+      if (content) return true;
+    }
+    return false;
+  } catch (err) {
+    Logger.log('Conversation presence parser fallback: ' + err);
+    return !!text.trim();
+  }
+}
+
+function _getProductChatKeyFromRowObject_(rowObj) {
+  if (!rowObj) return '';
+  return _getProcessAliasValueFromObject_(rowObj, PROCESS_TRACKING_KEY_ALIASES);
+}
+
+function _buildDatabaseConversationFlagMap_(keys) {
+  var wanted = {};
+  var hasWanted = false;
+  var list = Array.isArray(keys) ? keys : [];
+  for (var i = 0; i < list.length; i++) {
+    var normalized = _normalizeProcessExactKey_(list[i]);
+    if (!normalized || wanted[normalized]) continue;
+    wanted[normalized] = true;
+    hasWanted = true;
+  }
+
+  var out = {};
+  try {
+    var ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+    var sheet = ss.getSheetByName(CONFIG.SHEET_NAME_DATABASE || 'Database');
+    if (!sheet) return out;
+
+    var headers = _trimTrailingEmptyHeaders_(_getHeaders(sheet));
+    var chatCol = _findHeaderIndexLoose_(headers, CONFIG.CHAT_FIELD_NAME || 'SSV Note Product');
+    var keyIndexes = _findProcessHeaderIndexes_(headers, PROCESS_TRACKING_KEY_ALIASES);
+    var lastRow = sheet.getLastRow();
+    if (!headers.length || chatCol < 0 || !keyIndexes.length || lastRow < CONFIG.DATA_START_ROW) return out;
+
+    var rowCount = lastRow - CONFIG.DATA_START_ROW + 1;
+    var rows = sheet.getRange(CONFIG.DATA_START_ROW, 1, rowCount, headers.length).getValues();
+    for (var r = 0; r < rows.length; r++) {
+      var row = rows[r];
+      var hasConversation = _hasProductChatConversationValue_(row[chatCol]);
+      for (var k = 0; k < keyIndexes.length; k++) {
+        var key = _normalizeProcessExactKey_(row[keyIndexes[k]]);
+        if (!key || (hasWanted && !wanted[key])) continue;
+        if (!out.hasOwnProperty(key)) out[key] = false;
+        if (hasConversation) out[key] = true;
+      }
+    }
+  } catch (err) {
+    Logger.log('Database conversation flag map failed: ' + err);
+  }
+  return out;
+}
+
+function _applyConversationMetaToRows_(rows, access) {
+  var list = Array.isArray(rows) ? rows : [];
+  if (!list.length) return list;
+
+  var viewCode = _getSelectedViewCode_(access);
+  if (viewCode === 'CAT') {
+    for (var i = 0; i < list.length; i++) {
+      list[i].hasConversation = _hasProductChatConversationValue_(list[i][CONFIG.CHAT_FIELD_NAME || 'SSV Note Product']);
+    }
+    return list;
+  }
+
+  var keys = [];
+  for (var r = 0; r < list.length; r++) {
+    var rawKey = _getProductChatKeyFromRowObject_(list[r]);
+    if (rawKey) keys.push(rawKey);
+  }
+  var flags = _buildDatabaseConversationFlagMap_(keys);
+  for (var j = 0; j < list.length; j++) {
+    var normalizedKey = _normalizeProcessExactKey_(_getProductChatKeyFromRowObject_(list[j]));
+    list[j].hasConversation = !!(normalizedKey && flags[normalizedKey]);
+  }
+  return list;
+}
+
+function _attachDatabaseConversationMetaToProcessRecords_(records) {
+  var list = Array.isArray(records) ? records : [];
+  if (!list.length) return list;
+  var keys = [];
+  for (var i = 0; i < list.length; i++) {
+    if (list[i] && list[i].key) keys.push(list[i].key);
+  }
+  var flags = _buildDatabaseConversationFlagMap_(keys);
+  for (var r = 0; r < list.length; r++) {
+    var normalizedKey = _normalizeProcessExactKey_(list[r] && list[r].key);
+    list[r].hasConversation = !!(normalizedKey && flags[normalizedKey]);
+  }
+  return list;
+}
+
 // ========================================
 // PROCESS TRACKING API
 // ========================================
@@ -1392,8 +1499,8 @@ var PROCESS_TRACKING_KEY_ALIASES = [
   'Ticket ID'
 ];
 
-var PROCESS_TRACKING_CARD_LIMIT_DEFAULT = 80;
-var PROCESS_TRACKING_CARD_LIMIT_MAX = 160;
+var PROCESS_TRACKING_CARD_LIMIT_DEFAULT = 5000;
+var PROCESS_TRACKING_CARD_LIMIT_MAX = 5000;
 
 function _requireProcessTrackingAccess_(params) {
   var accessRes = _resolveAccessForDataApi_(params);
@@ -2187,6 +2294,7 @@ function _buildProcessCardSummary_(record, fallback) {
     currentStatus: current.currentStatus || '',
     displayStageLabel: current.displayStageLabel || (currentFlowState && currentFlowState.displayStageLabel) || base.displayStageLabel || (fallbackFlowState && fallbackFlowState.displayStageLabel) || '',
     lastSeen: current.lastSeen || '',
+    hasConversation: current.hasConversation === true || base.hasConversation === true,
     flowState: currentFlowState || fallbackFlowState || null
   };
 }
@@ -2206,6 +2314,7 @@ function _buildProcessDetailModel_(record, fallback) {
     currentStatus: summary.currentStatus,
     displayStageLabel: summary.displayStageLabel,
     lastSeen: summary.lastSeen,
+    hasConversation: summary.hasConversation === true,
     stageTimeline: record ? record.stageTimeline : (summary.flowState ? summary.flowState.stageTimeline : _buildProcessStageTimeline_('', '')),
     flowState: summary.flowState || null
   };
@@ -2233,6 +2342,7 @@ function _buildProcessLookupEntry_(record, rowSnapshot, primaryKey, access) {
       productName: emptySummary.productName,
       barcodeOrUom: emptySummary.barcodeOrUom,
       productGroup: emptySummary.productGroup,
+      hasConversation: emptySummary.hasConversation === true,
       flowState: emptySummary.flowState || null
     };
   }
@@ -2253,6 +2363,7 @@ function _buildProcessLookupEntry_(record, rowSnapshot, primaryKey, access) {
     productName: summary.productName || '',
     barcodeOrUom: summary.barcodeOrUom || '',
     productGroup: summary.productGroup || '',
+    hasConversation: summary.hasConversation === true,
     flowState: selectedFlowState
   };
 }
@@ -2344,6 +2455,7 @@ function getProcessingProducts(params) {
     deduped = deduped.filter(function(record) {
       return _isProcessListEligible_(record);
     });
+    _attachDatabaseConversationMetaToProcessRecords_(deduped);
 
     var query = String(params.query || '').trim();
     if (query) {
@@ -2360,7 +2472,7 @@ function getProcessingProducts(params) {
     });
 
     var total = deduped.length;
-    var limit = _getProcessingProductsLimit_(params.limit);
+    var limit = params.fullDataset === true ? PROCESS_TRACKING_CARD_LIMIT_MAX : _getProcessingProductsLimit_(params.limit);
     var selectedSheet = _getSelectedBusinessSheetForAccess_(accessRes.data);
     var items = deduped.slice(0, limit).map(function(record) {
       var item = _buildProcessCardSummary_(record, null);
@@ -2377,6 +2489,7 @@ function getProcessingProducts(params) {
       total: total,
       returned: items.length,
       limit: limit,
+      fullDataset: params.fullDataset === true,
       query: query,
       allowedGroups: allowedGroupInfo.list,
       warning: allowedGroupInfo.warning
@@ -2497,6 +2610,7 @@ function getProcessDetail(params) {
       if (!matchedRowRecord) {
         return _err('PROCESS_NOT_FOUND', 'Khong tim thay du lieu process cho ma: ' + rowKeys.primary);
       }
+      _attachDatabaseConversationMetaToProcessRecords_([matchedRowRecord]);
 
       return _ok(_buildProcessDetailPayload_(matchedRowRecord, rowSnapshot, rowKeys.primary, accessRes.data));
     }
@@ -2526,6 +2640,7 @@ function getProcessDetail(params) {
     if (!matchedQueryRecord) {
       return _err('FORBIDDEN_SCOPE', 'Khong the hien thi process cho ma nay trong pham vi quyen hien tai.');
     }
+    _attachDatabaseConversationMetaToProcessRecords_([matchedQueryRecord]);
 
     return _ok(_buildProcessDetailPayload_(matchedQueryRecord, null, query, accessRes.data));
   } catch (err) {

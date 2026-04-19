@@ -217,9 +217,12 @@ Implemented behavior:
 - Search only runs when the user clicks the Search button or presses Enter in the search input.
 - Exact code lookup remains a separate fallback via lookupProcessExactCode().
 - Detail and chat requests use sequence/key guards so older responses cannot overwrite a newer selection.
-- When a search/filter is run intentionally, the current selection is kept if it still exists in the returned queue; otherwise selection/detail/chat are cleared deliberately.
-- The queue response primes a lightweight client detail cache for returned cards, so selecting a queued item can render the right panel immediately from cached summary/timeline data while a background detail refresh verifies freshness.
-- Process chat responses are cached per New Product ID. Opening Process preloads chat for the active/first item and the first few queued items; selecting a cached item shows the thread immediately and refreshes in the background.
+- Process queue data is now a static client dataset until the user explicitly clicks Reload/Tải lại in the Process modal.
+- Search, Product Group filter, and Có Hội Thoại filter inside Process run locally on the loaded dataset; they do not call getProcessingProducts again.
+- When a search/filter is run intentionally, the current selection is kept if it still exists in the filtered queue; otherwise selection/detail/chat are cleared deliberately.
+- The queue response primes a lightweight client detail cache for returned cards, so selecting a queued item renders the right panel from cached summary/timeline data without a detail server round trip.
+- Process chat is not prefetched for the whole queue. It is fetched fresh when the user opens/selects an item detail, then cached per New Product ID for UI continuity.
+- Process and main product lists receive hasConversation metadata. Có Hội Thoại means at least one valid parsed message or one non-empty legacy block; an empty/whitespace SSV Note Product is not counted.
 - Empty SSV Note Product is a valid empty conversation, not an error.
 
 Chat lookup correction:
@@ -276,6 +279,15 @@ Latest validation after Process cache/preload and chat rowNumber fallback:
 - node --check Show_Director.js passed.
 - Parsed client script blocks in Index.html and Director_View.html; both parsed successfully, Apps Script template blocks skipped.
 - git diff --check passed with only normal CRLF warnings.
+
+Latest validation after static Process dataset / Có Hội Thoại upgrade:
+- node --check Code.js passed.
+- node --check Chat_Service.js passed.
+- node --check Show_Director.js passed.
+- Parsed client script blocks in Index.html and Director_View.html; both parsed successfully, Apps Script template blocks skipped.
+- git diff --check passed with only normal CRLF warnings.
+- Static audit confirms Process search/filter uses the loaded client dataset, while Reload/Tải lại is the explicit server refresh path.
+- Static audit confirms Process queue selection renders detail from cache/dataset and fetches chat fresh for the selected item.
 
 Logic tests run locally:
 - Business flow state machine cases:

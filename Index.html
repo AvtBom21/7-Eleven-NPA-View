@@ -407,6 +407,27 @@
       appearance: none
     }
 
+    .fcheck {
+      height: 37px;
+      padding: 0 11px;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      background: #f8fafc;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font: 700 11px var(--font);
+      color: var(--text2);
+      cursor: pointer;
+      white-space: nowrap
+    }
+
+    .fcheck input {
+      width: 15px;
+      height: 15px;
+      accent-color: var(--blue)
+    }
+
     .vtoggle {
       display: flex;
       gap: 2px;
@@ -907,6 +928,35 @@
       background: var(--bl);
       border: 1px solid #bfdbfe;
       color: var(--blue)
+    }
+
+    .tag-chat,
+    .conversation-chip {
+      background: #ecfdf5;
+      border-color: #86efac;
+      color: #15803d
+    }
+
+    .conversation-dot {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: #ecfdf5;
+      border: 1px solid #86efac;
+      color: #15803d;
+      font: 700 10px var(--font);
+      white-space: nowrap
+    }
+
+    .conversation-dot::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, .13)
     }
 
     .cfoot {
@@ -1991,6 +2041,63 @@
       box-shadow: 0 0 0 4px rgba(96, 165, 250, .18)
     }
 
+    .process-local-filters {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      flex-wrap: wrap
+    }
+
+    .process-filter-field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-width: 170px
+    }
+
+    .process-filter-field span {
+      font: 700 10px var(--mono);
+      color: #64748b;
+      letter-spacing: .06em;
+      text-transform: uppercase
+    }
+
+    .process-filter-field select {
+      height: 42px;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      background: #fff;
+      color: #0f172a;
+      padding: 0 34px 0 12px;
+      font: 700 12px var(--font);
+      outline: 0;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath d='M1 1l3 3 3-3' stroke='%2364748b' stroke-width='1.3' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center
+    }
+
+    .process-conversation-filter {
+      height: 42px;
+      padding: 0 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      background: #fff;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: #334155;
+      font: 800 12px var(--font);
+      cursor: pointer;
+      white-space: nowrap
+    }
+
+    .process-conversation-filter input {
+      width: 15px;
+      height: 15px;
+      accent-color: #16a34a
+    }
+
     .process-toolbar-note {
       font: 600 11px/1.5 var(--font);
       color: #64748b
@@ -2188,6 +2295,12 @@
       background: #eff6ff;
       border: 1px solid #bfdbfe;
       color: #1d4ed8
+    }
+
+    .process-conversation-chip {
+      background: #ecfdf5;
+      border: 1px solid #86efac;
+      color: #15803d
     }
 
     .process-list-foot {
@@ -7239,6 +7352,10 @@
       <div class="fg"><label>Product Group</label><select id="fG">
           <option value="">Tất cả Group</option>
         </select></div>
+      <label class="fcheck" title="Chỉ hiện sản phẩm đã có hội thoại nội bộ">
+        <input type="checkbox" id="fChat">
+        <span>Có Hội Thoại</span>
+      </label>
       <div style="display:flex;gap:6px;align-items:flex-end;flex-shrink:0">
         <button class="btn btn-ghost btn-sm" onclick="App.clearFilters()" style="padding:8px 12px">✕</button>
         <div class="vtoggle">
@@ -8548,7 +8665,20 @@
           <input type="text" id="processSearchInput" placeholder="Tìm mã, tên sản phẩm, barcode/UOM, Product Group" onkeydown="if (event.key === 'Enter') App.searchProcess()">
           <div class="process-search-actions">
             <button class="btn btn-ghost btn-sm" onclick="App.searchProcess()">Tìm</button>
+            <button class="btn btn-ghost btn-sm" onclick="App.reloadProcessQueue()">Tải lại</button>
           </div>
+        </div>
+        <div class="process-local-filters">
+          <label class="process-filter-field">
+            <span>Product Group</span>
+            <select id="processGroupFilter" onchange="App.applyProcessFilters()">
+              <option value="">Tất cả Group</option>
+            </select>
+          </label>
+          <label class="process-conversation-filter">
+            <input type="checkbox" id="processHasConversationFilter" onchange="App.applyProcessFilters()">
+            <span>Có Hội Thoại</span>
+          </label>
         </div>
         <div class="process-toolbar-note" id="processToolbarNote">Chỉ hiển thị các mã đang process thuộc Product Group trong scope hiện tại.</div>
       </div>
@@ -8588,10 +8718,10 @@
         subcateMap: {}, subcateMasterMap: {}, subcateBench: {}, subcateBenchMaster: {}, refProductCache: {}, currentRefDetail: null,
         activeRow: null, batchActiveRow: null, navSection: 'list',
         processLookupByRow: {}, processLookupByKey: {}, processLookupWarning: null, processLookupSeq: 0, processLookupLoaded: false,
-        processProducts: [], processProductsMeta: null, processProductsLoading: false, processProductsError: null, processProductsSeq: 0, processProductsLoaded: false,
+        processProducts: [], processProductsAll: [], processProductsMeta: null, processProductsDatasetMeta: null, processProductsLoading: false, processProductsError: null, processProductsSeq: 0, processProductsLoaded: false,
         processDetailSeq: 0, processModalOpen: false, processLoading: false, processError: null, processDetail: null,
-        processLastRequest: null, processSearchValue: '', processActiveKey: '',
-        processDetailCache: {}, processChatCache: {}, processChatPrefetching: {},
+        processLastRequest: null, processSearchValue: '', processGroupFilter: '', processHasConversationOnly: false, processActiveKey: '',
+        processDetailCache: {}, processChatCache: {},
         processChatSeq: 0, processChatKey: '', processChatLoading: false, processChatError: null, processChatHistory: null,
         processChatBusy: false, processChatEditId: '', processChatDraft: '', processChatEditDraft: '',
         workspaceChatSeq: 0, workspaceChatKey: '', workspaceChatRowNumber: null, workspaceChatLoading: false,
@@ -8765,8 +8895,72 @@
           barcodeOrUom: _cleanDisplayValue(row && (row['UOM Information'] || row['UOM INFORMATION'] || '')),
           productGroup: _cleanDisplayValue(row && (row['Product Group'] || '')),
           imageOriginalUrl: primaryImage,
-          imageUrl: _toProcessPreviewUrl(primaryImage, 'w1200')
+          imageUrl: _toProcessPreviewUrl(primaryImage, 'w1200'),
+          hasConversation: _rowHasConversation(row)
         };
+      }
+      function _rowHasConversation(row) {
+        if (!row) return false;
+        if (row.hasConversation === true || row._hasConversation === true) return true;
+        var raw = row['SSV Note Product'];
+        return typeof raw === 'string' && raw.replace(/\s+/g, '').length > 0;
+      }
+      function _setRowConversationMeta(rowNumber, hasConversation, renderList) {
+        var rn = parseInt(rowNumber, 10);
+        if (!rn) return;
+        var changed = false;
+        function update(list) {
+          for (var i = 0; i < list.length; i++) {
+            if (parseInt(list[i] && list[i]._rowNumber, 10) === rn && list[i].hasConversation !== (hasConversation === true)) {
+              list[i].hasConversation = hasConversation === true;
+              changed = true;
+            }
+          }
+        }
+        update(S.allRows || []);
+        update(S.rows || []);
+        var cached = S.selectedRows[_rnKey(rn)];
+        if (cached) cached.hasConversation = hasConversation === true;
+        if (changed && renderList !== false) {
+          var chatFilter = document.getElementById('fChat');
+          if (chatFilter && chatFilter.checked) applyClientFilters();
+          else render();
+        }
+      }
+      function _setMainConversationMetaByProductKey(key, hasConversation) {
+        var normalized = _normalizeProcessSearchKey(key);
+        if (!normalized) return;
+        var changed = false;
+        function update(row) {
+          var keys = _getRowProcessKeys(row);
+          for (var i = 0; i < keys.length; i++) {
+            if (keys[i].normalized === normalized) {
+              if (row.hasConversation !== (hasConversation === true)) {
+                row.hasConversation = hasConversation === true;
+                changed = true;
+              }
+              return;
+            }
+          }
+        }
+        (S.allRows || []).forEach(update);
+        (S.rows || []).forEach(update);
+        if (changed) {
+          var chatFilter = document.getElementById('fChat');
+          if (chatFilter && chatFilter.checked) applyClientFilters();
+          else render();
+        }
+      }
+      function _hasChatHistoryConversation(history) {
+        var normalized = _normalizeProductChatHistoryPayload(history);
+        for (var i = 0; i < normalized.items.length; i++) {
+          var item = normalized.items[i] || {};
+          if (String(item.content || '').replace(/\s+/g, '').length) return true;
+        }
+        return false;
+      }
+      function _conversationBadgeHtml(label, extraClass) {
+        return '<span class="' + esc(extraClass || 'conversation-dot') + '" title="Sản phẩm đã có hội thoại nội bộ">' + esc(label || 'Có hội thoại') + '</span>';
       }
       function _normalizeProcessCardSummary(data) {
         var item = Object.assign({}, data || {});
@@ -8783,6 +8977,7 @@
         item.currentStatus = _cleanDisplayValue(item.currentStatus || '');
         item.displayStageLabel = _cleanDisplayValue(item.displayStageLabel || item.label || '');
         item.lastSeen = _cleanDisplayValue(item.lastSeen || '');
+        item.hasConversation = item.hasConversation === true || (item.chatMeta && item.chatMeta.hasConversation === true);
         item.flowState = sourceFlowState;
         return item;
       }
@@ -8802,6 +8997,7 @@
           currentStatus: card.currentStatus || '',
           displayStageLabel: card.displayStageLabel || '',
           lastSeen: card.lastSeen || '',
+          hasConversation: card.hasConversation === true || rowFallback.hasConversation === true,
           flowState: card.flowState || null
         };
       }
@@ -8815,6 +9011,11 @@
         for (var i = 0; i < S.processProducts.length; i++) {
           if (_normalizeProcessSearchKey(S.processProducts[i] && S.processProducts[i].key) === normalized) {
             return _normalizeProcessCardSummary(S.processProducts[i]);
+          }
+        }
+        for (var a = 0; a < S.processProductsAll.length; a++) {
+          if (_normalizeProcessSearchKey(S.processProductsAll[a] && S.processProductsAll[a].key) === normalized) {
+            return _normalizeProcessCardSummary(S.processProductsAll[a]);
           }
         }
         var lookup = S.processLookupByKey[key] || null;
@@ -8854,52 +9055,101 @@
         return cached ? _normalizeProductChatHistoryPayload(cached) : null;
       }
       function _primeProcessDetailCacheFromQueue() {
-        for (var i = 0; i < S.processProducts.length; i++) {
-          var item = _normalizeProcessCardSummary(S.processProducts[i]);
+        var source = S.processProductsAll.length ? S.processProductsAll : S.processProducts;
+        for (var i = 0; i < source.length; i++) {
+          var item = _normalizeProcessCardSummary(source[i]);
           if (!item.key) continue;
           _cacheProcessDetail(item.key, _normalizeProcessDetail(item, null, item));
         }
       }
-      function _prefetchProcessChatHistory(key, detail) {
-        var cacheKey = _getProcessCacheKey(key || detail);
-        if (!cacheKey || S.processChatCache[cacheKey] || S.processChatPrefetching[cacheKey]) return;
-        var sourceDetail = detail || _getCachedProcessDetail(cacheKey) || _findProcessSummaryByKey(cacheKey);
-        if (!sourceDetail || !sourceDetail.key) return;
-        S.processChatPrefetching[cacheKey] = true;
-        google.script.run
-          .withSuccessHandler(function (res) {
-            delete S.processChatPrefetching[cacheKey];
-            if (!res || !res.ok) return;
-            _cacheProcessChatHistory(cacheKey, res.data);
-            if (_normalizeProcessSearchKey(S.processChatKey || '') === cacheKey && !S.processChatHistory) {
-              S.processChatHistory = _getCachedProcessChatHistory(cacheKey);
-              S.processChatLoading = false;
-              S.processChatError = null;
-              _renderProcessChatOnly();
-            }
-          })
-          .withFailureHandler(function () {
-            delete S.processChatPrefetching[cacheKey];
-          })
-          .getProductChatHistory(_getProcessChatPayload({ newProductId: sourceDetail.key }, sourceDetail));
+      function _syncProcessFilterControls() {
+        var select = document.getElementById('processGroupFilter');
+        if (select) {
+          var current = S.processGroupFilter || select.value || '';
+          var groups = {};
+          (S.processProductsAll || []).forEach(function (item) {
+            var group = _cleanDisplayValue(item && item.productGroup);
+            if (group) groups[group] = true;
+          });
+          select.innerHTML = '<option value="">Tất cả Group</option>' + Object.keys(groups).sort().map(function (group) {
+            return '<option value="' + esc(group) + '">' + esc(group) + '</option>';
+          }).join('');
+          select.value = groups[current] ? current : '';
+          S.processGroupFilter = select.value;
+        }
+        var chatOnly = document.getElementById('processHasConversationFilter');
+        if (chatOnly) chatOnly.checked = S.processHasConversationOnly === true;
       }
-      function _prefetchProcessChatFromQueue(limit) {
-        var max = Math.max(0, parseInt(limit, 10) || 0);
-        if (!max) return;
-        var seen = {};
-        var activeKey = _chooseProcessPreloadKey();
-        if (activeKey) {
-          var activeDetail = _getCachedProcessDetail(activeKey) || _findProcessSummaryByKey(activeKey);
-          _prefetchProcessChatHistory(activeKey, activeDetail);
-          seen[_getProcessCacheKey(activeKey)] = true;
+      function _readProcessFilterControls() {
+        var group = document.getElementById('processGroupFilter');
+        var hasConversation = document.getElementById('processHasConversationFilter');
+        S.processGroupFilter = group ? String(group.value || '').trim() : (S.processGroupFilter || '');
+        S.processHasConversationOnly = hasConversation ? hasConversation.checked === true : S.processHasConversationOnly === true;
+      }
+      function _buildProcessLocalSearchText(item) {
+        var data = _normalizeProcessCardSummary(item);
+        return [
+          data.key,
+          data.productName,
+          data.barcodeOrUom,
+          data.productGroup,
+          data.currentSheet,
+          data.currentStatus,
+          data.displayStageLabel
+        ].join(' ').toLowerCase();
+      }
+      function _matchesProcessLocalFilters(item) {
+        var data = _normalizeProcessCardSummary(item);
+        var query = String(S.processSearchValue || '').trim().toLowerCase();
+        if (S.processGroupFilter && data.productGroup !== S.processGroupFilter) return false;
+        if (S.processHasConversationOnly === true && data.hasConversation !== true) return false;
+        if (!query) return true;
+        return _buildProcessLocalSearchText(data).indexOf(query) >= 0;
+      }
+      function _applyProcessLocalFilters(options) {
+        var opts = options || {};
+        _readProcessFilterControls();
+        var source = Array.isArray(S.processProductsAll) ? S.processProductsAll : [];
+        S.processProducts = source.filter(_matchesProcessLocalFilters).map(_normalizeProcessCardSummary);
+        var baseMeta = Object.assign({}, S.processProductsDatasetMeta || S.processProductsMeta || {});
+        S.processProductsMeta = Object.assign(baseMeta, {
+          total: S.processProducts.length,
+          returned: S.processProducts.length,
+          datasetTotal: source.length,
+          query: S.processSearchValue || '',
+          productGroup: S.processGroupFilter || '',
+          hasConversationOnly: S.processHasConversationOnly === true,
+          localFilter: true
+        });
+        var activeKey = _normalizeProcessSearchKey(S.processActiveKey || '');
+        var shouldClearSelection = opts.clearSelectionWhenMissing === true && !!activeKey && !_hasProcessProductInQueue(activeKey);
+        if (shouldClearSelection) _clearProcessSelectionState({ render: false });
+        _renderProcessList({ resetScroll: opts.resetScroll === true });
+        if (shouldClearSelection) _renderProcessModalBody(null, null);
+        _refreshProcessTriggerState();
+      }
+      function _setProcessConversationMeta(key, hasConversation) {
+        var normalized = _normalizeProcessSearchKey(key);
+        if (!normalized) return;
+        function updateList(list) {
+          for (var i = 0; i < list.length; i++) {
+            if (_normalizeProcessSearchKey(list[i] && list[i].key) === normalized) {
+              list[i].hasConversation = hasConversation === true;
+            }
+          }
         }
-        for (var i = 0; i < S.processProducts.length && Object.keys(seen).length < max; i++) {
-          var item = _normalizeProcessCardSummary(S.processProducts[i]);
-          var cacheKey = _getProcessCacheKey(item.key);
-          if (!cacheKey || seen[cacheKey]) continue;
-          seen[cacheKey] = true;
-          _prefetchProcessChatHistory(item.key, _getCachedProcessDetail(item.key) || _normalizeProcessDetail(item, null, item));
+        updateList(S.processProductsAll || []);
+        updateList(S.processProducts || []);
+        var cached = _getCachedProcessDetail(normalized);
+        if (cached) {
+          cached.hasConversation = hasConversation === true;
+          S.processDetailCache[normalized] = cached;
         }
+        if (_normalizeProcessSearchKey(S.processDetail && S.processDetail.key) === normalized) {
+          S.processDetail.hasConversation = hasConversation === true;
+        }
+        if (S.processHasConversationOnly === true) _applyProcessLocalFilters({ clearSelectionWhenMissing: false });
+        else _renderProcessList();
       }
       function _chooseProcessPreloadKey(preferKey) {
         var preferred = _normalizeProcessSearchKey(preferKey || '');
@@ -9078,6 +9328,7 @@
         if (!detail.currentStatus) detail.currentStatus = fallback.currentStatus || '';
         if (!detail.displayStageLabel) detail.displayStageLabel = fallback.displayStageLabel || '';
         if (!detail.lastSeen) detail.lastSeen = fallback.lastSeen || '';
+        detail.hasConversation = detail.hasConversation === true || fallback.hasConversation === true;
         if (!detail.flowState && fallback.flowState) detail.flowState = fallback.flowState;
         if (!Array.isArray(detail.stageTimeline) || !detail.stageTimeline.length) {
           detail.stageTimeline = detail.flowState && Array.isArray(detail.flowState.stageTimeline) ? detail.flowState.stageTimeline : _buildEmptyProcessTimeline();
@@ -9332,6 +9583,9 @@
             }
             S.processChatHistory = _normalizeProductChatHistoryPayload(res.data);
             _cacheProcessChatHistory(key, S.processChatHistory);
+            var hasConversation = _hasChatHistoryConversation(S.processChatHistory);
+            _setProcessConversationMeta(key, hasConversation);
+            _setMainConversationMetaByProductKey(key, hasConversation);
             S.processChatError = null;
             _renderProcessChatOnly();
           })
@@ -9365,6 +9619,10 @@
         }
         S.processChatHistory = _normalizeProductChatHistoryPayload(res.data && (res.data.history || res.data));
         _cacheProcessChatHistory(S.processDetail && S.processDetail.key, S.processChatHistory);
+        var key = S.processDetail && S.processDetail.key;
+        var hasConversation = _hasChatHistoryConversation(S.processChatHistory);
+        _setProcessConversationMeta(key, hasConversation);
+        _setMainConversationMetaByProductKey(key, hasConversation);
         S.processChatError = null;
         S.processChatEditId = '';
         S.processChatDraft = '';
@@ -9617,6 +9875,7 @@
               return;
             }
             S.workspaceChatHistory = _normalizeProductChatHistoryPayload(res.data);
+            _setRowConversationMeta(rn, _hasChatHistoryConversation(S.workspaceChatHistory), false);
             S.workspaceChatError = null;
             _renderWorkspaceChatOnly();
           })
@@ -9642,6 +9901,7 @@
           return false;
         }
         S.workspaceChatHistory = _normalizeProductChatHistoryPayload(res.data && (res.data.history || res.data));
+        _setRowConversationMeta(S.workspaceChatRowNumber, _hasChatHistoryConversation(S.workspaceChatHistory), true);
         S.workspaceChatError = null;
         S.workspaceChatEditId = '';
         S.workspaceChatDraft = '';
@@ -9756,6 +10016,7 @@
           + '    <div class="process-list-chiprow">'
           + '      <span class="process-group-chip">' + esc(data.productGroup || 'Chưa có Product Group') + '</span>'
           + '      <span class="process-stage-chip">' + esc(data.displayStageLabel || 'Đang theo dõi Process') + '</span>'
+          +        (data.hasConversation ? '<span class="process-conversation-chip">Có hội thoại</span>' : '')
           + '    </div>'
           + '    <div class="process-list-foot"></div>'
           + '  </div>'
@@ -9788,10 +10049,17 @@
           note = 'Chỉ hiển thị các mã process thuộc Product Group bạn được phép xử lý.';
         }
         if (typeof meta.total === 'number') {
-          note = (meta.total ? (meta.total + ' mã đang process') : 'Hiện chưa có mã nào đang process') + (allowedGroups.length ? (' · ' + allowedGroups.join(', ')) : '');
+          var datasetTotal = typeof meta.datasetTotal === 'number' ? meta.datasetTotal : meta.total;
+          note = (meta.total ? (meta.total + '/' + datasetTotal + ' mã đang process') : 'Hiện chưa có mã nào đang process') + (allowedGroups.length ? (' · ' + allowedGroups.join(', ')) : '');
         }
         if (meta.query) {
           note = 'Đang lọc "' + meta.query + '" · ' + note;
+        }
+        if (meta.productGroup) {
+          note = 'Group ' + meta.productGroup + ' · ' + note;
+        }
+        if (meta.hasConversationOnly) {
+          note = 'Có Hội Thoại · ' + note;
         }
         _setProcessListNote(note);
 
@@ -9802,16 +10070,17 @@
         }
 
         if (S.processProductsError) {
-          body.innerHTML = '<div class="process-error"><strong>Không thể tải danh sách đang xử lý</strong><p>' + esc(S.processProductsError.message || 'Không thể tải danh sách Process.') + '</p><div class="process-actions"><button class="btn btn-ghost btn-sm" onclick="App.searchProcessQueue()">Thử lại</button></div></div>';
+          body.innerHTML = '<div class="process-error"><strong>Không thể tải danh sách đang xử lý</strong><p>' + esc(S.processProductsError.message || 'Không thể tải danh sách Process.') + '</p><div class="process-actions"><button class="btn btn-ghost btn-sm" onclick="App.reloadProcessQueue()">Thử lại</button></div></div>';
           if (opts.resetScroll === true) body.scrollTop = 0;
           return;
         }
 
         if (!S.processProducts.length) {
-          var emptyMsg = S.processSearchValue
-            ? 'Không có mã process nào khớp với từ khóa vừa lọc trong Product Group hiện tại.'
+          var hasLocalFilter = !!(S.processSearchValue || S.processGroupFilter || S.processHasConversationOnly);
+          var emptyMsg = hasLocalFilter
+            ? 'Không có mã process nào khớp với bộ lọc hiện tại trên dữ liệu đã tải.'
             : 'Hiện chưa có mã nào đang process trong Product Group bạn phụ trách.';
-          body.innerHTML = '<div class="process-empty"><strong>Chưa có mã đang xử lý trong scope</strong><p>' + esc(emptyMsg) + '</p><div class="process-actions"><button class="btn btn-ghost btn-sm" onclick="App.searchProcessQueue()">Tải lại danh sách</button></div></div>';
+          body.innerHTML = '<div class="process-empty"><strong>' + (hasLocalFilter ? 'Không có kết quả phù hợp' : 'Chưa có mã đang xử lý trong scope') + '</strong><p>' + esc(emptyMsg) + '</p><div class="process-actions"><button class="btn btn-ghost btn-sm" onclick="App.reloadProcessQueue()">Tải lại danh sách</button></div></div>';
           if (opts.resetScroll === true) body.scrollTop = 0;
           return;
         }
@@ -9847,7 +10116,7 @@
         if (!S.processDetail) {
           var fallback = _mergeProcessFallback(fallbackRow, fallbackSummary);
           _setProcessToolbarNote('Chọn một mã ở panel bên trái để xem timeline, hoặc tra mã chính xác nếu mã không còn trong danh sách hiện tại.');
-          body.innerHTML = '<div class="process-empty"><strong>Chọn một mã đang xử lý</strong><p>Panel bên trái ưu tiên hiển thị sẵn các mã đang process theo đúng Product Group của bạn.' + (fallback.key ? (' Bạn cũng có thể tra nhanh mã <b>' + esc(fallback.key) + '</b>.') : '') + '</p><div class="process-actions"><button class="btn btn-ghost btn-sm" onclick="App.searchProcess()">Làm mới danh sách</button><button class="btn btn-ghost btn-sm" onclick="App.lookupProcessExactCode()">Tra mã chính xác</button></div></div>';
+          body.innerHTML = '<div class="process-empty"><strong>Chọn một mã đang xử lý</strong><p>Panel bên trái ưu tiên hiển thị sẵn các mã đang process theo đúng Product Group của bạn.' + (fallback.key ? (' Bạn cũng có thể tra nhanh mã <b>' + esc(fallback.key) + '</b>.') : '') + '</p><div class="process-actions"><button class="btn btn-ghost btn-sm" onclick="App.reloadProcessQueue()">Làm mới danh sách</button><button class="btn btn-ghost btn-sm" onclick="App.lookupProcessExactCode()">Tra mã chính xác</button></div></div>';
           return;
         }
 
@@ -9956,7 +10225,11 @@
         var seq = ++S.processProductsSeq;
         S.processProductsLoading = true;
         S.processProductsError = null;
-        if (opts.reset === true) S.processProducts = [];
+        if (opts.reset === true) {
+          S.processProducts = [];
+          S.processProductsAll = [];
+          S.processProductsDatasetMeta = null;
+        }
         _renderProcessList({ resetScroll: opts.resetScroll === true });
         _refreshProcessTriggerState();
 
@@ -9975,22 +10248,19 @@
             }
             S.processProductsLoading = false;
             S.processProductsError = null;
-            S.processProducts = Array.isArray(res.data && res.data.items) ? res.data.items.map(_normalizeProcessCardSummary) : [];
-            S.processProductsMeta = res.data || {};
+            S.processProductsAll = Array.isArray(res.data && res.data.items) ? res.data.items.map(_normalizeProcessCardSummary) : [];
+            S.processProductsDatasetMeta = Object.assign({}, res.data || {}, {
+              datasetTotal: S.processProductsAll.length,
+              query: ''
+            });
             S.processProductsLoaded = true;
+            _syncProcessFilterControls();
             _primeProcessDetailCacheFromQueue();
             if (opts.preferKey) S.processActiveKey = _normalizeProcessSearchKey(opts.preferKey);
-            var activeKey = _normalizeProcessSearchKey(S.processActiveKey || '');
-            _prefetchProcessChatFromQueue(4);
-            var shouldClearSelection = opts.clearSelectionWhenMissing === true
-              && !!activeKey
-              && !_hasProcessProductInQueue(activeKey);
-            if (shouldClearSelection) {
-              _clearProcessSelectionState({ render: false });
-            }
-            _renderProcessList({ resetScroll: opts.resetScroll === true });
-            if (shouldClearSelection) _renderProcessModalBody(null, null);
-            _refreshProcessTriggerState();
+            _applyProcessLocalFilters({
+              resetScroll: opts.resetScroll === true,
+              clearSelectionWhenMissing: opts.clearSelectionWhenMissing === true
+            });
             var preloadKey = opts.autoSelectFirst === true ? _chooseProcessPreloadKey(opts.preferKey || '') : '';
             if (preloadKey && !S.processLoading && !S.processDetail) {
               selectProcessProduct(preloadKey, {
@@ -10010,7 +10280,7 @@
             _renderProcessList({ resetScroll: opts.resetScroll === true });
             _refreshProcessTriggerState();
           })
-          .getProcessingProducts({ token: AUTH_TOKEN, query: query, limit: 80 });
+          .getProcessingProducts({ token: AUTH_TOKEN, fullDataset: true, limit: 5000 });
       }
       function _isProcessDetailRequestCurrent(seq, expectedKey) {
         if (seq !== S.processDetailSeq) return false;
@@ -10123,6 +10393,7 @@
         var currentDetailKey = _normalizeProcessSearchKey(S.processDetail && S.processDetail.key);
         if (!opts.forceReload && normalizedKey && normalizedKey === currentDetailKey && !S.processLoading && !S.processError) {
           _syncProcessListActiveState();
+          if (!S.processChatBusy) requestProcessChat(S.processDetail, { useCache: false });
           return;
         }
 
@@ -10135,6 +10406,30 @@
         }
         var hasCachedDetail = !!_getCachedProcessDetail(normalizedKey);
         var useCachedDetail = opts.useCache !== false && hasCachedDetail && opts.forceReload !== true;
+
+        if (useCachedDetail) {
+          var cachedDetail = _getCachedProcessDetail(normalizedKey);
+          S.processDetailSeq++;
+          S.processLoading = false;
+          S.processError = null;
+          S.processDetail = _normalizeProcessDetail(cachedDetail, row, summary);
+          if (normalizedKey !== currentDetailKey) {
+            S.processChatDraft = '';
+            S.processChatEditId = '';
+            S.processChatEditDraft = '';
+          }
+          S.processLastRequest = {
+            payload: { query: rawKey },
+            fallbackRowNumber: row ? row._rowNumber : null,
+            fallbackSummary: summary,
+            expectedKey: normalizedKey,
+            source: String(opts.source || 'queue-select').trim() || 'queue-select'
+          };
+          _renderProcessModalBody(row, summary);
+          _syncProcessListActiveState();
+          requestProcessChat(S.processDetail, { useCache: false });
+          return;
+        }
 
         var payload = {};
         if (row && row._rowNumber) payload.rowNumber = row._rowNumber;
@@ -10171,14 +10466,58 @@
         ).trim();
         _setProcessSearchValue(resolvedQuery);
 
-        _requestProcessingProducts({
-          query: resolvedQuery,
-          syncInput: true,
-          reset: opts.reset !== false,
-          clearSelectionWhenMissing: opts.clearSelectionWhenMissing === true,
+        if (S.processProductsLoading) {
+          _renderProcessList();
+          return;
+        }
+
+        if (!S.processProductsLoaded && !S.processProductsLoading) {
+          _requestProcessingProducts({
+            query: resolvedQuery,
+            syncInput: true,
+            reset: opts.reset === true,
+            clearSelectionWhenMissing: opts.clearSelectionWhenMissing === true,
+            resetScroll: opts.resetScroll === true,
+            preferKey: opts.preferKey || '',
+            autoSelectFirst: opts.autoSelectFirst === true
+          });
+          return;
+        }
+
+        _applyProcessLocalFilters({
           resetScroll: opts.resetScroll === true,
-          preferKey: opts.preferKey || '',
-          autoSelectFirst: opts.autoSelectFirst === true
+          clearSelectionWhenMissing: opts.clearSelectionWhenMissing === true
+        });
+      }
+      function applyProcessFilters() {
+        if (!_isProcessTrackingEnabled()) return;
+        if (S.processProductsLoading) {
+          _readProcessFilterControls();
+          _renderProcessList();
+          return;
+        }
+        if (!S.processProductsLoaded && !S.processProductsLoading) {
+          _requestProcessingProducts({ reset: false, resetScroll: true });
+          return;
+        }
+        _applyProcessLocalFilters({
+          resetScroll: true,
+          clearSelectionWhenMissing: true
+        });
+      }
+      function reloadProcessQueue(options) {
+        if (!_isProcessTrackingEnabled()) return;
+        var opts = options || {};
+        openProcessModal({ focusSearch: opts.focusSearch === true });
+        _readProcessFilterControls();
+        _requestProcessingProducts({
+          query: S.processSearchValue || '',
+          syncInput: true,
+          reset: true,
+          resetScroll: opts.resetScroll !== false,
+          clearSelectionWhenMissing: true,
+          preferKey: S.processActiveKey || '',
+          autoSelectFirst: false
         });
       }
       function openProcess(options) {
@@ -10188,15 +10527,20 @@
         var explicitKey = String(opts.key || opts.query || '').trim();
         openProcessModal({ focusSearch: opts.focusSearch === true });
 
-        if (opts.reloadQueue === true || (!S.processProductsLoaded && !S.processProductsLoading)) {
-          searchProcessQueue(S.processSearchValue || '', {
-            reset: opts.reloadQueue === true,
+        if (opts.reloadQueue === true) {
+          reloadProcessQueue({ resetScroll: true, focusSearch: false });
+        } else if (!S.processProductsLoaded && !S.processProductsLoading) {
+          _requestProcessingProducts({
+            query: S.processSearchValue || '',
+            syncInput: true,
+            reset: false,
             clearSelectionWhenMissing: false,
-            resetScroll: opts.reloadQueue === true,
-            focusSearch: false,
-            autoSelectFirst: !row && !explicitKey && opts.autoSelectFirst !== false
+            resetScroll: false,
+            autoSelectFirst: false
           });
         } else {
+          _syncProcessFilterControls();
+          _applyProcessLocalFilters({ clearSelectionWhenMissing: false });
           _renderProcessList();
         }
 
@@ -10226,7 +10570,7 @@
 
         if (!S.processDetail && !S.processLoading && !S.processError) {
           var preloadKey = _chooseProcessPreloadKey();
-          if (preloadKey && opts.autoSelectFirst !== false) {
+          if (preloadKey && opts.autoSelectFirst === true) {
             selectProcessProduct(preloadKey, {
               source: 'open-preload',
               backgroundRefresh: true,
@@ -11314,7 +11658,9 @@
           if (newType) tags.push('🆕 ' + newType);
           if (premium) tags.push('⭐ ' + premium);
           if (branded) tags.push('🏷 ' + branded);
-          if (tags.length) html += '<div class="c-tags">' + tags.map(function (t) { return '<span class="tag">' + esc(t) + '</span>'; }).join('') + '</div>';
+          var tagHtml = tags.map(function (t) { return '<span class="tag">' + esc(t) + '</span>'; }).join('');
+          if (_rowHasConversation(row)) tagHtml += '<span class="tag tag-chat">Có hội thoại</span>';
+          if (tagHtml) html += '<div class="c-tags">' + tagHtml + '</div>';
           html += '</div>';
           html += '<div class="cfoot"><div class="c-date">' + (date ? '📅 ' + esc(date) : '—') + '</div>';
           html += '<div class="c-acts" onclick="event.stopPropagation()">';
@@ -11337,7 +11683,15 @@
           var processAction = _buildProcessActionMarkup(row);
           html += '<tr class="' + (ed ? 'editing' : '') + (sel ? ' selected' : '') + (active ? ' active-item' : '') + '" onclick="App.openModal(' + rn + ')">';
           if (USER_CAN_EDIT) html += '<td onclick="event.stopPropagation()" style="text-align:center;padding:6px"><input type="checkbox" data-rn="' + rn + '" ' + (sel ? 'checked' : '') + ' onchange="App.toggleSelect(' + rn + ',this.checked)" style="accent-color:var(--blue);cursor:pointer;width:16px;height:16px"></td>';
-          cols.forEach(function (col) { var vl = row[col] == null ? '' : row[col]; html += col === 'Status' ? '<td>' + pill(String(vl)) + '</td>' : '<td title="' + esc(String(vl)) + '">' + esc(String(vl)) + '</td>'; });
+          cols.forEach(function (col) {
+            var vl = row[col] == null ? '' : row[col];
+            if (col === 'Status') {
+              html += '<td>' + pill(String(vl)) + '</td>';
+              return;
+            }
+            var extra = (col === 'Product Name' && _rowHasConversation(row)) ? (' ' + _conversationBadgeHtml('Có hội thoại', 'conversation-dot')) : '';
+            html += '<td title="' + esc(String(vl)) + '">' + esc(String(vl)) + extra + '</td>';
+          });
           html += '<td onclick="event.stopPropagation()" style="padding:5px 10px">';
           if (processAction) html += processAction + ' ';
           if (USER_CAN_EDIT && ed) html += '<button class="btn btn-green btn-sm" onclick="App.saveRow(' + rn + ')">💾</button> <button class="btn btn-ghost btn-sm" onclick="App.cancelEdit(' + rn + ')">✕</button>';
@@ -15231,11 +15585,13 @@
         var zone = document.getElementById('fZ').value;
         var status = document.getElementById('fS').value;
         var productGroup = document.getElementById('fG').value;
+        var hasConversationOnly = document.getElementById('fChat') && document.getElementById('fChat').checked;
 
         return (S.allRows || []).filter(function (row) {
           if (zone && String(row['Zone'] || '') !== zone) return false;
           if (status && String(row['Status'] || '') !== status) return false;
           if (productGroup && String(row['Product Group'] || '') !== productGroup) return false;
+          if (hasConversationOnly && !_rowHasConversation(row)) return false;
           if (!keyword) return true;
           return (S.headers || []).some(function (h) {
             return String(row[h] || '').toLowerCase().indexOf(keyword) >= 0;
@@ -15255,7 +15611,7 @@
       var _st;
       function doSearch() { clearTimeout(_st); _st = setTimeout(function () { applyClientFilters(); }, 220); }
       function goPage() { return; }
-      function clearFilters() { ['q', 'fZ', 'fS', 'fG'].forEach(function (id) { var el = document.getElementById(id); if (el) el.value = ''; }); applyClientFilters(); }
+      function clearFilters() { ['q', 'fZ', 'fS', 'fG'].forEach(function (id) { var el = document.getElementById(id); if (el) el.value = ''; }); var chat = document.getElementById('fChat'); if (chat) chat.checked = false; applyClientFilters(); }
 
       function toast(msg, type) { var icons = { success: '✓', error: '✕', warning: '⚠', info: 'ℹ' }; var el = document.createElement('div'); el.className = 'toast ' + (type || 'info'); el.innerHTML = '<span class="toast-msg">' + (icons[type] || 'ℹ') + '  ' + esc(msg) + '</span><button class="toast-x" onclick="this.parentElement.remove()">×</button>'; document.getElementById('toasts').appendChild(el); setTimeout(function () { if (el.parentElement) el.remove(); }, type === 'error' ? 9000 : 4200); }
       function _authErrCode(payload) { return payload && payload.error && payload.error.code ? String(payload.error.code) : (payload && payload.code ? String(payload.code) : ''); }
@@ -15381,19 +15737,22 @@
         S.processLookupWarning = null;
         S.processLookupLoaded = false;
         S.processProducts = [];
+        S.processProductsAll = [];
         S.processProductsMeta = null;
+        S.processProductsDatasetMeta = null;
         S.processProductsLoading = false;
         S.processProductsError = null;
         S.processProductsLoaded = false;
         S.processDetailCache = {};
         S.processChatCache = {};
-        S.processChatPrefetching = {};
         S.processLoading = false;
         S.processError = null;
         S.processDetail = null;
         S.processLastRequest = null;
         S.processActiveKey = '';
         S.processSearchValue = '';
+        S.processGroupFilter = '';
+        S.processHasConversationOnly = false;
         S.processChatSeq++;
         S.processChatKey = '';
         S.processChatLoading = false;
@@ -15492,7 +15851,7 @@
 
       (function () {
         document.getElementById('q').addEventListener('input', function () { doSearch(); });
-        ['fZ', 'fS', 'fG'].forEach(function (id) { document.getElementById(id).addEventListener('change', function () { doSearch(); }); });
+        ['fZ', 'fS', 'fG', 'fChat'].forEach(function (id) { var el = document.getElementById(id); if (el) el.addEventListener('change', function () { doSearch(); }); });
         // Overlay click close disabled per request
         // document.getElementById('overlay').addEventListener('click', function (e) { if (e.target === this) closeModal(); });
         // document.getElementById('bfillOverlay').addEventListener('click', function (e) { if (e.target === this) closeBatchFill(); });
@@ -15537,6 +15896,7 @@
         openSelectedModal: openSelectedModal, previewSelected: previewSelected,
         openProcess: openProcess, openProcessModal: openProcessModal, openProcessKey: openProcessKey,
         searchProcess: searchProcess, searchProcessQueue: searchProcessQueue,
+        applyProcessFilters: applyProcessFilters, reloadProcessQueue: reloadProcessQueue,
         selectProcessProduct: selectProcessProduct, selectProcessQueueItem: selectProcessQueueItem,
         requestProcessDetail: requestProcessDetail, requestProcessChat: requestProcessChat,
         openModalProcessThread: openModalProcessThread, openWorkspaceFromProcess: openWorkspaceFromProcess,
