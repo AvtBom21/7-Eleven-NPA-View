@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -7,6 +7,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="npa-director-build" content="director-es5-parsefix-20260420-v91">
   <title>NPA RATING</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
@@ -117,7 +118,8 @@
     select {
       font-size: 16px !important;
       -webkit-text-size-adjust: 100%;
-      transform: translateZ(0); /* force GPU layer, prevents zoom repaint */
+      transform: translateZ(0);
+      /* force GPU layer, prevents zoom repaint */
     }
 
     /* Prevent double-tap zoom on buttons and interactive elements */
@@ -308,6 +310,7 @@
     }
 
     @keyframes loginSceneFloat {
+
       0%,
       100% {
         transform: translateY(0)
@@ -359,6 +362,7 @@
     }
 
     @keyframes appOrbFloat {
+
       0%,
       100% {
         transform: translateY(0)
@@ -1035,49 +1039,6 @@
       transform-origin: center;
     }
 
-    .btn-other {
-      height: 36px;
-      padding: 0 12px;
-      border-radius: 18px;
-      border: 1px solid var(--border);
-      background: var(--card);
-      color: var(--text2);
-      font-size: 12px;
-      font-weight: 800;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      flex-shrink: 0;
-      transition: all .2s;
-    }
-
-    .btn-other:hover {
-      border-color: var(--goldbdr);
-      color: var(--gold);
-      box-shadow: var(--shadow-s);
-    }
-
-    .btn-other[disabled] {
-      opacity: .45;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
-
-    .other-count {
-      min-width: 18px;
-      height: 18px;
-      border-radius: 999px;
-      padding: 0 6px;
-      background: var(--goldbg);
-      border: 1px solid var(--goldbdr);
-      color: var(--gold);
-      font-size: 10px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      line-height: 1;
-    }
-
     .user-badge {
       display: flex;
       align-items: center;
@@ -1503,6 +1464,7 @@
       letter-spacing: .04em;
       text-transform: uppercase;
     }
+
     .badge-type-full {
       font-size: 9px;
       letter-spacing: .01em;
@@ -1827,194 +1789,6 @@
       display: none;
     }
 
-    .other-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 430;
-      background: rgba(15, 23, 42, .42);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      padding: 0;
-    }
-
-    .other-overlay.hidden {
-      display: none;
-    }
-
-    .other-panel {
-      width: min(980px, 100%);
-      height: min(88vh, 760px);
-      background: var(--bg);
-      border-radius: 18px 18px 0 0;
-      border: 1px solid var(--border);
-      border-bottom: 0;
-      box-shadow: var(--shadow-l);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      animation: slideUp .25s cubic-bezier(.16, 1, .3, 1);
-    }
-
-    .other-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 14px 14px 10px;
-      border-bottom: 1px solid var(--border);
-      background: rgba(255, 255, 255, .92);
-    }
-
-    .other-title-wrap {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-
-    .other-title {
-      font-family: var(--fh);
-      font-size: 18px;
-      font-weight: 800;
-      color: var(--text);
-      letter-spacing: -.3px;
-    }
-
-    .other-sub {
-      font-size: 12px;
-      color: var(--text3);
-    }
-
-    .other-close {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      border: 1px solid var(--border);
-      background: var(--bg3);
-      color: var(--text2);
-      font-size: 16px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-
-    .other-body {
-      padding: 12px;
-      overflow: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .other-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-    }
-
-    .other-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 10px;
-      display: grid;
-      grid-template-columns: 86px 1fr;
-      gap: 10px;
-      align-items: center;
-      cursor: pointer;
-      transition: box-shadow .18s, transform .18s;
-    }
-
-    .other-card:hover {
-      box-shadow: var(--shadow-s);
-      transform: translateY(-1px);
-    }
-
-    .other-thumb {
-      height: 86px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: #fff;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .other-thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      padding: 8px;
-    }
-
-    .other-info {
-      min-width: 0;
-    }
-
-    .other-row-top {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-wrap: wrap;
-      margin-bottom: 4px;
-    }
-
-    .other-no {
-      font-size: 11px;
-      font-weight: 800;
-      color: var(--blue);
-      background: var(--bluebg);
-      border: 1px solid #bfdbfe;
-      border-radius: 999px;
-      padding: 2px 8px;
-      letter-spacing: .02em;
-    }
-
-    .other-state {
-      font-size: 10px;
-      font-weight: 800;
-      color: var(--green);
-      background: var(--greenbg);
-      border: 1px solid #bbf7d0;
-      border-radius: 999px;
-      padding: 2px 7px;
-      letter-spacing: .04em;
-      text-transform: uppercase;
-    }
-
-    .other-brand {
-      font-size: 11px;
-      font-weight: 800;
-      color: var(--gold);
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      margin-bottom: 2px;
-    }
-
-    .other-name {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--text);
-      line-height: 1.35;
-      margin-bottom: 4px;
-      display: -webkit-box;
-      line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    .other-meta {
-      font-size: 12px;
-      color: var(--text3);
-      line-height: 1.4;
-      display: -webkit-box;
-      line-clamp: 1;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
     .password-panel {
       width: 100%;
       max-width: 420px;
@@ -2190,6 +1964,7 @@
       flex-wrap: wrap;
       align-items: center;
     }
+
     .modal-tags-main {
       display: flex;
       gap: 5px;
@@ -2197,6 +1972,7 @@
       flex: 1 1 auto;
       min-width: 0;
     }
+
     .badge-stock {
       margin-left: auto;
     }
@@ -3217,6 +2993,7 @@
     }
 
     @media (max-width: 639px) {
+
       .login-input,
       .filter-input,
       .filter-select,
@@ -3225,20 +3002,6 @@
       textarea.form-input {
         font-size: 16px !important;
         touch-action: manipulation;
-      }
-
-      .btn-other {
-        height: 34px;
-        padding: 0 8px;
-        font-size: 11px;
-        gap: 4px;
-      }
-
-      .other-count {
-        min-width: 16px;
-        height: 16px;
-        padding: 0 4px;
-        font-size: 9px;
       }
 
       .user-badge {
@@ -3400,21 +3163,6 @@
         animation: scaleIn .3s cubic-bezier(.16, 1, .3, 1);
       }
 
-      .other-overlay {
-        align-items: center;
-        padding: 20px;
-      }
-
-      .other-panel {
-        height: min(86vh, 760px);
-        border-radius: 18px;
-        border: 1px solid var(--border);
-      }
-
-      .other-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-
       .modal-handle {
         display: none;
       }
@@ -3504,32 +3252,58 @@
       <div class="login-orb login-orb-3"></div>
       <div class="login-hub"></div>
       <div class="login-lane">
-        <span class="login-pack" style="--sx:-78vw;--sy:-30vh;--tx:-16px;--ty:-8px;--delay:.2s;--dur:8.4s"><b>🥤</b>Drink</span>
-        <span class="login-pack" style="--sx:82vw;--sy:-26vh;--tx:12px;--ty:-4px;--delay:1.4s;--dur:8.8s"><b>🍫</b>Snack</span>
-        <span class="login-pack" style="--sx:-85vw;--sy:26vh;--tx:-18px;--ty:8px;--delay:2.1s;--dur:9.4s"><b>🧴</b>Care</span>
-        <span class="login-pack" style="--sx:86vw;--sy:28vh;--tx:16px;--ty:10px;--delay:3s;--dur:9.8s"><b>🥛</b>Dairy</span>
-        <span class="login-pack" style="--sx:-18vw;--sy:-56vh;--tx:-8px;--ty:-14px;--delay:3.8s;--dur:8.9s"><b>🍜</b>Food</span>
-        <span class="login-pack" style="--sx:20vw;--sy:56vh;--tx:10px;--ty:14px;--delay:4.6s;--dur:9.6s"><b>🍪</b>Cookie</span>
-        <span class="login-pack" style="--sx:-102vw;--sy:8vh;--tx:-24px;--ty:2px;--delay:5.4s;--dur:10.1s"><b>🧃</b>Juice</span>
-        <span class="login-pack" style="--sx:104vw;--sy:-6vh;--tx:24px;--ty:-2px;--delay:6.3s;--dur:10.4s"><b>☕</b>Coffee</span>
-        <span class="login-pack" style="--sx:-96vw;--sy:-16vh;--tx:-26px;--ty:-5px;--delay:.9s;--dur:9.2s"><b>🥫</b>Can</span>
-        <span class="login-pack" style="--sx:98vw;--sy:16vh;--tx:28px;--ty:6px;--delay:1.8s;--dur:9.7s"><b>🍞</b>Bread</span>
-        <span class="login-pack" style="--sx:-30vw;--sy:-64vh;--tx:-12px;--ty:-18px;--delay:2.9s;--dur:10s"><b>🍎</b>Fresh</span>
-        <span class="login-pack" style="--sx:32vw;--sy:64vh;--tx:12px;--ty:18px;--delay:3.6s;--dur:10.6s"><b>🥚</b>Egg</span>
-        <span class="login-pack" style="--sx:-112vw;--sy:36vh;--tx:-34px;--ty:12px;--delay:4.4s;--dur:11s"><b>🧻</b>Tissue</span>
-        <span class="login-pack" style="--sx:114vw;--sy:-34vh;--tx:34px;--ty:-12px;--delay:5.1s;--dur:11.3s"><b>🧼</b>Soap</span>
-        <span class="login-pack" style="--sx:-118vw;--sy:4vh;--tx:-36px;--ty:1px;--delay:6s;--dur:11.8s"><b>🍟</b>Chips</span>
-        <span class="login-pack" style="--sx:120vw;--sy:-4vh;--tx:36px;--ty:-1px;--delay:6.9s;--dur:12s"><b>🍬</b>Candy</span>
-        <span class="login-pack" style="--sx:-66vw;--sy:-52vh;--tx:-18px;--ty:-16px;--delay:7.6s;--dur:11.4s"><b>🍼</b>Baby</span>
-        <span class="login-pack" style="--sx:68vw;--sy:52vh;--tx:18px;--ty:16px;--delay:8.3s;--dur:11.7s"><b>🐾</b>Pet</span>
-        <span class="login-pack" style="--sx:-108vw;--sy:-40vh;--tx:-30px;--ty:-13px;--delay:1.1s;--dur:10.7s"><b>🥗</b>Salad</span>
-        <span class="login-pack" style="--sx:106vw;--sy:42vh;--tx:30px;--ty:12px;--delay:2.7s;--dur:11.2s"><b>🧀</b>Cheese</span>
-        <span class="login-pack" style="--sx:-44vw;--sy:70vh;--tx:-14px;--ty:20px;--delay:3.4s;--dur:12.2s"><b>🥜</b>Nuts</span>
-        <span class="login-pack" style="--sx:46vw;--sy:-70vh;--tx:14px;--ty:-20px;--delay:4.9s;--dur:12.4s"><b>🍇</b>Fruit</span>
-        <span class="login-pack" style="--sx:-126vw;--sy:-8vh;--tx:-38px;--ty:-3px;--delay:5.7s;--dur:12.6s"><b>🧂</b>Spice</span>
-        <span class="login-pack" style="--sx:124vw;--sy:10vh;--tx:38px;--ty:3px;--delay:7.2s;--dur:12.9s"><b>🍯</b>Honey</span>
-        <span class="login-pack" style="--sx:-74vw;--sy:58vh;--tx:-20px;--ty:18px;--delay:8.7s;--dur:13.1s"><b>🥤</b>Soda</span>
-        <span class="login-pack" style="--sx:72vw;--sy:-58vh;--tx:20px;--ty:-18px;--delay:9.4s;--dur:13.4s"><b>🍵</b>Tea</span>
+        <span class="login-pack"
+          style="--sx:-78vw;--sy:-30vh;--tx:-16px;--ty:-8px;--delay:.2s;--dur:8.4s"><b>🥤</b>Drink</span>
+        <span class="login-pack"
+          style="--sx:82vw;--sy:-26vh;--tx:12px;--ty:-4px;--delay:1.4s;--dur:8.8s"><b>🍫</b>Snack</span>
+        <span class="login-pack"
+          style="--sx:-85vw;--sy:26vh;--tx:-18px;--ty:8px;--delay:2.1s;--dur:9.4s"><b>🧴</b>Care</span>
+        <span class="login-pack"
+          style="--sx:86vw;--sy:28vh;--tx:16px;--ty:10px;--delay:3s;--dur:9.8s"><b>🥛</b>Dairy</span>
+        <span class="login-pack"
+          style="--sx:-18vw;--sy:-56vh;--tx:-8px;--ty:-14px;--delay:3.8s;--dur:8.9s"><b>🍜</b>Food</span>
+        <span class="login-pack"
+          style="--sx:20vw;--sy:56vh;--tx:10px;--ty:14px;--delay:4.6s;--dur:9.6s"><b>🍪</b>Cookie</span>
+        <span class="login-pack"
+          style="--sx:-102vw;--sy:8vh;--tx:-24px;--ty:2px;--delay:5.4s;--dur:10.1s"><b>🧃</b>Juice</span>
+        <span class="login-pack"
+          style="--sx:104vw;--sy:-6vh;--tx:24px;--ty:-2px;--delay:6.3s;--dur:10.4s"><b>☕</b>Coffee</span>
+        <span class="login-pack"
+          style="--sx:-96vw;--sy:-16vh;--tx:-26px;--ty:-5px;--delay:.9s;--dur:9.2s"><b>🥫</b>Can</span>
+        <span class="login-pack"
+          style="--sx:98vw;--sy:16vh;--tx:28px;--ty:6px;--delay:1.8s;--dur:9.7s"><b>🍞</b>Bread</span>
+        <span class="login-pack"
+          style="--sx:-30vw;--sy:-64vh;--tx:-12px;--ty:-18px;--delay:2.9s;--dur:10s"><b>🍎</b>Fresh</span>
+        <span class="login-pack"
+          style="--sx:32vw;--sy:64vh;--tx:12px;--ty:18px;--delay:3.6s;--dur:10.6s"><b>🥚</b>Egg</span>
+        <span class="login-pack"
+          style="--sx:-112vw;--sy:36vh;--tx:-34px;--ty:12px;--delay:4.4s;--dur:11s"><b>🧻</b>Tissue</span>
+        <span class="login-pack"
+          style="--sx:114vw;--sy:-34vh;--tx:34px;--ty:-12px;--delay:5.1s;--dur:11.3s"><b>🧼</b>Soap</span>
+        <span class="login-pack"
+          style="--sx:-118vw;--sy:4vh;--tx:-36px;--ty:1px;--delay:6s;--dur:11.8s"><b>🍟</b>Chips</span>
+        <span class="login-pack"
+          style="--sx:120vw;--sy:-4vh;--tx:36px;--ty:-1px;--delay:6.9s;--dur:12s"><b>🍬</b>Candy</span>
+        <span class="login-pack"
+          style="--sx:-66vw;--sy:-52vh;--tx:-18px;--ty:-16px;--delay:7.6s;--dur:11.4s"><b>🍼</b>Baby</span>
+        <span class="login-pack"
+          style="--sx:68vw;--sy:52vh;--tx:18px;--ty:16px;--delay:8.3s;--dur:11.7s"><b>🐾</b>Pet</span>
+        <span class="login-pack"
+          style="--sx:-108vw;--sy:-40vh;--tx:-30px;--ty:-13px;--delay:1.1s;--dur:10.7s"><b>🥗</b>Salad</span>
+        <span class="login-pack"
+          style="--sx:106vw;--sy:42vh;--tx:30px;--ty:12px;--delay:2.7s;--dur:11.2s"><b>🧀</b>Cheese</span>
+        <span class="login-pack"
+          style="--sx:-44vw;--sy:70vh;--tx:-14px;--ty:20px;--delay:3.4s;--dur:12.2s"><b>🥜</b>Nuts</span>
+        <span class="login-pack"
+          style="--sx:46vw;--sy:-70vh;--tx:14px;--ty:-20px;--delay:4.9s;--dur:12.4s"><b>🍇</b>Fruit</span>
+        <span class="login-pack"
+          style="--sx:-126vw;--sy:-8vh;--tx:-38px;--ty:-3px;--delay:5.7s;--dur:12.6s"><b>🧂</b>Spice</span>
+        <span class="login-pack"
+          style="--sx:124vw;--sy:10vh;--tx:38px;--ty:3px;--delay:7.2s;--dur:12.9s"><b>🍯</b>Honey</span>
+        <span class="login-pack"
+          style="--sx:-74vw;--sy:58vh;--tx:-20px;--ty:18px;--delay:8.7s;--dur:13.1s"><b>🥤</b>Soda</span>
+        <span class="login-pack"
+          style="--sx:72vw;--sy:-58vh;--tx:20px;--ty:-18px;--delay:9.4s;--dur:13.4s"><b>🍵</b>Tea</span>
       </div>
     </div>
     <div class="login-inner">
@@ -3544,8 +3318,8 @@
       <form class="login-form" id="login-form" onsubmit="event.preventDefault();handleCredentialLogin();">
         <div class="login-field">
           <label class="login-label" for="login-email">Username</label>
-          <input class="login-input" id="login-email" type="text" autocomplete="username"
-            placeholder="Nhập username" oninput="setLoginMessage('')">
+          <input class="login-input" id="login-email" type="text" autocomplete="username" placeholder="Nhập username"
+            oninput="setLoginMessage('')">
         </div>
         <div class="login-field">
           <label class="login-label" for="login-password">Mật khẩu</label>
@@ -3570,28 +3344,50 @@
       <div class="app-scene-beam app-scene-beam-a"></div>
       <div class="app-scene-beam app-scene-beam-b"></div>
       <div class="app-lane">
-        <span class="app-pack" style="--sx:-72vw;--sy:-24vh;--tx:-16px;--ty:-8px;--delay:.2s;--dur:11.4s"><b>🥤</b>Drink</span>
-        <span class="app-pack" style="--sx:74vw;--sy:-20vh;--tx:14px;--ty:-6px;--delay:1s;--dur:11.9s"><b>🍫</b>Snack</span>
-        <span class="app-pack" style="--sx:-76vw;--sy:24vh;--tx:-18px;--ty:9px;--delay:1.8s;--dur:12.5s"><b>🧴</b>Care</span>
-        <span class="app-pack" style="--sx:78vw;--sy:26vh;--tx:18px;--ty:10px;--delay:2.7s;--dur:12.7s"><b>🥛</b>Dairy</span>
-        <span class="app-pack" style="--sx:-14vw;--sy:-54vh;--tx:-8px;--ty:-14px;--delay:3.4s;--dur:11.8s"><b>🍜</b>Food</span>
-        <span class="app-pack" style="--sx:16vw;--sy:54vh;--tx:10px;--ty:14px;--delay:4.2s;--dur:12.4s"><b>🍪</b>Cookie</span>
-        <span class="app-pack" style="--sx:-92vw;--sy:8vh;--tx:-22px;--ty:2px;--delay:5.1s;--dur:13s"><b>🧃</b>Juice</span>
-        <span class="app-pack" style="--sx:94vw;--sy:-6vh;--tx:22px;--ty:-2px;--delay:5.8s;--dur:13.2s"><b>☕</b>Coffee</span>
-        <span class="app-pack" style="--sx:-86vw;--sy:-14vh;--tx:-24px;--ty:-4px;--delay:6.4s;--dur:12.6s"><b>🥫</b>Can</span>
-        <span class="app-pack" style="--sx:88vw;--sy:14vh;--tx:24px;--ty:5px;--delay:7.2s;--dur:12.9s"><b>🍞</b>Bread</span>
-        <span class="app-pack" style="--sx:-30vw;--sy:-60vh;--tx:-11px;--ty:-18px;--delay:8s;--dur:13.6s"><b>🍎</b>Fresh</span>
-        <span class="app-pack" style="--sx:30vw;--sy:60vh;--tx:11px;--ty:18px;--delay:8.7s;--dur:13.8s"><b>🥚</b>Egg</span>
-        <span class="app-pack" style="--sx:-102vw;--sy:34vh;--tx:-30px;--ty:11px;--delay:9.2s;--dur:14.2s"><b>🧻</b>Tissue</span>
-        <span class="app-pack" style="--sx:104vw;--sy:-32vh;--tx:30px;--ty:-11px;--delay:10s;--dur:14.4s"><b>🧼</b>Soap</span>
-        <span class="app-pack" style="--sx:-108vw;--sy:4vh;--tx:-32px;--ty:1px;--delay:10.8s;--dur:14.8s"><b>🍟</b>Chips</span>
-        <span class="app-pack" style="--sx:110vw;--sy:-4vh;--tx:32px;--ty:-1px;--delay:11.6s;--dur:15s"><b>🍬</b>Candy</span>
-        <span class="app-pack" style="--sx:-58vw;--sy:-48vh;--tx:-16px;--ty:-15px;--delay:12.2s;--dur:14.1s"><b>🍼</b>Baby</span>
-        <span class="app-pack" style="--sx:60vw;--sy:48vh;--tx:16px;--ty:15px;--delay:13s;--dur:14.3s"><b>🐾</b>Pet</span>
-        <span class="app-pack" style="--sx:-96vw;--sy:-36vh;--tx:-26px;--ty:-12px;--delay:13.8s;--dur:15.4s"><b>🥗</b>Salad</span>
-        <span class="app-pack" style="--sx:98vw;--sy:36vh;--tx:26px;--ty:12px;--delay:14.6s;--dur:15.6s"><b>🧀</b>Cheese</span>
-        <span class="app-pack" style="--sx:-70vw;--sy:56vh;--tx:-18px;--ty:16px;--delay:15.3s;--dur:15.8s"><b>🥜</b>Nuts</span>
-        <span class="app-pack" style="--sx:72vw;--sy:-56vh;--tx:18px;--ty:-16px;--delay:16.1s;--dur:16s"><b>🍯</b>Honey</span>
+        <span class="app-pack"
+          style="--sx:-72vw;--sy:-24vh;--tx:-16px;--ty:-8px;--delay:.2s;--dur:11.4s"><b>🥤</b>Drink</span>
+        <span class="app-pack"
+          style="--sx:74vw;--sy:-20vh;--tx:14px;--ty:-6px;--delay:1s;--dur:11.9s"><b>🍫</b>Snack</span>
+        <span class="app-pack"
+          style="--sx:-76vw;--sy:24vh;--tx:-18px;--ty:9px;--delay:1.8s;--dur:12.5s"><b>🧴</b>Care</span>
+        <span class="app-pack"
+          style="--sx:78vw;--sy:26vh;--tx:18px;--ty:10px;--delay:2.7s;--dur:12.7s"><b>🥛</b>Dairy</span>
+        <span class="app-pack"
+          style="--sx:-14vw;--sy:-54vh;--tx:-8px;--ty:-14px;--delay:3.4s;--dur:11.8s"><b>🍜</b>Food</span>
+        <span class="app-pack"
+          style="--sx:16vw;--sy:54vh;--tx:10px;--ty:14px;--delay:4.2s;--dur:12.4s"><b>🍪</b>Cookie</span>
+        <span class="app-pack"
+          style="--sx:-92vw;--sy:8vh;--tx:-22px;--ty:2px;--delay:5.1s;--dur:13s"><b>🧃</b>Juice</span>
+        <span class="app-pack"
+          style="--sx:94vw;--sy:-6vh;--tx:22px;--ty:-2px;--delay:5.8s;--dur:13.2s"><b>☕</b>Coffee</span>
+        <span class="app-pack"
+          style="--sx:-86vw;--sy:-14vh;--tx:-24px;--ty:-4px;--delay:6.4s;--dur:12.6s"><b>🥫</b>Can</span>
+        <span class="app-pack"
+          style="--sx:88vw;--sy:14vh;--tx:24px;--ty:5px;--delay:7.2s;--dur:12.9s"><b>🍞</b>Bread</span>
+        <span class="app-pack"
+          style="--sx:-30vw;--sy:-60vh;--tx:-11px;--ty:-18px;--delay:8s;--dur:13.6s"><b>🍎</b>Fresh</span>
+        <span class="app-pack"
+          style="--sx:30vw;--sy:60vh;--tx:11px;--ty:18px;--delay:8.7s;--dur:13.8s"><b>🥚</b>Egg</span>
+        <span class="app-pack"
+          style="--sx:-102vw;--sy:34vh;--tx:-30px;--ty:11px;--delay:9.2s;--dur:14.2s"><b>🧻</b>Tissue</span>
+        <span class="app-pack"
+          style="--sx:104vw;--sy:-32vh;--tx:30px;--ty:-11px;--delay:10s;--dur:14.4s"><b>🧼</b>Soap</span>
+        <span class="app-pack"
+          style="--sx:-108vw;--sy:4vh;--tx:-32px;--ty:1px;--delay:10.8s;--dur:14.8s"><b>🍟</b>Chips</span>
+        <span class="app-pack"
+          style="--sx:110vw;--sy:-4vh;--tx:32px;--ty:-1px;--delay:11.6s;--dur:15s"><b>🍬</b>Candy</span>
+        <span class="app-pack"
+          style="--sx:-58vw;--sy:-48vh;--tx:-16px;--ty:-15px;--delay:12.2s;--dur:14.1s"><b>🍼</b>Baby</span>
+        <span class="app-pack"
+          style="--sx:60vw;--sy:48vh;--tx:16px;--ty:15px;--delay:13s;--dur:14.3s"><b>🐾</b>Pet</span>
+        <span class="app-pack"
+          style="--sx:-96vw;--sy:-36vh;--tx:-26px;--ty:-12px;--delay:13.8s;--dur:15.4s"><b>🥗</b>Salad</span>
+        <span class="app-pack"
+          style="--sx:98vw;--sy:36vh;--tx:26px;--ty:12px;--delay:14.6s;--dur:15.6s"><b>🧀</b>Cheese</span>
+        <span class="app-pack"
+          style="--sx:-70vw;--sy:56vh;--tx:-18px;--ty:16px;--delay:15.3s;--dur:15.8s"><b>🥜</b>Nuts</span>
+        <span class="app-pack"
+          style="--sx:72vw;--sy:-56vh;--tx:18px;--ty:-16px;--delay:16.1s;--dur:16s"><b>🍯</b>Honey</span>
       </div>
     </div>
 
@@ -3614,17 +3410,14 @@
           <path d="M3 3v5h5" />
         </svg>
       </button>
-      <button class="btn-other" id="other-btn" type="button" onclick="openOtherList()" title="Other list">
-        Other
-        <span class="other-count" id="other-count">0</span>
-      </button>
       <div class="user-menu" id="user-menu">
         <button class="user-badge user-menu-btn" type="button" onclick="toggleUserMenu(event)">
           <div class="av" id="user-av-badge">?</div>
           <span id="user-name-badge">—</span>
         </button>
         <div class="user-menu-panel" id="user-menu-panel">
-          <button class="user-menu-item" type="button" id="switch-view-item" onclick="openViewSelector()" style="display:none">Switch View</button>
+          <button class="user-menu-item" type="button" id="switch-view-item" onclick="openViewSelector()"
+            style="display:none">Switch View</button>
           <button class="user-menu-item" type="button" onclick="openPasswordModal()">Đổi mật khẩu</button>
           <button class="user-menu-item danger" type="button" onclick="switchUser()">Log Out</button>
         </div>
@@ -3655,14 +3448,14 @@
         </div>
         <div class="filter-selects">
           <select class="filter-select" id="cat-filter" onchange="applyFilters()">
-            <option value="">All categories</option>
+            <option value="">Tất cả ngành hàng</option>
           </select>
           <select class="filter-select" id="country-filter" onchange="applyFilters()">
-            <option value="">All countries</option>
+            <option value="">Tất cả quốc gia</option>
           </select>
         </div>
         <div class="filter-tabs">
-          <button class="filter-tab active" id="tab-all" onclick="setTab('all')">All</button>
+          <button class="filter-tab active" id="tab-all" onclick="setTab('all')">Tất cả</button>
           <button class="filter-tab" id="tab-pending" onclick="setTab('pending')">⏳ Đang chờ</button>
           <button class="filter-tab" id="tab-voted" onclick="setTab('voted')">✅ Đã review</button>
         </div>
@@ -3670,12 +3463,12 @@
 
       <div id="loading">
         <div class="spinner"></div>
-        <div>Loading data...</div>
+        <div>Đang tải dữ liệu...</div>
       </div>
       <div id="product-grid" style="display:none"></div>
       <div id="empty-state" style="display:none" class="empty-state">
         <div class="icon">📦</div>
-        <p>No products found</p>
+        <p>Không tìm thấy sản phẩm</p>
       </div>
     </div>
 
@@ -3689,7 +3482,7 @@
             <rect x="3" y="14" width="7" height="7" rx="1" />
             <rect x="14" y="14" width="7" height="7" rx="1" />
           </svg>
-          <span class="bnav-label">All</span>
+          <span class="bnav-label">Tất cả</span>
         </button>
         <button class="bottom-nav-btn" id="nav-pending" onclick="setTab('pending');setActiveNav('pending')">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -3702,7 +3495,7 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M20 6 9 17l-5-5" />
           </svg>
-        <span class="bnav-label">Đã review</span>
+          <span class="bnav-label">Đã review</span>
         </button>
       </div>
     </div>
@@ -3714,20 +3507,6 @@
       <div class="modal-handle"></div>
       <button class="modal-close" onclick="closeModal()">✕</button>
       <div class="modal-scroll" id="modal-content"></div>
-    </div>
-  </div>
-
-  <div class="other-overlay hidden" id="other-overlay" onclick="closeOtherListOutside(event)">
-    <div class="other-panel">
-      <div class="other-head">
-        <div class="other-title-wrap">
-          <div class="other-title">Other Products</div>
-        </div>
-        <button class="other-close" type="button" onclick="closeOtherList()">✕</button>
-      </div>
-      <div class="other-body">
-        <div class="other-grid" id="other-grid"></div>
-      </div>
     </div>
   </div>
 
@@ -3801,21 +3580,25 @@
 
       <div class="password-field">
         <label class="password-label" for="pwd-current">Mật khẩu hiện tại</label>
-        <input class="password-input" id="pwd-current" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu hiện tại">
+        <input class="password-input" id="pwd-current" type="password" autocomplete="current-password"
+          placeholder="Nhập mật khẩu hiện tại">
       </div>
       <div class="password-field">
         <label class="password-label" for="pwd-new">Mật khẩu mới</label>
-        <input class="password-input" id="pwd-new" type="password" autocomplete="new-password" placeholder="Nhập mật khẩu mới">
+        <input class="password-input" id="pwd-new" type="password" autocomplete="new-password"
+          placeholder="Nhập mật khẩu mới">
       </div>
       <div class="password-field">
         <label class="password-label" for="pwd-confirm">Xác nhận mật khẩu mới</label>
-        <input class="password-input" id="pwd-confirm" type="password" autocomplete="new-password" placeholder="Nhập lại mật khẩu mới">
+        <input class="password-input" id="pwd-confirm" type="password" autocomplete="new-password"
+          placeholder="Nhập lại mật khẩu mới">
       </div>
 
       <div class="password-message" id="password-message"></div>
       <div class="password-actions">
         <button class="btn-ghost" type="button" onclick="closePasswordModal()">Hủy</button>
-        <button class="btn-primary" type="button" id="pwd-save-btn" onclick="submitPasswordChange()">Cập nhật mật khẩu</button>
+        <button class="btn-primary" type="button" id="pwd-save-btn" onclick="submitPasswordChange()">Cập nhật mật
+          khẩu</button>
       </div>
     </div>
   </div>
@@ -3823,1466 +3606,1358 @@
   <div id="toast"></div>
 
   <script>
-    /* ══ State ══════════════════════════════════════ */
-    let currentUser = '', currentEmail = '', allProducts = [], otherProducts = [], existingResults = [], activeTab = 'all', selectedStatus = '';
-    let authToken = '', currentCanEdit = false, availableViews = [];
-    let directorChatSeq = 0, directorChatProductId = '', directorChatHistory = null, directorChatLoading = false, directorChatError = null, directorChatBusy = false, directorChatEditId = '', directorChatDraft = '', directorChatEditDraft = '';
-    const REQUEST_TOKEN = String((new URLSearchParams(window.location.search || '')).get('token') || '').trim();
-    function readServerUser() {
-      const el = document.getElementById('app-user-json');
-      if (!el) return {};
-      try {
-        const raw = String(el.textContent || '').trim();
-        if (!raw) return {};
-        const parsed = JSON.parse(raw);
-        return (parsed && typeof parsed === 'object') ? parsed : {};
-      } catch (err) {
-        return {};
-      }
+
+/* ══ State ══════════════════════════════════════ */
+var DIRECTOR_CLIENT_BUILD = 'director-es5-parsefix-20260420-v91';
+var currentUser = '',currentEmail = '',allProducts = [],existingResults = [],activeTab = 'all',selectedStatus = '';
+var authToken = '',currentCanEdit = false,availableViews = [];
+var directorChatSeq = 0,directorChatProductId = '',directorChatHistory = null,directorChatLoading = false,directorChatError = null,directorChatBusy = false,directorChatEditId = '',directorChatDraft = '',directorChatEditDraft = '';
+var REQUEST_TOKEN = String(new URLSearchParams(window.location.search || '').get('token') || '').trim();
+function readServerUser() {
+  var el = document.getElementById('app-user-json');
+  if (!el) return {};
+  try {
+    var raw = String(el.textContent || '').trim();
+    if (!raw) return {};
+    var parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch (err) {
+    return {};
+  }
+}
+var SERVER_USER = readServerUser();
+
+var ROLE_DIRECTOR = 'DIRECTOR';
+var ROLE_META = {
+  DIRECTOR: { initial: 'D', cssClass: 'director', result: '' }
+};
+var isSyncing = false,syncProgressValue = 0,syncProgressTimer = null,syncStoryboardTimer = null,syncOverlayHideTimer = null;
+
+function applyAdaptiveMobileLayout() {
+  var ua = navigator.userAgent || '';
+  var uaMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(ua);
+  var touchDevice = navigator.maxTouchPoints > 1;
+  var smallestScreen = Math.min(window.screen.width || 0, window.screen.height || 0);
+  var visualWidth = window.visualViewport ? window.visualViewport.width : window.innerWidth;
+  var forceMobile = (uaMobile || touchDevice) && (smallestScreen <= 1024 || visualWidth <= 820);
+  document.documentElement.classList.toggle('mobile-embed', forceMobile);
+}
+
+function setSyncButtonBusy(busy) {
+  var btn = document.getElementById('sync-btn');
+  var icon = document.getElementById('sync-btn-icon');
+  if (btn) {
+    btn.disabled = !!busy;
+    btn.style.opacity = busy ? '.65' : '1';
+    btn.style.cursor = busy ? 'wait' : 'pointer';
+  }
+  if (icon) icon.classList.toggle('spinning', !!busy);
+}
+
+function clearSyncAnimationTimers() {
+  if (syncProgressTimer) {clearInterval(syncProgressTimer);syncProgressTimer = null;}
+  if (syncStoryboardTimer) {clearTimeout(syncStoryboardTimer);syncStoryboardTimer = null;}
+  if (syncOverlayHideTimer) {clearTimeout(syncOverlayHideTimer);syncOverlayHideTimer = null;}
+}
+
+function setSyncProgress(value, caption) {
+  var fill = document.getElementById('sync-progress-fill');
+  var text = document.getElementById('sync-progress-caption');
+  syncProgressValue = Math.max(0, Math.min(100, Number(value) || 0));
+  if (fill) fill.style.width = syncProgressValue + '%';
+  if (text && caption) text.textContent = caption;
+}
+
+function toErrorText(err, fallback) {
+  var fb = fallback || 'Lỗi không xác định';
+  try {
+    if (err === null || err === undefined) return fb;
+    if (typeof err === 'string') return err;
+    if (typeof err.message === 'string' && err.message.trim()) return err.message;
+    if (err.error && typeof err.error.message === 'string' && err.error.message.trim()) return err.error.message;
+    var s = typeof err.toString === 'function' ? err.toString() : '';
+    if (s && s !== '[object Object]') return s;
+    var json = JSON.stringify(err);
+    return json && json !== '{}' ? json : fb;
+  } catch (e) {
+    return fb;
+  }
+}
+
+function safeText(value, fallback) {
+  var fb = fallback || '';
+  try {
+    if (value === null || value === undefined) return fb;
+    if (typeof value === 'string') return value;
+    if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+    if (value instanceof Date) return value.toISOString();
+    var s = typeof value.toString === 'function' ? value.toString() : '';
+    if (s && s !== '[object Object]') return s;
+    var json = JSON.stringify(value);
+    return json && json !== '{}' ? json : fb;
+  } catch (e) {
+    return fb;
+  }
+}
+
+function setSyncStep(step, state, note) {
+  var statusMap = { pending: 'Đang chờ', running: 'Đang chạy', done: 'Hoàn tất', error: 'Lỗi' };
+  var stateEl = document.getElementById('sync-state-' + step);
+  var noteEl = document.getElementById('sync-note-' + step);
+  if (stateEl) {
+    stateEl.className = 'sync-state ' + state;
+    stateEl.textContent = statusMap[state] || statusMap.pending;
+  }
+  if (noteEl && typeof note === 'string') noteEl.textContent = note;
+}
+
+function runSyncStoryboard() {
+  var story = [
+  { delay: 250, step: 'connect', state: 'running', note: 'Authenticating workspace session', progress: 11, caption: 'Connecting to secure source...' },
+  { delay: 450, step: 'connect', state: 'done', note: 'Secure connection established' },
+  { delay: 380, step: 'fetch', state: 'running', note: 'Reading products and approval records', progress: 36, caption: 'Fetching latest product and voting data...' },
+  { delay: 520, step: 'fetch', state: 'done', note: 'Rows loaded successfully' },
+  { delay: 380, step: 'rebuild', state: 'running', note: 'Recomputing product cards and KPI chips', progress: 63, caption: 'Rebuilding dashboard layers...' },
+  { delay: 520, step: 'rebuild', state: 'done', note: 'Interface data model rebuilt' },
+  { delay: 360, step: 'complete', state: 'running', note: 'Kiểm tra toàn vẹn và độ mới dữ liệu', progress: 82, caption: 'Đang kiểm tra chất lượng cuối cùng...' }];
+
+  var index = 0;
+
+  var _playNext = function playNext() {
+    var overlay = document.getElementById('sync-overlay');
+    if (!overlay || overlay.classList.contains('hidden')) return;
+    if (index >= story.length) return;
+
+    var s = story[index++];
+    setSyncStep(s.step, s.state, s.note);
+    if (typeof s.progress === 'number' || s.caption) {
+      setSyncProgress(typeof s.progress === 'number' ? s.progress : syncProgressValue, s.caption);
     }
-    const SERVER_USER = readServerUser();
-    const ROLE_DIRECTOR = 'DIRECTOR';
-    const ROLE_META = {
-      [ROLE_DIRECTOR]: { initial: 'D', cssClass: 'director', result: '' },
-    };
-    let isSyncing = false, syncProgressValue = 0, syncProgressTimer = null, syncStoryboardTimer = null, syncOverlayHideTimer = null;
+    syncStoryboardTimer = setTimeout(_playNext, s.delay);
+  };
 
-    function applyAdaptiveMobileLayout() {
-      const ua = navigator.userAgent || '';
-      const uaMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(ua);
-      const touchDevice = navigator.maxTouchPoints > 1;
-      const smallestScreen = Math.min(window.screen.width || 0, window.screen.height || 0);
-      const visualWidth = window.visualViewport ? window.visualViewport.width : window.innerWidth;
-      const forceMobile = (uaMobile || touchDevice) && (smallestScreen <= 1024 || visualWidth <= 820);
-      document.documentElement.classList.toggle('mobile-embed', forceMobile);
-    }
+  _playNext();
+  syncProgressTimer = setInterval(function () {
+    if (syncProgressValue >= 92) return;
+    setSyncProgress(Math.min(92, syncProgressValue + (Math.random() * 3 + 1)));
+  }, 220);
+}
 
-    function setSyncButtonBusy(busy) {
-      const btn = document.getElementById('sync-btn');
-      const icon = document.getElementById('sync-btn-icon');
-      if (btn) {
-        btn.disabled = !!busy;
-        btn.style.opacity = busy ? '.65' : '1';
-        btn.style.cursor = busy ? 'wait' : 'pointer';
-      }
-      if (icon) icon.classList.toggle('spinning', !!busy);
-    }
+function showSyncOverlay() {
+  var overlay = document.getElementById('sync-overlay');
+  if (!overlay) return;
 
-    function clearSyncAnimationTimers() {
-      if (syncProgressTimer) { clearInterval(syncProgressTimer); syncProgressTimer = null; }
-      if (syncStoryboardTimer) { clearTimeout(syncStoryboardTimer); syncStoryboardTimer = null; }
-      if (syncOverlayHideTimer) { clearTimeout(syncOverlayHideTimer); syncOverlayHideTimer = null; }
-    }
+  clearSyncAnimationTimers();
+  overlay.classList.remove('hidden');
+  overlay.classList.add('active');
 
-    function setSyncProgress(value, caption) {
-      const fill = document.getElementById('sync-progress-fill');
-      const text = document.getElementById('sync-progress-caption');
-      syncProgressValue = Math.max(0, Math.min(100, Number(value) || 0));
-      if (fill) fill.style.width = syncProgressValue + '%';
-      if (text && caption) text.textContent = caption;
-    }
+  setSyncStep('connect', 'pending', 'Open secure connection');
+  setSyncStep('fetch', 'pending', 'Read latest rows from source');
+  setSyncStep('rebuild', 'pending', 'Refresh cards and statistics');
+  setSyncStep('complete', 'pending', 'Kiểm tra cuối cùng');
+  setSyncProgress(4, 'Initializing sync pipeline...');
+  runSyncStoryboard();
+}
 
-    function toErrorText(err, fallback) {
-      const fb = fallback || 'Lỗi không xác định';
-      try {
-        if (err === null || err === undefined) return fb;
-        if (typeof err === 'string') return err;
-        if (typeof err.message === 'string' && err.message.trim()) return err.message;
-        if (err.error && typeof err.error.message === 'string' && err.error.message.trim()) return err.error.message;
-        const s = (typeof err.toString === 'function') ? err.toString() : '';
-        if (s && s !== '[object Object]') return s;
-        const json = JSON.stringify(err);
-        return (json && json !== '{}') ? json : fb;
-      } catch (e) {
-        return fb;
-      }
-    }
+function hideSyncOverlay(success, message) {
+  var overlay = document.getElementById('sync-overlay');
+  if (!overlay || overlay.classList.contains('hidden')) return;
 
-    function safeText(value, fallback) {
-      const fb = fallback || '';
-      try {
-        if (value === null || value === undefined) return fb;
-        if (typeof value === 'string') return value;
-        if (typeof value === 'number' || typeof value === 'boolean') return String(value);
-        if (value instanceof Date) return value.toISOString();
-        const s = (typeof value.toString === 'function') ? value.toString() : '';
-        if (s && s !== '[object Object]') return s;
-        const json = JSON.stringify(value);
-        return (json && json !== '{}') ? json : fb;
-      } catch (e) {
-        return fb;
-      }
-    }
+  clearSyncAnimationTimers();
+  if (success) {
+    setSyncStep('connect', 'done', 'Secure connection established');
+    setSyncStep('fetch', 'done', 'Latest rows loaded');
+    setSyncStep('rebuild', 'done', 'Cards and KPIs refreshed');
+    setSyncStep('complete', 'done', 'Gói đồng bộ đã sẵn sàng');
+    setSyncProgress(100, 'Đồng bộ hoàn tất. Dashboard đã được cập nhật.');
+    syncOverlayHideTimer = setTimeout(function () {overlay.classList.add('hidden');overlay.classList.remove('active');}, 760);
+  } else {
+    var err = message || 'Không thể hoàn tất đồng bộ.';
+    setSyncStep('complete', 'error', err);
+    setSyncProgress(100, 'Đồng bộ thất bại. Vui lòng thử lại.');
+    syncOverlayHideTimer = setTimeout(function () {overlay.classList.add('hidden');overlay.classList.remove('active');}, 1200);
+  }
+}
 
-    function setSyncStep(step, state, note) {
-      const statusMap = { pending: 'Đang chờ', running: 'Đang chạy', done: 'Hoàn tất', error: 'Lỗi' };
-      const stateEl = document.getElementById('sync-state-' + step);
-      const noteEl = document.getElementById('sync-note-' + step);
-      if (stateEl) {
-        stateEl.className = 'sync-state ' + state;
-        stateEl.textContent = statusMap[state] || statusMap.pending;
-      }
-      if (noteEl && typeof note === 'string') noteEl.textContent = note;
-    }
+/* ══ Login ═════════════════════════════════════ */
+function setLoginMessage(message, type) {
+  var el = document.getElementById('login-message');
+  if (!el) return;
+  el.textContent = message || '';
+  el.className = 'login-message' + (type ? ' ' + type : '');
+}
 
-    function runSyncStoryboard() {
-      const story = [
-        { delay: 250, step: 'connect', state: 'running', note: 'Authenticating workspace session', progress: 11, caption: 'Connecting to secure source...' },
-        { delay: 450, step: 'connect', state: 'done', note: 'Secure connection established' },
-        { delay: 380, step: 'fetch', state: 'running', note: 'Reading products and approval records', progress: 36, caption: 'Fetching latest product and voting data...' },
-        { delay: 520, step: 'fetch', state: 'done', note: 'Rows loaded successfully' },
-        { delay: 380, step: 'rebuild', state: 'running', note: 'Recomputing product cards and KPI chips', progress: 63, caption: 'Rebuilding dashboard layers...' },
-        { delay: 520, step: 'rebuild', state: 'done', note: 'Interface data model rebuilt' },
-        { delay: 360, step: 'complete', state: 'running', note: 'Kiểm tra toàn vẹn và độ mới dữ liệu', progress: 82, caption: 'Đang kiểm tra chất lượng cuối cùng...' },
-      ];
-      let index = 0;
+function setLoginButtonBusy(busy) {
+  var btn = document.getElementById('btn-enter');
+  if (!btn) return;
+  btn.disabled = !!busy;
+  btn.textContent = busy ? 'Signing In...' : 'Sign In';
+}
 
-      const playNext = () => {
-        const overlay = document.getElementById('sync-overlay');
-        if (!overlay || overlay.classList.contains('hidden')) return;
-        if (index >= story.length) return;
+function handleCredentialLogin() {
+  var emailInput = document.getElementById('login-email');
+  var passwordInput = document.getElementById('login-password');
+  if (!emailInput || !passwordInput) return;
 
-        const s = story[index++];
-        setSyncStep(s.step, s.state, s.note);
-        if (typeof s.progress === 'number' || s.caption) {
-          setSyncProgress(typeof s.progress === 'number' ? s.progress : syncProgressValue, s.caption);
-        }
-        syncStoryboardTimer = setTimeout(playNext, s.delay);
-      };
+  var email = String(emailInput.value || '').trim().toLowerCase();
+  var password = String(passwordInput.value || '').trim();
+  emailInput.value = email;
 
-      playNext();
-      syncProgressTimer = setInterval(() => {
-        if (syncProgressValue >= 92) return;
-        setSyncProgress(Math.min(92, syncProgressValue + (Math.random() * 3 + 1)));
-      }, 220);
-    }
+  if (!email) {
+    setLoginMessage('Vui lòng nhập username.', 'error');
+    emailInput.focus();
+    return;
+  }
+  if (!password) {
+    setLoginMessage('Vui lòng nhập mật khẩu.', 'error');
+    passwordInput.focus();
+    return;
+  }
 
-    function showSyncOverlay() {
-      const overlay = document.getElementById('sync-overlay');
-      if (!overlay) return;
+  setLoginButtonBusy(true);
+  setLoginMessage('Verifying account...', '');
 
-      clearSyncAnimationTimers();
-      overlay.classList.remove('hidden');
-      overlay.classList.add('active');
-
-      setSyncStep('connect', 'pending', 'Open secure connection');
-      setSyncStep('fetch', 'pending', 'Read latest rows from source');
-      setSyncStep('rebuild', 'pending', 'Refresh cards and statistics');
-      setSyncStep('complete', 'pending', 'Kiểm tra cuối cùng');
-      setSyncProgress(4, 'Initializing sync pipeline...');
-      runSyncStoryboard();
-    }
-
-    function hideSyncOverlay(success, message) {
-      const overlay = document.getElementById('sync-overlay');
-      if (!overlay || overlay.classList.contains('hidden')) return;
-
-      clearSyncAnimationTimers();
-      if (success) {
-        setSyncStep('connect', 'done', 'Secure connection established');
-        setSyncStep('fetch', 'done', 'Latest rows loaded');
-        setSyncStep('rebuild', 'done', 'Cards and KPIs refreshed');
-        setSyncStep('complete', 'done', 'Gói đồng bộ đã sẵn sàng');
-        setSyncProgress(100, 'Đồng bộ hoàn tất. Dashboard đã được cập nhật.');
-        syncOverlayHideTimer = setTimeout(() => { overlay.classList.add('hidden'); overlay.classList.remove('active'); }, 760);
-      } else {
-        const err = message || 'Không thể hoàn tất đồng bộ.';
-        setSyncStep('complete', 'error', err);
-        setSyncProgress(100, 'Đồng bộ thất bại. Vui lòng thử lại.');
-        syncOverlayHideTimer = setTimeout(() => { overlay.classList.add('hidden'); overlay.classList.remove('active'); }, 1200);
-      }
-    }
-
-    /* ══ Login ═════════════════════════════════════ */
-    function setLoginMessage(message, type) {
-      const el = document.getElementById('login-message');
-      if (!el) return;
-      el.textContent = message || '';
-      el.className = 'login-message' + (type ? ' ' + type : '');
-    }
-
-    function setLoginButtonBusy(busy) {
-      const btn = document.getElementById('btn-enter');
-      if (!btn) return;
-      btn.disabled = !!busy;
-      btn.textContent = busy ? 'Signing In...' : 'Sign In';
-    }
-
-    function handleCredentialLogin() {
-      const emailInput = document.getElementById('login-email');
-      const passwordInput = document.getElementById('login-password');
-      if (!emailInput || !passwordInput) return;
-
-      const email = String(emailInput.value || '').trim().toLowerCase();
-      const password = String(passwordInput.value || '').trim();
-      emailInput.value = email;
-
-      if (!email) {
-        setLoginMessage('Vui lòng nhập username.', 'error');
-        emailInput.focus();
-        return;
-      }
-      if (!password) {
-        setLoginMessage('Vui lòng nhập mật khẩu.', 'error');
-        passwordInput.focus();
-        return;
-      }
-
-      setLoginButtonBusy(true);
-      setLoginMessage('Verifying account...', '');
-
-      google.script.run
-        .withSuccessHandler(res => {
-          const role = String((res && res.role) || '').trim().toUpperCase();
-          if (!res || !res.ok || role !== ROLE_DIRECTOR) {
-            setLoginButtonBusy(false);
-            setLoginMessage((res && res.message) || 'Chỉ tài khoản DIRECTOR mới được truy cập màn hình này.', 'error');
-            passwordInput.focus();
-            passwordInput.select();
-            return;
-          }
-          currentEmail = String((res && res.email) || email).trim().toLowerCase();
-          currentUser = ROLE_DIRECTOR;
-          authToken = String((res && res.authToken) || '').trim();
-          currentCanEdit = !!(res && res.currentViewCanEdit);
-          availableViews = Array.isArray(res && res.allowedViews) ? res.allowedViews.slice() : [];
-          setLoginMessage('Login successful. Opening portal...', 'ok');
-          setTimeout(() => {
-            setLoginButtonBusy(false);
-            enterApp();
-          }, 180);
-        })
-        .withFailureHandler(err => {
-          setLoginButtonBusy(false);
-          setLoginMessage('Lỗi hệ thống: ' + toErrorText(err, 'Lỗi không xác định'), 'error');
-        })
-        .authenticateAccount(email, password);
-    }
-
-    function enterApp() {
-      if (!currentUser) return;
-      closeUserMenu();
-      const ls = document.getElementById('login-screen');
-      ls.classList.add('out');
-      setTimeout(() => ls.classList.add('hidden'), 350);
-
-      const app = document.getElementById('app');
-      app.classList.add('visible');
-
-      const roleMeta = ROLE_META[currentUser] || { initial: 'D', cssClass: 'director' };
-      const av = document.getElementById('user-av-badge');
-      av.textContent = roleMeta.initial;
-      av.className = 'av ' + roleMeta.cssClass;
-      document.getElementById('user-name-badge').textContent = currentEmail || currentUser;
-      const switchItem = document.getElementById('switch-view-item');
-      if (switchItem) switchItem.style.display = availableViews.length > 1 ? '' : 'none';
-      document.getElementById('date-display').textContent =
-        new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-      const viewStatus = document.getElementById('view-status-display');
-      if (viewStatus) {
-        viewStatus.textContent = 'Director View · ' + (currentCanEdit ? 'Có thể sửa' : 'Chỉ xem');
-      }
-
-      loadData();
-    }
-
-    function goToLoginPage(prefillEmail) {
-      const email = String(prefillEmail || '').trim().toLowerCase();
-      const target = email
-        ? ('?page=login&email=' + encodeURIComponent(email))
-        : '?page=login';
-      window.location.href = target;
-    }
-
-    function bootstrapFromServerSession() {
-      const selectedView = String(SERVER_USER.selectedView || '').trim().toUpperCase();
-      const email = String(SERVER_USER.email || '').trim().toLowerCase();
-      const token = String(SERVER_USER.authToken || REQUEST_TOKEN || '').trim();
-      const selectedPage = String(SERVER_USER.selectedPage || '').trim().toLowerCase();
-
-      authToken = token;
-      availableViews = Array.isArray(SERVER_USER.allowedViews) ? SERVER_USER.allowedViews.slice() : [];
-      currentCanEdit = SERVER_USER.currentViewCanEdit === true;
-
-      if (!selectedView) {
-        if (token) {
-          window.location.href = '?page=login&token=' + encodeURIComponent(token);
-          return;
-        }
-        goToLoginPage(email);
-        return;
-      }
-
-      if (selectedView !== 'DIR') {
-        if (token) {
-          window.location.href = '?page=' + encodeURIComponent(selectedPage || 'index') + '&token=' + encodeURIComponent(token);
-          return;
-        }
-        goToLoginPage(email);
-        return;
-      }
-
-      currentUser = ROLE_DIRECTOR;
-      currentEmail = email || 'director';
+  google.script.run.
+  withSuccessHandler(function (res) {
+    var role = String(res && res.role || '').trim().toUpperCase();
+    if (!res || !res.ok || role !== ROLE_DIRECTOR) {
       setLoginButtonBusy(false);
-      setLoginMessage('');
+      setLoginMessage(res && res.message || 'Chỉ tài khoản DIRECTOR mới được truy cập màn hình này.', 'error');
+      passwordInput.focus();
+      passwordInput.select();
+      return;
+    }
+    currentEmail = String(res && res.email || email).trim().toLowerCase();
+    currentUser = ROLE_DIRECTOR;
+    authToken = String(res && res.authToken || '').trim();
+    currentCanEdit = !!(res && res.currentViewCanEdit);
+    availableViews = Array.isArray(res && res.allowedViews) ? res.allowedViews.slice() : [];
+    setLoginMessage('Login successful. Opening portal...', 'ok');
+    setTimeout(function () {
+      setLoginButtonBusy(false);
       enterApp();
-    }
+    }, 180);
+  }).
+  withFailureHandler(function (err) {
+    setLoginButtonBusy(false);
+    setLoginMessage('Lỗi hệ thống: ' + toErrorText(err, 'Lỗi không xác định'), 'error');
+  }).
+  authenticateAccount(email, password);
+}
 
-    function toggleUserMenu(event) {
-      if (event) event.stopPropagation();
-      const panel = document.getElementById('user-menu-panel');
-      if (!panel) return;
-      panel.classList.toggle('show');
-    }
+function enterApp() {
+  if (!currentUser) return;
+  closeUserMenu();
+  var ls = document.getElementById('login-screen');
+  ls.classList.add('out');
+  setTimeout(function () {return ls.classList.add('hidden');}, 350);
 
-    function closeUserMenu() {
-      const panel = document.getElementById('user-menu-panel');
-      if (panel) panel.classList.remove('show');
-    }
+  var app = document.getElementById('app');
+  app.classList.add('visible');
 
-    function setPasswordMessage(message, type) {
-      const el = document.getElementById('password-message');
-      if (!el) return;
-      el.textContent = message || '';
-      el.className = 'password-message' + (type ? ' ' + type : '');
-    }
+  var roleMeta = ROLE_META[currentUser] || { initial: 'D', cssClass: 'director' };
+  var av = document.getElementById('user-av-badge');
+  av.textContent = roleMeta.initial;
+  av.className = 'av ' + roleMeta.cssClass;
+  document.getElementById('user-name-badge').textContent = currentEmail || currentUser;
+  var switchItem = document.getElementById('switch-view-item');
+  if (switchItem) switchItem.style.display = availableViews.length > 1 ? '' : 'none';
+  document.getElementById('date-display').textContent =
+  new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  var viewStatus = document.getElementById('view-status-display');
+  if (viewStatus) {
+    viewStatus.textContent = 'Director View · ' + (currentCanEdit ? 'Có thể sửa' : 'Chỉ xem');
+  }
 
-    function setPasswordButtonBusy(busy) {
-      const btn = document.getElementById('pwd-save-btn');
-      if (!btn) return;
-      btn.disabled = !!busy;
-      btn.textContent = busy ? 'Đang cập nhật...' : 'Cập nhật mật khẩu';
-      btn.style.opacity = busy ? '.7' : '1';
-      btn.style.cursor = busy ? 'wait' : 'pointer';
-    }
+  loadData();
+}
 
-    function openPasswordModal() {
-      closeUserMenu();
-      if (!currentEmail) {
-        showToast('Vui lòng đăng nhập lại.', 'error');
+function goToLoginPage(prefillEmail) {
+  var email = String(prefillEmail || '').trim().toLowerCase();
+  var target = email ?
+  '?page=login&email=' + encodeURIComponent(email) :
+  '?page=login';
+  window.location.href = target;
+}
+
+function bootstrapFromServerSession() {
+  var selectedView = String(SERVER_USER.selectedView || '').trim().toUpperCase();
+  var email = String(SERVER_USER.email || '').trim().toLowerCase();
+  var token = String(SERVER_USER.authToken || REQUEST_TOKEN || '').trim();
+  var selectedPage = String(SERVER_USER.selectedPage || '').trim().toLowerCase();
+
+  authToken = token;
+  availableViews = Array.isArray(SERVER_USER.allowedViews) ? SERVER_USER.allowedViews.slice() : [];
+  currentCanEdit = SERVER_USER.currentViewCanEdit === true;
+
+  if (!selectedView) {
+    if (token) {
+      window.location.href = '?page=login&token=' + encodeURIComponent(token);
+      return;
+    }
+    goToLoginPage(email);
+    return;
+  }
+
+  if (selectedView !== 'DIR') {
+    if (token) {
+      window.location.href = '?page=' + encodeURIComponent(selectedPage || 'index') + '&token=' + encodeURIComponent(token);
+      return;
+    }
+    goToLoginPage(email);
+    return;
+  }
+
+  currentUser = ROLE_DIRECTOR;
+  currentEmail = email || 'director';
+  setLoginButtonBusy(false);
+  setLoginMessage('');
+  enterApp();
+}
+
+function toggleUserMenu(event) {
+  if (event) event.stopPropagation();
+  var panel = document.getElementById('user-menu-panel');
+  if (!panel) return;
+  panel.classList.toggle('show');
+}
+
+function closeUserMenu() {
+  var panel = document.getElementById('user-menu-panel');
+  if (panel) panel.classList.remove('show');
+}
+
+function setPasswordMessage(message, type) {
+  var el = document.getElementById('password-message');
+  if (!el) return;
+  el.textContent = message || '';
+  el.className = 'password-message' + (type ? ' ' + type : '');
+}
+
+function setPasswordButtonBusy(busy) {
+  var btn = document.getElementById('pwd-save-btn');
+  if (!btn) return;
+  btn.disabled = !!busy;
+  btn.textContent = busy ? 'Đang cập nhật...' : 'Cập nhật mật khẩu';
+  btn.style.opacity = busy ? '.7' : '1';
+  btn.style.cursor = busy ? 'wait' : 'pointer';
+}
+
+function openPasswordModal() {
+  closeUserMenu();
+  if (!currentEmail) {
+    showToast('Vui lòng đăng nhập lại.', 'error');
+    return;
+  }
+  var overlay = document.getElementById('password-overlay');
+  var emailLabel = document.getElementById('password-email-label');
+  if (!overlay || !emailLabel) return;
+
+  emailLabel.textContent = currentEmail;
+  document.getElementById('pwd-current').value = '';
+  document.getElementById('pwd-new').value = '';
+  document.getElementById('pwd-confirm').value = '';
+  setPasswordMessage('');
+  setPasswordButtonBusy(false);
+  overlay.classList.remove('hidden');
+  document.getElementById('pwd-current').focus();
+}
+
+function closePasswordModal() {
+  var overlay = document.getElementById('password-overlay');
+  if (!overlay) return;
+  overlay.classList.add('hidden');
+  setPasswordMessage('');
+  setPasswordButtonBusy(false);
+}
+
+function closePasswordModalOutside(e) {
+  if (e.target === document.getElementById('password-overlay')) closePasswordModal();
+}
+
+function submitPasswordChange() {
+  if (!currentEmail) {
+    setPasswordMessage('Vui lòng đăng nhập lại.', 'error');
+    return;
+  }
+  var currentPwd = String(document.getElementById('pwd-current').value || '').trim();
+  var newPwd = String(document.getElementById('pwd-new').value || '').trim();
+  var confirmPwd = String(document.getElementById('pwd-confirm').value || '').trim();
+
+  if (!currentPwd || !newPwd || !confirmPwd) {
+    setPasswordMessage('Vui lòng nhập đầy đủ thông tin.', 'error');
+    return;
+  }
+  if (newPwd.length < 4) {
+    setPasswordMessage('Mật khẩu mới phải có ít nhất 4 ký tự.', 'error');
+    return;
+  }
+  if (newPwd !== confirmPwd) {
+    setPasswordMessage('Mật khẩu xác nhận không khớp.', 'error');
+    return;
+  }
+
+  setPasswordButtonBusy(true);
+  setPasswordMessage('Đang cập nhật mật khẩu...', '');
+  google.script.run.
+  withSuccessHandler(function (res) {
+    setPasswordButtonBusy(false);
+    if (!res || !res.ok) {
+      setPasswordMessage(res && res.message || 'Không thể cập nhật mật khẩu.', 'error');
+      return;
+    }
+    setPasswordMessage(res && res.message || 'Đã cập nhật mật khẩu.', 'ok');
+    showToast('Đã cập nhật mật khẩu', 'success');
+    setTimeout(function () {return closePasswordModal();}, 700);
+  }).
+  withFailureHandler(function (err) {
+    setPasswordButtonBusy(false);
+    setPasswordMessage('Lỗi hệ thống: ' + toErrorText(err, 'Lỗi không xác định'), 'error');
+  }).
+  changeAccountPassword(currentEmail, currentPwd, newPwd);
+}
+
+function switchUser() {
+  if (!confirm('Log out?')) return;
+  var emailForPrefill = String(currentEmail || '').trim().toLowerCase();
+  closeUserMenu();
+  closePasswordModal();
+  currentUser = '';
+  currentEmail = '';
+  authToken = '';
+  currentCanEdit = false;
+  availableViews = [];
+  var target = emailForPrefill ?
+  '?page=login&email=' + encodeURIComponent(emailForPrefill) :
+  '?page=login';
+  window.location.href = target;
+}
+
+function openViewSelector() {
+  if (!authToken || availableViews.length <= 1) return;
+  closeUserMenu();
+  window.location.href = '?page=login&token=' + encodeURIComponent(authToken);
+}
+
+/* ══ Data ══════════════════════════════════════ */
+function loadData() {
+  if (!authToken) {
+    goToLoginPage(currentEmail);
+    return;
+  }
+  document.getElementById('loading').style.display = 'flex';
+  document.getElementById('product-grid').style.display = 'none';
+  // Single call: get products + results together — ensures key resolution is consistent
+  new Promise(function (ok, er) {return google.script.run.
+    withSuccessHandler(ok).withFailureHandler(er).getProductsAndResults({ token: authToken });}).
+  then(function (data) {
+    var products = data && data.products || [];
+    allProducts = products;
+    existingResults = data && data.results || [];
+    buildFilterOptions();
+    updateStats();
+    applyFilters();
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('product-grid').style.display = 'grid';
+  }).
+  catch(function (err) {
+    if (handleSessionError(err)) return;
+    document.getElementById('loading').innerHTML = "<div style=\"color:var(--red);text-align:center;padding:20px\">\u274C " +
+    escHtml(toErrorText(err, 'Không thể tải dữ liệu')) + "</div>";
+  });
+}
+
+/* ══ Helpers ═══════════════════════════════════ */
+function escHtml(s) {
+  return safeText(s, '').
+  replace(/&/g, '&amp;').
+  replace(/</g, '&lt;').
+  replace(/>/g, '&gt;').
+  replace(/"/g, '&quot;').
+  replace(/'/g, '&#39;');
+}
+function textOrDash(value) {
+  var txt = safeText(value, '').trim();
+  return txt || '—';
+}
+function multilineHtml(value) {
+  var txt = safeText(value, '').replace(/\r\n?/g, '\n').trim();
+  if (!txt) return '—';
+  return escHtml(txt).replace(/\n/g, '<br>');
+}
+// Canonical key — case-insensitive, prefer newProductId, fallback productName
+function normKey(s) {return safeText(s, '').trim().toLowerCase();}
+function productKey(p) {return normKey(p.newProductId || p.productName);}
+// Match votes using case-insensitive key comparison
+function getMyVote(p) {
+  var k = productKey(p);
+  for (var i = existingResults.length - 1; i >= 0; i--) {
+    var r = existingResults[i];
+    if (normKey(r.newProductId) === k) return r;
+  }
+  return null;
+}
+function decodeChatVisibleText(value) {
+  var raw = safeText(value, '').replace(/\r\n?/g, '\n');
+  if (!raw) return '';
+
+  if (!/%[0-9A-Fa-f]{2}/.test(raw)) return raw;
+
+  var firstPass = raw;
+  try {
+    firstPass = decodeURIComponent(raw);
+  } catch (err) {
+    return raw;
+  }
+
+  if (!/%[0-9A-Fa-f]{2}/.test(firstPass)) return firstPass;
+  if (!/%(?:C[2-9A-F]|D[0-9A-F]|E[0-9A-F]|F[0-4])[0-9A-F]/i.test(firstPass)) return firstPass;
+
+  try {
+    return decodeURIComponent(firstPass);
+  } catch (secondErr) {
+    return firstPass;
+  }
+}
+function normalizeDirectorChatItem(item, index) {
+  var entry = item || {};
+  var type = safeText(entry.type, 'message').toLowerCase();
+  if (type === 'legacy') {
+    return {
+      type: 'legacy',
+      id: safeText(entry.id, 'legacy-' + index),
+      content: decodeChatVisibleText(entry.content),
+      readOnly: true
+    };
+  }
+  return {
+    type: 'message',
+    id: safeText(entry.id, ''),
+    pic: safeText(entry.pic, ''),
+    content: decodeChatVisibleText(entry.content),
+    timestamp: safeText(entry.timestamp, ''),
+    isOwn: entry.isOwn === true
+  };
+}
+function normalizeDirectorChatHistory(data) {
+  var h = data || {};
+  var items = Array.isArray(h.items) ? h.items.map(function (item, index) {return normalizeDirectorChatItem(item, index);}) : [];
+  var messages = items.filter(function (item) {return item.type !== 'legacy';});
+  var legacy = items.filter(function (item) {return item.type === 'legacy';});
+  return {
+    newProductId: safeText(h.newProductId, ''),
+    canWrite: h.canWrite === true,
+    actorEmail: safeText(h.actorEmail, '').toLowerCase(),
+    items: items,
+    messages: messages,
+    legacy: legacy
+  };
+}
+function resetDirectorChatState(productId) {
+  directorChatSeq++;
+  directorChatProductId = safeText(productId, '').trim();
+  directorChatHistory = null;
+  directorChatLoading = false;
+  directorChatError = null;
+  directorChatBusy = false;
+  directorChatEditId = '';
+  directorChatDraft = '';
+  directorChatEditDraft = '';
+}
+function directorChatPayload(extra) {
+  return Object.assign({
+    token: authToken,
+    newProductId: directorChatProductId,
+    sheetContext: 'Director',
+    viewContext: 'DIRECTOR_PRODUCT_MODAL',
+    storageMode: 'DATABASE'
+  }, extra || {});
+}
+function renderDirectorChat() {
+  var panel = document.getElementById('director-chat-panel');
+  if (!panel) return;
+  if (!directorChatProductId) {
+    panel.innerHTML = '<div class="director-chat-empty">Chưa có New Product ID để mở hội thoại.</div>';
+    return;
+  }
+  var history = directorChatHistory || normalizeDirectorChatHistory(null);
+  var html = '';
+  if (directorChatError) {
+    html += "<div class=\"director-chat-empty\">" + escHtml(directorChatError.message || 'Không thể tải hội thoại.') + "<div style=\"margin-top:10px\"><button class=\"director-chat-action\" onclick=\"loadDirectorProductChatById()\">Th\u1EED l\u1EA1i</button></div></div>";
+  } else if (directorChatLoading && !history.items.length) {
+    html += '<div class="director-chat-empty">Đang tải hội thoại...</div>';
+  } else if (!history.items.length) {
+    html += '<div class="director-chat-empty">Chưa có hội thoại.</div>';
+  } else {
+    html += '<div class="director-chat-list">';
+    history.items.forEach(function (item) {
+      if (!item) return;
+      if (item.type === 'legacy') {
+        html += "<div class=\"director-chat-message is-legacy\">\n  <div class=\"director-chat-meta\"><span class=\"director-chat-pic\">Ghi ch\xFA c\u0169</span><span>Ch\u1EC9 xem</span></div>\n  <div class=\"director-chat-text\">" +
+
+        escHtml(item.content || '').replace(/\n/g, '<br>') + "</div>\n</div>";
+
         return;
       }
-      const overlay = document.getElementById('password-overlay');
-      const emailLabel = document.getElementById('password-email-label');
-      if (!overlay || !emailLabel) return;
+      var own = item.isOwn === true;
+      var editing = directorChatEditId && directorChatEditId === item.id;
+      html += "<div class=\"director-chat-message" + (own ? ' is-own' : '') + "\">\n  <div class=\"director-chat-meta\"><span class=\"director-chat-pic\">" +
+      escHtml(item.pic || '') + "</span><span>" + escHtml(item.timestamp || '') + "</span></div>";
+      if (editing) {
+        var editValue = directorChatEditDraft || item.content || '';
+        var actionId = JSON.stringify(item.id || '');
+        html += "<div class=\"director-chat-edit\"><textarea id=\"director-chat-edit-input\">" + escHtml(editValue) + "</textarea></div>\n  <div class=\"director-chat-actions\">\n    <button class=\"director-chat-action\" onclick='saveDirectorChatEdit(" +
 
-      emailLabel.textContent = currentEmail;
-      document.getElementById('pwd-current').value = '';
-      document.getElementById('pwd-new').value = '';
-      document.getElementById('pwd-confirm').value = '';
-      setPasswordMessage('');
-      setPasswordButtonBusy(false);
-      overlay.classList.remove('hidden');
-      document.getElementById('pwd-current').focus();
-    }
+        actionId + ")'>L\u01B0u</button>\n    <button class=\"director-chat-action\" onclick=\"cancelDirectorChatEdit()\">H\u1EE7y</button>\n  </div>";
 
-    function closePasswordModal() {
-      const overlay = document.getElementById('password-overlay');
-      if (!overlay) return;
-      overlay.classList.add('hidden');
-      setPasswordMessage('');
-      setPasswordButtonBusy(false);
-    }
 
-    function closePasswordModalOutside(e) {
-      if (e.target === document.getElementById('password-overlay')) closePasswordModal();
-    }
-
-    function submitPasswordChange() {
-      if (!currentEmail) {
-        setPasswordMessage('Vui lòng đăng nhập lại.', 'error');
-        return;
-      }
-      const currentPwd = String(document.getElementById('pwd-current').value || '').trim();
-      const newPwd = String(document.getElementById('pwd-new').value || '').trim();
-      const confirmPwd = String(document.getElementById('pwd-confirm').value || '').trim();
-
-      if (!currentPwd || !newPwd || !confirmPwd) {
-        setPasswordMessage('Vui lòng nhập đầy đủ thông tin.', 'error');
-        return;
-      }
-      if (newPwd.length < 4) {
-        setPasswordMessage('Mật khẩu mới phải có ít nhất 4 ký tự.', 'error');
-        return;
-      }
-      if (newPwd !== confirmPwd) {
-        setPasswordMessage('Mật khẩu xác nhận không khớp.', 'error');
-        return;
-      }
-
-      setPasswordButtonBusy(true);
-      setPasswordMessage('Đang cập nhật mật khẩu...', '');
-      google.script.run
-        .withSuccessHandler(res => {
-          setPasswordButtonBusy(false);
-          if (!res || !res.ok) {
-            setPasswordMessage((res && res.message) || 'Không thể cập nhật mật khẩu.', 'error');
-            return;
-          }
-          setPasswordMessage((res && res.message) || 'Đã cập nhật mật khẩu.', 'ok');
-          showToast('Đã cập nhật mật khẩu', 'success');
-          setTimeout(() => closePasswordModal(), 700);
-        })
-        .withFailureHandler(err => {
-          setPasswordButtonBusy(false);
-          setPasswordMessage('Lỗi hệ thống: ' + toErrorText(err, 'Lỗi không xác định'), 'error');
-        })
-        .changeAccountPassword(currentEmail, currentPwd, newPwd);
-    }
-
-    function switchUser() {
-      if (!confirm('Log out?')) return;
-      const emailForPrefill = String(currentEmail || '').trim().toLowerCase();
-      closeUserMenu();
-      closePasswordModal();
-      closeOtherList();
-      currentUser = '';
-      currentEmail = '';
-      authToken = '';
-      currentCanEdit = false;
-      availableViews = [];
-      const target = emailForPrefill
-        ? ('?page=login&email=' + encodeURIComponent(emailForPrefill))
-        : '?page=login';
-      window.location.href = target;
-    }
-
-    function openViewSelector() {
-      if (!authToken || availableViews.length <= 1) return;
-      closeUserMenu();
-      window.location.href = '?page=login&token=' + encodeURIComponent(authToken);
-    }
-
-    /* ══ Data ══════════════════════════════════════ */
-    function loadData() {
-      if (!authToken) {
-        goToLoginPage(currentEmail);
-        return;
-      }
-      document.getElementById('loading').style.display = 'flex';
-      document.getElementById('product-grid').style.display = 'none';
-      // Single call: get products + results together — ensures key resolution is consistent
-      new Promise((ok, er) => google.script.run
-        .withSuccessHandler(ok).withFailureHandler(er).getProductsAndResults({ token: authToken }))
-        .then(data => {
-          const products = (data && data.products) || [];
-          otherProducts = products.filter(isOtherProduct).sort((a, b) => otherSortKey(a) - otherSortKey(b));
-          allProducts = products.filter(p => !isOtherProduct(p));
-          existingResults = (data && data.results) || [];
-          buildFilterOptions();
-          updateStats();
-          updateOtherButton();
-          renderOtherList();
-          applyFilters();
-          document.getElementById('loading').style.display = 'none';
-          document.getElementById('product-grid').style.display = 'grid';
-        })
-        .catch(err => {
-          if (handleSessionError(err)) return;
-          document.getElementById('loading').innerHTML =
-            `<div style="color:var(--red);text-align:center;padding:20px">❌ ${escHtml(toErrorText(err, 'Không thể tải dữ liệu'))}</div>`;
-        });
-    }
-
-    /* ══ Helpers ═══════════════════════════════════ */
-    function isOtherNoPresent(noPresent) {
-      return /^other_\d+$/i.test(safeText(noPresent, '').trim());
-    }
-    function isOtherProduct(p) {
-      return !!p && isOtherNoPresent(p.noPresent);
-    }
-    function otherSortKey(p) {
-      const m = safeText((p && p.noPresent) || '', '').trim().match(/^other_(\d+)$/i);
-      return m ? Number(m[1]) : Number.MAX_SAFE_INTEGER;
-    }
-    function escHtml(s) {
-      return safeText(s, '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
-    // Canonical key — case-insensitive, prefer newProductId, fallback productName
-    function normKey(s) { return safeText(s, '').trim().toLowerCase(); }
-    function productKey(p) { return normKey(p.newProductId || p.productName); }
-    // Match votes using case-insensitive key comparison
-    function getMyVote(p) {
-      const k = productKey(p);
-      for (let i = existingResults.length - 1; i >= 0; i--) {
-        const r = existingResults[i];
-        if (normKey(r.newProductId) === k) return r;
-      }
-      return null;
-    }
-    function decodeChatVisibleText(value) {
-      const raw = safeText(value, '').replace(/\r\n?/g, '\n');
-      if (!raw) return '';
-
-      if (!/%[0-9A-Fa-f]{2}/.test(raw)) return raw;
-
-      let firstPass = raw;
-      try {
-        firstPass = decodeURIComponent(raw);
-      } catch (err) {
-        return raw;
-      }
-
-      if (!/%[0-9A-Fa-f]{2}/.test(firstPass)) return firstPass;
-      if (!/%(?:C[2-9A-F]|D[0-9A-F]|E[0-9A-F]|F[0-4])[0-9A-F]/i.test(firstPass)) return firstPass;
-
-      try {
-        return decodeURIComponent(firstPass);
-      } catch (secondErr) {
-        return firstPass;
-      }
-    }
-    function normalizeDirectorChatItem(item, index) {
-      const entry = item || {};
-      const type = safeText(entry.type, 'message').toLowerCase();
-      if (type === 'legacy') {
-        return {
-          type: 'legacy',
-          id: safeText(entry.id, 'legacy-' + index),
-          content: decodeChatVisibleText(entry.content),
-          readOnly: true
-        };
-      }
-      return {
-        type: 'message',
-        id: safeText(entry.id, ''),
-        pic: safeText(entry.pic, ''),
-        content: decodeChatVisibleText(entry.content),
-        timestamp: safeText(entry.timestamp, ''),
-        isOwn: entry.isOwn === true
-      };
-    }
-    function normalizeDirectorChatHistory(data) {
-      const h = data || {};
-      const items = Array.isArray(h.items) ? h.items.map((item, index) => normalizeDirectorChatItem(item, index)) : [];
-      const messages = items.filter(item => item.type !== 'legacy');
-      const legacy = items.filter(item => item.type === 'legacy');
-      return {
-        newProductId: safeText(h.newProductId, ''),
-        canWrite: h.canWrite === true,
-        actorEmail: safeText(h.actorEmail, '').toLowerCase(),
-        items,
-        messages,
-        legacy
-      };
-    }
-    function resetDirectorChatState(productId) {
-      directorChatSeq++;
-      directorChatProductId = safeText(productId, '').trim();
-      directorChatHistory = null;
-      directorChatLoading = false;
-      directorChatError = null;
-      directorChatBusy = false;
-      directorChatEditId = '';
-      directorChatDraft = '';
-      directorChatEditDraft = '';
-    }
-    function directorChatPayload(extra) {
-      return Object.assign({
-        token: authToken,
-        newProductId: directorChatProductId,
-        sheetContext: 'Director',
-        viewContext: 'DIRECTOR_PRODUCT_MODAL'
-      }, extra || {});
-    }
-    function renderDirectorChat() {
-      const panel = document.getElementById('director-chat-panel');
-      if (!panel) return;
-      if (!directorChatProductId) {
-        panel.innerHTML = '<div class="director-chat-empty">Chưa có New Product ID để mở hội thoại.</div>';
-        return;
-      }
-      const history = directorChatHistory || normalizeDirectorChatHistory(null);
-      let html = '';
-      if (directorChatError) {
-        html += `<div class="director-chat-empty">${escHtml(directorChatError.message || 'Không thể tải hội thoại.')}<div style="margin-top:10px"><button class="director-chat-action" onclick="loadDirectorProductChatById()">Thử lại</button></div></div>`;
-      } else if (directorChatLoading && !history.items.length) {
-        html += '<div class="director-chat-empty">Đang tải hội thoại...</div>';
-      } else if (!history.items.length) {
-        html += '<div class="director-chat-empty">Chưa có hội thoại.</div>';
       } else {
-        html += '<div class="director-chat-list">';
-        history.items.forEach(item => {
-          if (!item) return;
-          if (item.type === 'legacy') {
-            html += `<div class="director-chat-message is-legacy">
-  <div class="director-chat-meta"><span class="director-chat-pic">Ghi chú cũ</span><span>Chỉ xem</span></div>
-  <div class="director-chat-text">${escHtml(item.content || '').replace(/\n/g, '<br>')}</div>
-</div>`;
-            return;
-          }
-          const own = item.isOwn === true;
-          const editing = directorChatEditId && directorChatEditId === item.id;
-          html += `<div class="director-chat-message${own ? ' is-own' : ''}">
-  <div class="director-chat-meta"><span class="director-chat-pic">${escHtml(item.pic || '')}</span><span>${escHtml(item.timestamp || '')}</span></div>`;
-          if (editing) {
-            const editValue = directorChatEditDraft || item.content || '';
-            const actionId = JSON.stringify(item.id || '');
-            html += `<div class="director-chat-edit"><textarea id="director-chat-edit-input">${escHtml(editValue)}</textarea></div>
-  <div class="director-chat-actions">
-    <button class="director-chat-action" onclick='saveDirectorChatEdit(${actionId})'>Lưu</button>
-    <button class="director-chat-action" onclick="cancelDirectorChatEdit()">Hủy</button>
-  </div>`;
-          } else {
-            html += `<div class="director-chat-text">${escHtml(item.content || '').replace(/\n/g, '<br>')}</div>`;
-            if (own && currentCanEdit) {
-              const actionId = JSON.stringify(item.id || '');
-              html += `<div class="director-chat-actions">
-    <button class="director-chat-action" onclick='startDirectorChatEdit(${actionId})'>Sửa</button>
-    <button class="director-chat-action" onclick='deleteDirectorChatMessage(${actionId})'>Xóa</button>
-  </div>`;
-            }
-          }
-          html += '</div>';
-        });
-        html += '</div>';
-      }
+        html += "<div class=\"director-chat-text\">" + escHtml(item.content || '').replace(/\n/g, '<br>') + "</div>";
+        if (own && currentCanEdit) {
+          var _actionId = JSON.stringify(item.id || '');
+          html += "<div class=\"director-chat-actions\">\n    <button class=\"director-chat-action\" onclick='startDirectorChatEdit(" +
+          _actionId + ")'>S\u1EEDa</button>\n    <button class=\"director-chat-action\" onclick='deleteDirectorChatMessage(" +
+          _actionId + ")'>X\xF3a</button>\n  </div>";
 
-      if (currentCanEdit && history.canWrite !== false) {
-        html += `<div class="director-chat-composer">
-  <textarea id="director-chat-input" placeholder="Nhập tin nhắn"${directorChatBusy ? ' disabled' : ''}>${escHtml(directorChatDraft)}</textarea>
-  <button class="btn-submit" style="width:auto;min-width:88px;margin-top:0" onclick="sendDirectorChatMessage()"${directorChatBusy ? ' disabled' : ''}>${directorChatBusy ? 'Đang gửi' : 'Gửi'}</button>
-</div>`;
-      } else {
-        html += '<div class="director-chat-empty">Bạn đang ở chế độ chỉ xem.</div>';
-      }
-      panel.innerHTML = html;
-    }
-    function applyDirectorChatResult(res, fallbackMessage) {
-      if (!res || !res.ok) {
-        const msg = (res && res.error && res.error.message) || fallbackMessage || 'Không thể cập nhật chat.';
-        showToast('❌ ' + msg, 'error');
-        renderDirectorChat();
-        return false;
-      }
-      directorChatHistory = normalizeDirectorChatHistory((res.data && (res.data.history || res.data)) || {});
-      directorChatError = null;
-      directorChatEditId = '';
-      directorChatDraft = '';
-      directorChatEditDraft = '';
-      renderDirectorChat();
-      return true;
-    }
-    function loadDirectorProductChat(product) {
-      const productId = safeText(product && product.newProductId, '').trim();
-      resetDirectorChatState(productId);
-      renderDirectorChat();
-      loadDirectorProductChatById();
-    }
-    function loadDirectorProductChatById() {
-      const productId = directorChatProductId;
-      if (!productId) return;
-      const seq = ++directorChatSeq;
-      directorChatLoading = true;
-      directorChatError = null;
-      renderDirectorChat();
-      google.script.run
-        .withSuccessHandler(res => {
-          if (seq !== directorChatSeq || productId !== directorChatProductId) return;
-          directorChatLoading = false;
-          if (!res || !res.ok) {
-            directorChatError = res && res.error ? res.error : { message: 'Không thể tải hội thoại.' };
-            renderDirectorChat();
-            return;
-          }
-          directorChatHistory = normalizeDirectorChatHistory(res.data);
-          renderDirectorChat();
-        })
-        .withFailureHandler(err => {
-          if (seq !== directorChatSeq || productId !== directorChatProductId) return;
-          if (handleSessionError(err)) return;
-          directorChatLoading = false;
-          directorChatError = { message: toErrorText(err, 'Không thể tải hội thoại.') };
-          renderDirectorChat();
-        })
-        .getProductChatHistory(directorChatPayload({ newProductId: productId }));
-    }
-    function sendDirectorChatMessage() {
-      if (!currentCanEdit || directorChatBusy || !directorChatProductId) return;
-      const input = document.getElementById('director-chat-input');
-      const content = safeText(input && input.value, '').trim();
-      if (!content) { if (input) input.focus(); return; }
-      const productId = directorChatProductId;
-      directorChatDraft = content;
-      directorChatBusy = true;
-      renderDirectorChat();
-      google.script.run
-        .withSuccessHandler(res => {
-          directorChatBusy = false;
-          if (productId !== directorChatProductId) return;
-          if (applyDirectorChatResult(res, 'Không thể gửi tin nhắn.')) showToast('Đã gửi tin nhắn', 'success');
-        })
-        .withFailureHandler(err => {
-          if (handleSessionError(err)) return;
-          directorChatBusy = false;
-          showToast('❌ ' + toErrorText(err, 'Gửi tin nhắn thất bại'), 'error');
-          renderDirectorChat();
-        })
-        .addProductChatMessage(directorChatPayload({ newProductId: productId, content }));
-    }
-    function startDirectorChatEdit(messageId) {
-      directorChatEditId = safeText(messageId, '');
-      directorChatEditDraft = '';
-      renderDirectorChat();
-    }
-    function cancelDirectorChatEdit() {
-      directorChatEditId = '';
-      directorChatEditDraft = '';
-      renderDirectorChat();
-    }
-    function saveDirectorChatEdit(messageId) {
-      if (!currentCanEdit || directorChatBusy || !directorChatProductId) return;
-      const input = document.getElementById('director-chat-edit-input');
-      const content = safeText(input && input.value, '').trim();
-      if (!content) { if (input) input.focus(); return; }
-      const productId = directorChatProductId;
-      directorChatEditDraft = content;
-      directorChatBusy = true;
-      renderDirectorChat();
-      google.script.run
-        .withSuccessHandler(res => {
-          directorChatBusy = false;
-          if (productId !== directorChatProductId) return;
-          if (applyDirectorChatResult(res, 'Không thể sửa tin nhắn.')) showToast('Đã sửa tin nhắn', 'success');
-        })
-        .withFailureHandler(err => {
-          if (handleSessionError(err)) return;
-          directorChatBusy = false;
-          showToast('❌ ' + toErrorText(err, 'Sửa tin nhắn thất bại'), 'error');
-          renderDirectorChat();
-        })
-        .editProductChatMessage(directorChatPayload({ newProductId: productId, messageId, content }));
-    }
-    function deleteDirectorChatMessage(messageId) {
-      if (!currentCanEdit || directorChatBusy || !directorChatProductId) return;
-      if (!confirm('Xóa tin nhắn này?')) return;
-      const productId = directorChatProductId;
-      directorChatBusy = true;
-      renderDirectorChat();
-      google.script.run
-        .withSuccessHandler(res => {
-          directorChatBusy = false;
-          if (productId !== directorChatProductId) return;
-          if (applyDirectorChatResult(res, 'Không thể xóa tin nhắn.')) showToast('Đã xóa tin nhắn', 'success');
-        })
-        .withFailureHandler(err => {
-          if (handleSessionError(err)) return;
-          directorChatBusy = false;
-          showToast('❌ ' + toErrorText(err, 'Xóa tin nhắn thất bại'), 'error');
-          renderDirectorChat();
-        })
-        .deleteProductChatMessage(directorChatPayload({ newProductId: productId, messageId }));
-    }
-    function parseLooseNumber(v) {
-      if (v === null || v === undefined || v === '') return NaN;
-      if (typeof v === 'number') return Number.isFinite(v) ? v : NaN;
-
-      let s = safeText(v, '').trim().replace(/[^\d,.\-]/g, '');
-      if (!s || s === '-' || s === '.' || s === ',') return NaN;
-
-      const hasComma = s.includes(',');
-      const hasDot = s.includes('.');
-
-      if (hasComma && hasDot) {
-        if (s.lastIndexOf(',') > s.lastIndexOf('.')) {
-          s = s.replace(/\./g, '').replace(',', '.');
-        } else {
-          s = s.replace(/,/g, '');
         }
-      } else if (hasComma) {
-        if (/^-?\d{1,3}(,\d{3})+$/.test(s)) {
-          s = s.replace(/,/g, '');
-        } else {
-          s = s.replace(',', '.');
-        }
-      } else if (hasDot && /^-?\d{1,3}(\.\d{3})+$/.test(s)) {
-        s = s.replace(/\./g, '');
       }
-
-      const n = Number(s);
-      return Number.isFinite(n) ? n : NaN;
-    }
-
-    const NUMBER_LOCALE = 'en-US'; // 1,234.56
-
-    function formatNumberLocale(n, maxFractionDigits) {
-      return n.toLocaleString(NUMBER_LOCALE, {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: maxFractionDigits
-      });
-    }
-
-    function fmtNumber(v, maxFractionDigits = 2) {
-      const n = parseLooseNumber(v);
-      if (isNaN(n)) return '—';
-      return formatNumberLocale(n, maxFractionDigits);
-    }
-    function fmtSkuCount(v) {
-      const n = parseLooseNumber(v);
-      if (isNaN(n)) return '';
-      return '#SKU: ' + formatNumberLocale(n, 0);
-    }
-    function subCategoryWithSku(p) {
-      const sub = safeText((p && p.subCategory) || '', '').trim();
-      const sku = fmtSkuCount(p && p.skuCountSubcat);
-      if (sub && sku) return sub + ' (' + sku + ')';
-      if (sub) return sub;
-      if (sku) return sku;
-      return '—';
-    }
-    function fmtPct(v) {
-      const n = parseLooseNumber(v);
-      if (isNaN(n)) return '—';
-      const pct = n > 1 ? n : n * 100;
-      return pct.toLocaleString(NUMBER_LOCALE, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%';
-    }
-    function fmtSignedPct(v) {
-      const n = parseLooseNumber(v);
-      if (isNaN(n)) return '—';
-      const pct = n > 1 || n < -1 ? n : n * 100;
-      const sign = pct >= 0 ? '+' : '';
-      return sign + pct.toLocaleString(NUMBER_LOCALE, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%';
-    }
-    function fmtPrice(v, maxFractionDigits = 2) {
-      const n = parseLooseNumber(v);
-      if (isNaN(n)) return '—';
-      return fmtNumber(n, maxFractionDigits) + '₫';
-    }
-    function gpCls(v) {
-      const raw = parseLooseNumber(v);
-      if (isNaN(raw)) return '';
-      const n = raw * (raw > 1 ? 1 : 100);
-      return n >= 35 ? 'gp-good' : n >= 28 ? 'gp-ok' : 'gp-low';
-    }
-    function impactCls(v) {
-      const raw = parseLooseNumber(v);
-      if (isNaN(raw)) return '';
-      const n = raw > 1 || raw < -1 ? raw : raw * 100;
-      if (n > 0) return 'gp-good';
-      if (n < 0) return 'gp-low';
-      return 'gp-ok';
-    }
-    function normalizeImageUrl(raw) {
-      const src = safeText(raw, '').trim();
-      if (!src) return '';
-
-      // Support values wrapped in formulas or JSON-like text by extracting first URL.
-      const embedded = src.match(/https?:\/\/[^"'\s)]+/i);
-      const candidate = embedded ? embedded[0] : src;
-      const driveId = candidate.match(/(?:thumbnail\?id=|\/d\/|[?&]id=|\/uc\?id=|\/open\?id=|lh3\.googleusercontent\.com\/d\/)([a-zA-Z0-9_-]{20,})/i);
-      if (driveId) {
-        return 'https://drive.google.com/thumbnail?id=' + driveId[1] + '&sz=w1200';
-      }
-
-      return /^https?:\/\//i.test(candidate) ? candidate : '';
-    }
-    function thumb(p) {
-      const candidates = [p && p.imagePath, p && p.urlImage];
-      for (let i = 0; i < candidates.length; i++) {
-        const u = normalizeImageUrl(candidates[i]);
-        if (u) return u;
-      }
-      return '';
-    }
-    function esc(s) { return safeText(s, '').replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
-
-    /* ══ Stats ═════════════════════════════════════ */
-    function updateStats() {
-      const tot = allProducts.length;
-      const mv = allProducts.map(p => getMyVote(p)).filter(Boolean);
-      const ap = mv.filter(r => r.status === 'Approved').length;
-      const re = mv.filter(r => r.status === 'Rejected').length;
-      document.getElementById('stats-row').innerHTML = `
-    <div class="stat-chip"><div class="dot dot-blue"></div><strong>${tot.toLocaleString('en-US')}</strong> Total</div>
-    <div class="stat-chip"><div class="dot dot-green"></div><strong>${ap.toLocaleString('en-US')}</strong> Đã duyệt</div>
-    <div class="stat-chip"><div class="dot dot-red"></div><strong>${re.toLocaleString('en-US')}</strong> Từ chối</div>
-    <div class="stat-chip"><div class="dot dot-amber"></div><strong>${(tot - mv.length).toLocaleString('en-US')}</strong> Đang chờ</div>`;
-    }
-
-    /* ══ Filters ═══════════════════════════════════ */
-    function buildFilterOptions() {
-      const uniq = arr => [...new Map(
-        arr.filter(Boolean).map(v => v.trim()).filter(Boolean).map(v => [v.toLowerCase(), v])
-      ).values()].sort();
-      const cats = uniq(allProducts.map(p => p.category));
-      const ctys = uniq(allProducts.map(p => p.countryOfOrigin));
-      const cs = document.getElementById('cat-filter');
-      const currentCat = cs.value;
-      cs.innerHTML = '<option value="">All categories</option>';
-      cats.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; cs.appendChild(o); });
-      if (cats.includes(currentCat)) cs.value = currentCat;
-      const ct = document.getElementById('country-filter');
-      const currentCountry = ct.value;
-      ct.innerHTML = '<option value="">All countries</option>';
-      ctys.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; ct.appendChild(o); });
-      if (ctys.includes(currentCountry)) ct.value = currentCountry;
-    }
-
-    function setTab(t) {
-      activeTab = t;
-      document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
-      document.getElementById('tab-' + t).classList.add('active');
-      applyFilters();
-    }
-    function setActiveNav(t) {
-      document.querySelectorAll('.bottom-nav-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById('nav-' + t).classList.add('active');
-    }
-
-    function applyFilters() {
-      const s = document.getElementById('search-input').value.toLowerCase();
-      const cat = document.getElementById('cat-filter').value;
-      const cty = document.getElementById('country-filter').value;
-      const f = allProducts.filter(p => {
-        const v = getMyVote(p);
-        if (activeTab === 'pending' && v) return false;
-        if (activeTab === 'voted' && !v) return false;
-        if (cat && p.category !== cat) return false;
-        if (cty && p.countryOfOrigin !== cty) return false;
-        if (s && !(p.productName + p.brandName + p.newProductId + p.category + p.supplierName).toLowerCase().includes(s)) return false;
-        return true;
-      });
-      const g = document.getElementById('product-grid');
-      const e = document.getElementById('empty-state');
-      if (!f.length) { g.style.display = 'none'; e.style.display = 'block'; return; }
-      g.style.display = 'grid'; e.style.display = 'none';
-      g.innerHTML = f.map((p, i) => cardHTML(p, allProducts.indexOf(p), i)).join('');
-    }
-
-    function updateOtherButton() {
-      const btn = document.getElementById('other-btn');
-      const badge = document.getElementById('other-count');
-      if (!btn || !badge) return;
-      badge.textContent = otherProducts.length.toLocaleString('en-US');
-      btn.disabled = otherProducts.length === 0;
-    }
-
-    function renderOtherList() {
-      const grid = document.getElementById('other-grid');
-      if (!grid) return;
-      if (!otherProducts.length) {
-        grid.innerHTML = '<div class="empty-state" style="padding:34px 10px"><div class="icon">📝</div><p>Chưa có sản phẩm Other</p></div>';
-        return;
-      }
-
-      grid.innerHTML = otherProducts.map((p, i) => {
-        const img = thumb(p);
-        const mine = getMyVote(p);
-        const noted = !!(mine && safeText(mine.note, '').trim());
-        const stateStyle = noted ? '' : ' style="color:var(--text3);background:var(--bg3);border-color:var(--border)"';
-        const notePreview = noted ? ('Note: ' + escHtml(mine.note)) : 'Tap to add note';
-        return `
-<div class="other-card" onclick="openOtherProduct(${i})">
-  <div class="other-thumb">
-    ${img ? `<img src="${img}" alt="" loading="lazy" onerror="this.style.display='none'">` : '<div style="opacity:.35;font-size:24px">🏷️</div>'}
-  </div>
-  <div class="other-info">
-    <div class="other-row-top">
-      <span class="other-no">${escHtml(p.noPresent || 'Other')}</span>
-      <span class="other-state"${stateStyle}>${noted ? 'NOTED' : 'FEEDBACK'}</span>
-    </div>
-    <div class="other-brand">${escHtml(p.brandName || 'Unknown')}</div>
-    <div class="other-name">${escHtml(p.productName || 'Unnamed product')}</div>
-    <div class="other-meta">${escHtml((p.group || '—') + ' · ' + (p.category || '—') + ' · ' + subCategoryWithSku(p))}</div>
-    <div class="other-meta">${notePreview}</div>
-  </div>
-</div>`;
-      }).join('');
-    }
-
-    function openOtherProduct(idx) {
-      openModal(idx, true);
-    }
-
-    function openOtherList() {
-      closeUserMenu();
-      if (!otherProducts.length) {
-        showToast('Chưa có sản phẩm Other', '');
-        return;
-      }
-      renderOtherList();
-      const overlay = document.getElementById('other-overlay');
-      if (!overlay) return;
-      overlay.classList.remove('hidden');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeOtherList() {
-      const overlay = document.getElementById('other-overlay');
-      if (!overlay) return;
-      overlay.classList.add('hidden');
-      const modalHidden = document.getElementById('modal-overlay').classList.contains('hidden');
-      const passwordHidden = document.getElementById('password-overlay').classList.contains('hidden');
-      if (modalHidden && passwordHidden) document.body.style.overflow = '';
-    }
-
-    function closeOtherListOutside(e) {
-      if (e.target === document.getElementById('other-overlay')) closeOtherList();
-    }
-
-    /* ══ Card HTML ═════════════════════════════════ */
-    function cardHTML(p, idx, ai) {
-      const v = getMyVote(p), img = thumb(p);
-      const npt = safeText(p && p.newProductType, '').toLowerCase();
-      const isExtensionType = npt.includes('ext');
-      const sc = v ? (v.status === 'Approved' ? 'approved' : 'rejected') : '';
-      const ov = v
-        ? `<div class="voted-overlay"><div class="voted-stamp ${v.status === 'Approved' ? 'approved-stamp' : 'rejected-stamp'}">${v.status === 'Approved' ? 'Đã duyệt' : 'Từ chối'}</div></div>`
-        : '';
-      const delay = (ai % 12) * 0.05;
-      return `
-<div class="product-card ${sc} enter" style="animation-delay:${delay}s" onclick="openModal(${idx})">
-  <div class="card-image-wrap">
-    ${img ? `<img src="${img}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}
-    <div class="card-image-placeholder" ${img ? 'style="display:none"' : ''}>🏷️</div>
-    <div class="card-badge-row">
-      ${p.newProductType ? `<span class="badge badge-type-full ${isExtensionType ? 'badge-blue' : 'badge-amber'}">${isExtensionType ? 'Extension of existing product' : 'Replacement of existing product'}</span>` : ''}
-    </div>
-    ${ov}
-  </div>
-  <div class="card-body">
-    <div class="card-no">#${p.noPresent}</div>
-    <div class="card-brand">${p.brandName || '—'}</div>
-    <div class="card-title">${p.productName}</div>
-    <div class="card-meta">
-      <span class="card-meta-item">${p.group || '—'}</span>
-      <span class="card-meta-item">${p.category || '—'}</span>
-      <span class="card-meta-item">${subCategoryWithSku(p)}</span>
-    </div>
-    <div class="card-price-row">
-      <div class="price-cell">
-        <div class="price-label">T6</div>
-        <div class="price-val">${fmtPrice(p.priceT6)}</div>
-        <div class="price-gp ${gpCls(p.gpPctT6)}">${fmtPct(p.gpPctT6)}</div>
-      </div>
-      <div class="price-cell">
-        <div class="price-label">T8</div>
-        <div class="price-val">${fmtPrice(p.priceT8)}</div>
-        <div class="price-gp ${gpCls(p.gpPctT8)}">${fmtPct(p.gpPctT8)}</div>
-      </div>
-      <div class="price-cell">
-        <div class="price-label">PSP</div>
-        <div class="price-val" style="font-size:10px">${fmtPrice(p.purchasePrice)}</div>
-        <div class="price-gp" style="color:var(--text3)">${(() => { const vat = fmtNumber(p.inboundVAT, 2); return vat === '—' ? '—' : 'VAT ' + vat + '%'; })()}</div>
-      </div>
-    </div>
-    <div class="card-footer">
-      <div style="display:flex;flex-direction:column;gap:3px;flex:1">
-        <div class="card-country">🌏 ${p.countryOfOrigin || '—'}</div>
-      </div>
-      <button class="btn-review" onclick="event.stopPropagation();openModal(${idx})">${v ? '✓ Xem' : 'Đánh giá →'}</button>
-    </div>
-  </div>
-</div>`;
-    }
-
-    /* ══ Modal ═════════════════════════════════════ */
-    function openModal(idx, otherMode) {
-      const source = otherMode ? otherProducts : allProducts;
-      const p = source[idx];
-      if (!p) return;
-      const v = getMyVote(p);
-      const img = thumb(p);
-      const allV = existingResults.filter(r => normKey(r.newProductId) === productKey(p));
-      const hasRef = p.refProductId && !['NO', 'No', 'no', ''].includes(p.refProductId?.trim?.() || '');
-      const subCategoryLabel = subCategoryWithSku(p);
-      const whyVi = safeText(p.whyDoWeListThisProduct_VN || p.whyDoWeListThisProduct || '', '').trim();
-      const whyEn = safeText(p.whyDoWeListThisProduct_EN || '', '').trim();
-      const whyText = whyVi || whyEn;
-
-      function gpBar(pct) {
-        const raw = parseLooseNumber(pct);
-        if (isNaN(raw)) return fmtPct(pct);
-        const n = raw * (raw > 1 ? 1 : 100);
-        const c = n >= 35 ? '#16a34a' : n >= 28 ? '#d97706' : '#dc2626';
-        const text = n.toLocaleString(NUMBER_LOCALE, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-        return `<span class="gp-bar" style="color:${c};font-weight:800">${text}%</span>`;
-      }
-
-      const tiers = [
-        { l: 'Tier 6', p: p.priceT6, gp: p.gpPctT6, ga: p.gpAmtT6, rp: p.refPriceT6, rg: p.refGpPctT6 },
-        { l: 'Tier 7', p: p.priceT7, gp: p.gpPctT7, ga: p.gpAmtT7, rp: p.refPriceT7, rg: p.refGpPctT7 },
-        { l: 'Tier 8', p: p.priceT8, gp: p.gpPctT8, ga: p.gpAmtT8, rp: p.refPriceT8, rg: p.refGpPctT8 },
-        { l: 'Tier 9', p: p.priceT9, gp: p.gpPctT9, ga: p.gpAmtT9, rp: p.refPriceT9, rg: p.refGpPctT9 },
-        { l: 'INTL', p: p.priceINTL, gp: p.gpPctINTL, ga: p.gpAmtINTL, rp: p.refPriceINTL, rg: p.refGpPctINTL },
-      ];
-
-      const rows = tiers.map((t, i) => `
-    <tr ${i === 0 ? 'class="hi"' : ''}>
-      <td>${t.l}</td>
-      <td>${fmtPrice(t.p)}</td>
-      <td>${gpBar(t.gp)}</td>
-      <td>${fmtPrice(t.ga)}</td>
-      ${hasRef ? `<td>${t.rp ? fmtPrice(t.rp) : '—'}</td><td>${t.rg ? gpBar(t.rg) : '—'}</td>` : ''}
-    </tr>`).join('');
-
-      const kpis = [
-        { lb: 'GP% T6', v: fmtPct(p.gpPctT6), c: gpCls(p.gpPctT6) },
-        { lb: 'GP% T8', v: fmtPct(p.gpPctT8), c: gpCls(p.gpPctT8) },
-        { lb: 'GP% SubCat', v: fmtPct(p.gpPctSubcat), c: gpCls(p.gpPctSubcat) },
-        { lb: '$GP/ Unit', v: fmtPrice(p.gpUnitSubcat, 0), c: '' },
-        { lb: 'FC UPSD', v: fmtNumber(p.fcUpsd, 2), c: '' },
-      ];
-      const kpiH = kpis.map((k, i) => `
-    <div class="kpi-card" style="animation-delay:${i * 0.05}s">
-      <div class="kpi-label">${k.lb}</div>
-      <div class="kpi-val ${k.c}">${k.v}</div>
-    </div>`).join('');
-
-      const impactKpis = [
-        { lb: 'FC Sale per Month', v: fmtNumber(p.fcSalePerMonth, 0), c: '' },
-        { lb: 'FC GP Amount per Month', v: fmtPrice(p.fcGpAmountPerMonth, 0), c: '' },
-        { lb: 'Sale Impact vs Sub Category', v: fmtSignedPct(p.saleImpactVsSubCategory), c: impactCls(p.saleImpactVsSubCategory) },
-        { lb: 'GP$ Impact vs Sub Category', v: fmtSignedPct(p.gpImpactVsSubCategory), c: impactCls(p.gpImpactVsSubCategory) },
-      ];
-      const impactH = impactKpis.map((k, i) => `
-    <div class="kpi-card" style="animation-delay:${i * 0.05}s">
-      <div class="kpi-label">${k.lb}</div>
-      <div class="kpi-val ${k.c}">${k.v}</div>
-    </div>`).join('');
-
-      const voteH = allV.length ? `
-    <div class="section">
-      <div class="section-title">Kết quả review</div>
-      <div style="display:flex;flex-direction:column;gap:6px">
-        ${allV.map((r, i) => `
-          <div class="vote-item" style="animation-delay:${i * .07}s">
-            <span class="vote-pic">${r.pic}</span>
-            <span class="badge ${r.status === 'Approved' ? 'badge-green' : (r.status === 'Rejected' ? 'badge-red' : 'badge-blue')}">${r.status === 'Approved' ? 'Đã duyệt' : (r.status === 'Rejected' ? 'Từ chối' : (r.status || 'Đã ghi chú'))}</span>
-            ${r.result ? `<span style="color:var(--gold);font-weight:800;font-size:12px">${r.result}</span>` : ''}
-            <span class="vote-note">${r.note || ''}</span>
-            <span class="vote-date">${r.date}</span>
-          </div>`).join('')}
-      </div>
-    </div>` : '';
-
-      const notePrefill = v && v.note ? escHtml(v.note) : '';
-      const readOnlyNotice = `<div class="voted-notice approved-n"><div><strong>Chỉ xem</strong></div><div style="font-size:12px;opacity:.85">Director view hiện tại không có quyền chỉnh sửa lựa chọn này.</div></div>`;
-      const dec = !currentCanEdit
-        ? readOnlyNotice
-        : (otherMode
-            ? `<div class="decision-panel">
-        <h4>📝 Ghi chú bởi ${currentUser}</h4>
-        <div style="margin-bottom:10px">
-          <textarea class="form-input" id="modal-note" placeholder="Nhập ghi chú cho sản phẩm Other này..." oninput="toggleOtherNoteSubmit()">${notePrefill}</textarea>
-          <div class="login-hint" style="margin-top:6px">Danh sách này chỉ cho phép ghi chú. Approve/Reject đã được khóa.</div>
-        </div>
-        <button class="btn-submit" id="modal-submit" ${notePrefill ? '' : 'disabled'}
-          onclick="submitOtherNote('${esc(productKey(p))}','${esc(p.productName)}')">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9l20-7z"/>
-          </svg>
-          Lưu ghi chú
-        </button>
-      </div>`
-            : (v
-                ? `<div class="voted-notice ${v.status === 'Approved' ? 'approved-n' : 'rejected-n'}">
-        <div><strong>${v.status === 'Approved' ? '✅ Đã duyệt' : '❌ Từ chối'}</strong>${v.result ? ' — ' + v.result : ''}</div>
-        ${v.note ? `<div style="font-size:12px;opacity:.8">📝 ${v.note}</div>` : ''}
-      </div>`
-                : `<div class="decision-panel">
-        <h4>📋 Decision by ${currentUser}</h4>
-        <div class="decision-grid">
-          <button class="status-btn status-btn-approve" id="modal-btn-approve" onclick="setModalStatus('Approved')">✅ Duyệt</button>
-          <button class="status-btn status-btn-reject"  id="modal-btn-reject"  onclick="setModalStatus('Rejected')">❌ Từ chối</button>
-        </div>
-        <div style="margin-bottom:10px">
-          <label class="form-label">Note (optional)</label>
-          <textarea class="form-input" id="modal-note" placeholder="Conditions, price adjustment requests..."></textarea>
-        </div>
-        <button class="btn-submit" id="modal-submit" disabled
-          onclick="submitDecision('${esc(productKey(p))}','${esc(p.productName)}')">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9l20-7z"/>
-          </svg>
-          Submit Decision
-        </button>
-      </div>`));
-
-      document.getElementById('modal-content').innerHTML = `
-<div class="modal-img-wrap">
-  ${img
-          ? `<img src="${img}" alt="${p.productName}" onerror="this.style.display='none'">`
-          : '<div style="font-size:52px;opacity:.2">🏷️</div>'}
-</div>
-<div class="modal-title-area">
-  <div class="modal-brand-row">
-    ${p.countryOfOrigin ? `<span class="modal-country">🌏 ${p.countryOfOrigin}</span>` : ''}
-    <span class="modal-brand-name">${p.brandName || 'Unknown'}</span>
-    ${p.newProductType ? `<span class="modal-type">${p.newProductType}</span>` : ''}
-  </div>
-  <div class="modal-title">${p.productName}</div>
-  <div class="modal-tags">
-    <div class="modal-tags-main">
-      ${p.group ? `<span class="badge badge-amber">${p.group}</span>` : ''}
-      ${p.category ? `<span class="badge badge-blue">${p.category}</span>` : ''}
-      ${subCategoryLabel !== '—' ? `<span class="badge badge-gold">${subCategoryLabel}</span>` : ''}
-    </div>
-    ${p.inventoryType ? `<span class="badge badge-green badge-stock">${p.inventoryType}</span>` : ''}
-  </div>
-  ${p.newProductId ? `<div style="margin-top:8px;font-size:11px;color:var(--text3)">ID: <code style="background:var(--bg3);padding:1px 5px;border-radius:4px;font-size:11px">${p.newProductId}</code> · #${p.noPresent}</div>` : ''}
-</div>
-<div class="modal-body">
-  <div class="section">
-    <div class="section-title">Economic KPIs</div>
-    <div class="kpi-row">${kpiH}</div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">Forecast & Impact</div>
-    <div class="kpi-row">${impactH}</div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">Price & GP by Tier${hasRef ? ' (vs ' + (p.refProductName || p.refProductId) + ')' : ''}</div>
-    <div class="pricing-wrap">
-      <table class="pricing-table">
-        <thead><tr>
-          <th>Tier</th><th>Retail Price</th><th>GP%</th><th>GP Amount</th>
-          ${hasRef ? '<th>Ref Price</th><th>Ref GP%</th>' : ''}
-        </tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">Supplier Information</div>
-    <div class="info-grid info-grid-product">
-      <div class="info-item"><div class="info-label">Supplier</div><div class="info-val">${p.supplierName || '—'}</div></div>
-      <div class="info-item info-item-compact"><div class="info-label">Pattern / Region</div><div class="info-val">${p.pattern || '—'}</div></div>
-    </div>
-  </div>
-
-  ${p.competitors ? `
-  <div class="section">
-    <div class="section-title">Retail Price Benchmark</div>
-    <div class="competitor-block">${p.competitors}</div>
-  </div>` : ''}
-
-  ${whyText ? `
-  <div class="section">
-    <div class="section-title">Why Do We List This Product?</div>
-    <div class="desc-block">${whyText}</div>
-  </div>` : ''}
-
-  ${whyText ? `
-  <div class="section" hidden>
-    <div class="section-title">Why Do We List This Product?</div>
-    <div class="desc-block">${whyText}</div>
-  </div>` : ''}
-
-  ${p.ceoNote ? `
-  <div class="section">
-    <div class="section-title">Ghi chú nội bộ</div>
-    <div class="info-grid">
-      ${p.ceoNote ? `<div class="info-item full"><div class="info-label">CEO & OPs Note</div><div class="info-val">${p.ceoNote}</div></div>` : ''}
-    </div>
-  </div>` : ''}
-
-  <div class="section">
-    <div class="section-title">Hội thoại nội bộ</div>
-    <div class="director-chat-panel" id="director-chat-panel"></div>
-  </div>
-
-  ${voteH}
-
-  <div class="section">
-    <div class="section-title">${otherMode ? 'Notes' : 'Approval'}</div>
-    ${dec}
-  </div>
-</div>`;
-
-      const overlay = document.getElementById('modal-overlay');
-      overlay.classList.remove('hidden');
-      overlay.classList.add('entering');
-      setTimeout(() => overlay.classList.remove('entering'), 300);
-      document.getElementById('modal-content').scrollTop = 0;
-      document.body.style.overflow = 'hidden';
-      loadDirectorProductChat(p);
-    }
-
-    function closeModal() {
-      document.getElementById('modal-overlay').classList.add('hidden');
-      const otherHidden = document.getElementById('other-overlay').classList.contains('hidden');
-      const passwordHidden = document.getElementById('password-overlay').classList.contains('hidden');
-      if (otherHidden && passwordHidden) document.body.style.overflow = '';
-      selectedStatus = '';
-      directorChatSeq++;
-    }
-    function closeModalOutside(e) { if (e.target === document.getElementById('modal-overlay')) closeModal(); }
-
-    function setModalStatus(s) {
-      if (!currentCanEdit) return;
-      selectedStatus = s;
-      document.getElementById('modal-btn-approve').classList.toggle('active', s === 'Approved');
-      document.getElementById('modal-btn-reject').classList.toggle('active', s === 'Rejected');
-      document.getElementById('modal-submit').disabled = false;
-    }
-
-    function toggleOtherNoteSubmit() {
-      const input = document.getElementById('modal-note');
-      const btn = document.getElementById('modal-submit');
-      if (!input || !btn) return;
-      btn.disabled = !String(input.value || '').trim();
-    }
-
-    function submitOtherNote(pkey, pname) {
-      if (!currentCanEdit) {
-        showToast('View hiện tại chỉ được xem.', 'error');
-        return;
-      }
-      const noteInput = document.getElementById('modal-note');
-      const note = String(noteInput && noteInput.value || '').trim();
-      if (!note) {
-        showToast('Vui lòng nhập ghi chú.', 'error');
-        if (noteInput) noteInput.focus();
-        return;
-      }
-
-      const btn = document.getElementById('modal-submit');
-      if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;border-top-color:#fff"></div> Saving...';
-      }
-
-      google.script.run
-        .withSuccessHandler(() => {
-          showToast('📝 Note saved', 'success');
-          closeModal();
-          refreshResults(true);
-        })
-        .withFailureHandler(err => {
-          if (handleSessionError(err)) return;
-          showToast('❌ ' + toErrorText(err, 'Lưu thất bại'), 'error');
-          if (btn) {
-            btn.disabled = false;
-            btn.innerHTML = 'Lưu ghi chú';
-          }
-        })
-        .saveOtherNote({ token: authToken, newProductId: pkey, productName: pname, note: note, pic: currentUser });
-    }
-
-    function submitDecision(pkey, pname) {
-      if (!currentCanEdit) {
-        showToast('View hiện tại chỉ được xem.', 'error');
-        return;
-      }
-      if (!selectedStatus) return;
-      // Guard: prevent double submission (case-insensitive)
-      const already = existingResults.find(r => normKey(r.newProductId) === normKey(pkey));
-      if (already) { showToast('Bạn đã review sản phẩm này.', 'error'); closeModal(); return; }
-
-      const note = document.getElementById('modal-note').value.trim();
-      const result = (ROLE_META[currentUser] && ROLE_META[currentUser].result) || '';
-      const btn = document.getElementById('modal-submit');
-      btn.disabled = true;
-      btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;border-top-color:#fff"></div> Saving...';
-
-      google.script.run
-        .withSuccessHandler(res => {
-          showToast('✅ Saved successfully!', 'success');
-          closeModal();
-          refreshResults(true);
-        })
-        .withFailureHandler(err => {
-          if (handleSessionError(err)) return;
-          showToast('❌ ' + toErrorText(err, 'Lưu thất bại'), 'error');
-          btn.disabled = false;
-          btn.innerHTML = '→ Submit Decision';
-        })
-        .saveResult({ token: authToken, newProductId: pkey, productName: pname, status: selectedStatus, note, result, pic: currentUser });
-    }
-
-    /* ══ Toast ═════════════════════════════════════ */
-    function showToast(msg, type) {
-      const t = document.getElementById('toast');
-      t.textContent = msg; t.className = 'show ' + (type || '');
-      setTimeout(() => { t.className = type || ''; }, 3000);
-    }
-
-    function isSessionError(err) {
-      const txt = toErrorText(err, '').toLowerCase();
-      return txt.includes('token') || txt.includes('dang nhap') || txt.includes('sign in') || txt.includes('access denied');
-    }
-
-    function handleSessionError(err) {
-      if (!isSessionError(err)) return false;
-      goToLoginPage(currentEmail);
-      return true;
-    }
-
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') {
-        const modalOpen = !document.getElementById('modal-overlay').classList.contains('hidden');
-        const otherOpen = !document.getElementById('other-overlay').classList.contains('hidden');
-        if (modalOpen) { closeModal(); return; }
-        if (otherOpen) { closeOtherList(); return; }
-        closePasswordModal();
-        closeUserMenu();
-      }
+      html += '</div>';
     });
+    html += '</div>';
+  }
 
-    document.addEventListener('click', e => {
-      const wrap = document.getElementById('user-menu');
-      if (wrap && !wrap.contains(e.target)) closeUserMenu();
-    });
+  if (currentCanEdit && history.canWrite !== false) {
+    html += "<div class=\"director-chat-composer\">\n  <textarea id=\"director-chat-input\" placeholder=\"Nh\u1EADp tin nh\u1EAFn\"" + (
+    directorChatBusy ? ' disabled' : '') + ">" + escHtml(directorChatDraft) + "</textarea>\n  <button class=\"btn-submit\" style=\"width:auto;min-width:88px;margin-top:0\" onclick=\"sendDirectorChatMessage()\"" + (
+    directorChatBusy ? ' disabled' : '') + ">" + (directorChatBusy ? 'Đang gửi' : 'Gửi') + "</button>\n</div>";
 
-    applyAdaptiveMobileLayout();
-    window.addEventListener('resize', applyAdaptiveMobileLayout);
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', applyAdaptiveMobileLayout);
+  } else {
+    html += '<div class="director-chat-empty">Bạn đang ở chế độ chỉ xem.</div>';
+  }
+  panel.innerHTML = html;
+}
+function applyDirectorChatResult(res, fallbackMessage) {
+  if (!res || !res.ok) {
+    var msg = res && res.error && res.error.message || fallbackMessage || 'Không thể cập nhật chat.';
+    showToast('❌ ' + msg, 'error');
+    renderDirectorChat();
+    return false;
+  }
+  directorChatHistory = normalizeDirectorChatHistory(res.data && (res.data.history || res.data) || {});
+  directorChatError = null;
+  directorChatEditId = '';
+  directorChatDraft = '';
+  directorChatEditDraft = '';
+  renderDirectorChat();
+  return true;
+}
+function loadDirectorProductChat(product) {
+  var productId = safeText(product && product.newProductId, '').trim();
+  resetDirectorChatState(productId);
+  renderDirectorChat();
+  loadDirectorProductChatById();
+}
+function loadDirectorProductChatById() {
+  var productId = directorChatProductId;
+  if (!productId) return;
+  var seq = ++directorChatSeq;
+  directorChatLoading = true;
+  directorChatError = null;
+  renderDirectorChat();
+  google.script.run.
+  withSuccessHandler(function (res) {
+    if (seq !== directorChatSeq || productId !== directorChatProductId) return;
+    directorChatLoading = false;
+    if (!res || !res.ok) {
+      directorChatError = res && res.error ? res.error : { message: 'Không thể tải hội thoại.' };
+      renderDirectorChat();
+      return;
     }
+    directorChatHistory = normalizeDirectorChatHistory(res.data);
+    renderDirectorChat();
+  }).
+  withFailureHandler(function (err) {
+    if (seq !== directorChatSeq || productId !== directorChatProductId) return;
+    if (handleSessionError(err)) return;
+    directorChatLoading = false;
+    directorChatError = { message: toErrorText(err, 'Không thể tải hội thoại.') };
+    renderDirectorChat();
+  }).
+  getProductChatHistory(directorChatPayload({ newProductId: productId }));
+}
+function sendDirectorChatMessage() {
+  if (!currentCanEdit || directorChatBusy || !directorChatProductId) return;
+  var input = document.getElementById('director-chat-input');
+  var content = safeText(input && input.value, '').trim();
+  if (!content) {if (input) input.focus();return;}
+  var productId = directorChatProductId;
+  directorChatDraft = content;
+  directorChatBusy = true;
+  renderDirectorChat();
+  google.script.run.
+  withSuccessHandler(function (res) {
+    directorChatBusy = false;
+    if (productId !== directorChatProductId) return;
+    if (applyDirectorChatResult(res, 'Không thể gửi tin nhắn.')) showToast('Đã gửi tin nhắn', 'success');
+  }).
+  withFailureHandler(function (err) {
+    if (handleSessionError(err)) return;
+    directorChatBusy = false;
+    showToast('❌ ' + toErrorText(err, 'Gửi tin nhắn thất bại'), 'error');
+    renderDirectorChat();
+  }).
+  addProductChatMessage(directorChatPayload({ newProductId: productId, content: content }));
+}
+function startDirectorChatEdit(messageId) {
+  directorChatEditId = safeText(messageId, '');
+  directorChatEditDraft = '';
+  renderDirectorChat();
+}
+function cancelDirectorChatEdit() {
+  directorChatEditId = '';
+  directorChatEditDraft = '';
+  renderDirectorChat();
+}
+function saveDirectorChatEdit(messageId) {
+  if (!currentCanEdit || directorChatBusy || !directorChatProductId) return;
+  var input = document.getElementById('director-chat-edit-input');
+  var content = safeText(input && input.value, '').trim();
+  if (!content) {if (input) input.focus();return;}
+  var productId = directorChatProductId;
+  directorChatEditDraft = content;
+  directorChatBusy = true;
+  renderDirectorChat();
+  google.script.run.
+  withSuccessHandler(function (res) {
+    directorChatBusy = false;
+    if (productId !== directorChatProductId) return;
+    if (applyDirectorChatResult(res, 'Không thể sửa tin nhắn.')) showToast('Đã sửa tin nhắn', 'success');
+  }).
+  withFailureHandler(function (err) {
+    if (handleSessionError(err)) return;
+    directorChatBusy = false;
+    showToast('❌ ' + toErrorText(err, 'Sửa tin nhắn thất bại'), 'error');
+    renderDirectorChat();
+  }).
+  editProductChatMessage(directorChatPayload({ newProductId: productId, messageId: messageId, content: content }));
+}
+function deleteDirectorChatMessage(messageId) {
+  if (!currentCanEdit || directorChatBusy || !directorChatProductId) return;
+  if (!confirm('Xóa tin nhắn này?')) return;
+  var productId = directorChatProductId;
+  directorChatBusy = true;
+  renderDirectorChat();
+  google.script.run.
+  withSuccessHandler(function (res) {
+    directorChatBusy = false;
+    if (productId !== directorChatProductId) return;
+    if (applyDirectorChatResult(res, 'Không thể xóa tin nhắn.')) showToast('Đã xóa tin nhắn', 'success');
+  }).
+  withFailureHandler(function (err) {
+    if (handleSessionError(err)) return;
+    directorChatBusy = false;
+    showToast('❌ ' + toErrorText(err, 'Xóa tin nhắn thất bại'), 'error');
+    renderDirectorChat();
+  }).
+  deleteProductChatMessage(directorChatPayload({ newProductId: productId, messageId: messageId }));
+}
+function parseLooseNumber(v) {
+  if (v === null || v === undefined || v === '') return NaN;
+  if (typeof v === 'number') return Number.isFinite(v) ? v : NaN;
 
-    bootstrapFromServerSession();
+  var s = safeText(v, '').trim().replace(/[^\d,.\-]/g, '');
+  if (!s || s === '-' || s === '.' || s === ',') return NaN;
 
-    // ── Sync function: manual sync button + post-approve/reject sync ─────
-    function refreshResults(silent) {
-      if (!currentUser || isSyncing) return;
-      if (!authToken) {
-        goToLoginPage(currentEmail);
-        return;
-      }
-      isSyncing = true;
-      setSyncButtonBusy(true);
-      if (!silent) showSyncOverlay();
+  var hasComma = s.includes(',');
+  var hasDot = s.includes('.');
 
-      new Promise((ok, er) => google.script.run
-        .withSuccessHandler(ok).withFailureHandler(er).getProductsAndResults({ token: authToken }))
-        .then(data => {
-          const products = (data && data.products) || [];
-          otherProducts = products.filter(isOtherProduct).sort((a, b) => otherSortKey(a) - otherSortKey(b));
-          allProducts = products.filter(p => !isOtherProduct(p));
-          existingResults = (data && data.results) || [];
-          updateStats();
-          updateOtherButton();
-          renderOtherList();
-          applyFilters();
-          if (!silent) {
-            hideSyncOverlay(true);
-            showToast('🔄 Data synced', '');
-          }
-        })
-        .catch(err => {
-          if (handleSessionError(err)) return;
-          if (!silent) {
-            const msg = toErrorText(err, 'Không thể đồng bộ dữ liệu');
-            hideSyncOverlay(false, msg);
-            showToast('❌ ' + msg, 'error');
-          }
-        })
-        .finally(() => {
-          isSyncing = false;
-          setSyncButtonBusy(false);
-        });
+  if (hasComma && hasDot) {
+    if (s.lastIndexOf(',') > s.lastIndexOf('.')) {
+      s = s.replace(/\./g, '').replace(',', '.');
+    } else {
+      s = s.replace(/,/g, '');
     }
-  </script>
+  } else if (hasComma) {
+    if (/^-?\d{1,3}(,\d{3})+$/.test(s)) {
+      s = s.replace(/,/g, '');
+    } else {
+      s = s.replace(',', '.');
+    }
+  } else if (hasDot && /^-?\d{1,3}(\.\d{3})+$/.test(s)) {
+    s = s.replace(/\./g, '');
+  }
+
+  var n = Number(s);
+  return Number.isFinite(n) ? n : NaN;
+}
+
+var NUMBER_LOCALE = 'en-US'; // 1,234.56
+
+function formatNumberLocale(n, maxFractionDigits) {
+  return n.toLocaleString(NUMBER_LOCALE, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: maxFractionDigits
+  });
+}
+
+function fmtNumber(v, maxFractionDigits) {if (maxFractionDigits === void 0) {maxFractionDigits = 2;}
+  var n = parseLooseNumber(v);
+  if (isNaN(n)) return '—';
+  return formatNumberLocale(n, maxFractionDigits);
+}
+function fmtSkuCount(v) {
+  var n = parseLooseNumber(v);
+  if (isNaN(n)) return '';
+  return '#SKU: ' + formatNumberLocale(n, 0);
+}
+function subCategoryWithSku(p) {
+  var sub = safeText(p && p.subCategory || '', '').trim();
+  var sku = fmtSkuCount(p && p.skuCountSubcat);
+  if (sub && sku) return sub + ' (' + sku + ')';
+  if (sub) return sub;
+  if (sku) return sku;
+  return '—';
+}
+function fmtPct(v) {
+  var n = parseLooseNumber(v);
+  if (isNaN(n)) return '—';
+  var pct = n > 1 ? n : n * 100;
+  return pct.toLocaleString(NUMBER_LOCALE, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%';
+}
+function fmtSignedPct(v) {
+  var n = parseLooseNumber(v);
+  if (isNaN(n)) return '—';
+  var pct = n > 1 || n < -1 ? n : n * 100;
+  var sign = pct >= 0 ? '+' : '';
+  return sign + pct.toLocaleString(NUMBER_LOCALE, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%';
+}
+function fmtPrice(v, maxFractionDigits) {if (maxFractionDigits === void 0) {maxFractionDigits = 2;}
+  var n = parseLooseNumber(v);
+  if (isNaN(n)) return '—';
+  return fmtNumber(n, maxFractionDigits) + '₫';
+}
+function gpCls(v) {
+  var raw = parseLooseNumber(v);
+  if (isNaN(raw)) return '';
+  var n = raw * (raw > 1 ? 1 : 100);
+  return n >= 35 ? 'gp-good' : n >= 28 ? 'gp-ok' : 'gp-low';
+}
+function impactCls(v) {
+  var raw = parseLooseNumber(v);
+  if (isNaN(raw)) return '';
+  var n = raw > 1 || raw < -1 ? raw : raw * 100;
+  if (n > 0) return 'gp-good';
+  if (n < 0) return 'gp-low';
+  return 'gp-ok';
+}
+function normalizeImageUrl(raw) {
+  var src = safeText(raw, '').trim();
+  if (!src) return '';
+
+  // Support values wrapped in formulas or JSON-like text by extracting first URL.
+  var embedded = src.match(/https?:\/\/[^"'\s)]+/i);
+  var candidate = embedded ? embedded[0] : src;
+  var driveId = candidate.match(/(?:thumbnail\?id=|\/d\/|[?&]id=|\/uc\?id=|\/open\?id=|lh3\.googleusercontent\.com\/d\/)([a-zA-Z0-9_-]{20,})/i);
+  if (driveId) {
+    return 'https://drive.google.com/thumbnail?id=' + driveId[1] + '&sz=w1200';
+  }
+
+  return /^https?:\/\//i.test(candidate) ? candidate : '';
+}
+function thumb(p) {
+  var candidates = [p && p.imagePath, p && p.urlImage];
+  for (var i = 0; i < candidates.length; i++) {
+    var u = normalizeImageUrl(candidates[i]);
+    if (u) return u;
+  }
+  return '';
+}
+function esc(s) {return safeText(s, '').replace(/'/g, "\\'").replace(/"/g, '&quot;');}
+
+/* ══ Stats ═════════════════════════════════════ */
+function updateStats() {
+  var tot = allProducts.length;
+  var mv = allProducts.map(function (p) {return getMyVote(p);}).filter(Boolean);
+  var ap = mv.filter(function (r) {return r.status === 'Approved';}).length;
+  var re = mv.filter(function (r) {return r.status === 'Rejected';}).length;
+  document.getElementById('stats-row').innerHTML = "\n    <div class=\"stat-chip\"><div class=\"dot dot-blue\"></div><strong>" +
+  tot.toLocaleString('en-US') + "</strong> Total</div>\n    <div class=\"stat-chip\"><div class=\"dot dot-green\"></div><strong>" +
+  ap.toLocaleString('en-US') + "</strong> \u0110\xE3 duy\u1EC7t</div>\n    <div class=\"stat-chip\"><div class=\"dot dot-red\"></div><strong>" +
+  re.toLocaleString('en-US') + "</strong> T\u1EEB ch\u1ED1i</div>\n    <div class=\"stat-chip\"><div class=\"dot dot-amber\"></div><strong>" +
+  (tot - mv.length).toLocaleString('en-US') + "</strong> \u0110ang ch\u1EDD</div>";
+}
+
+/* ══ Filters ═══════════════════════════════════ */
+function buildFilterOptions() {
+  var uniq = function uniq(arr) {return [].concat(new Map(
+      arr.filter(Boolean).map(function (v) {return v.trim();}).filter(Boolean).map(function (v) {return [v.toLowerCase(), v];})
+    ).values()).sort();};
+  var cats = uniq(allProducts.map(function (p) {return p.category;}));
+  var ctys = uniq(allProducts.map(function (p) {return p.countryOfOrigin;}));
+  var cs = document.getElementById('cat-filter');
+  var currentCat = cs.value;
+  cs.innerHTML = '<option value="">Tất cả ngành hàng</option>';
+  cats.forEach(function (c) {var o = document.createElement('option');o.value = c;o.textContent = c;cs.appendChild(o);});
+  if (cats.includes(currentCat)) cs.value = currentCat;
+  var ct = document.getElementById('country-filter');
+  var currentCountry = ct.value;
+  ct.innerHTML = '<option value="">Tất cả quốc gia</option>';
+  ctys.forEach(function (c) {var o = document.createElement('option');o.value = c;o.textContent = c;ct.appendChild(o);});
+  if (ctys.includes(currentCountry)) ct.value = currentCountry;
+}
+
+function setTab(t) {
+  activeTab = t;
+  document.querySelectorAll('.filter-tab').forEach(function (b) {return b.classList.remove('active');});
+  document.getElementById('tab-' + t).classList.add('active');
+  applyFilters();
+}
+function setActiveNav(t) {
+  document.querySelectorAll('.bottom-nav-btn').forEach(function (b) {return b.classList.remove('active');});
+  document.getElementById('nav-' + t).classList.add('active');
+}
+
+function applyFilters() {
+  var s = document.getElementById('search-input').value.toLowerCase();
+  var cat = document.getElementById('cat-filter').value;
+  var cty = document.getElementById('country-filter').value;
+  var f = allProducts.filter(function (p) {
+    var v = getMyVote(p);
+    if (activeTab === 'pending' && v) return false;
+    if (activeTab === 'voted' && !v) return false;
+    if (cat && p.category !== cat) return false;
+    if (cty && p.countryOfOrigin !== cty) return false;
+    if (s && !(p.productName + p.brandName + p.newProductId + p.category + p.supplierName).toLowerCase().includes(s)) return false;
+    return true;
+  });
+  var g = document.getElementById('product-grid');
+  var e = document.getElementById('empty-state');
+  if (!f.length) {g.style.display = 'none';e.style.display = 'block';return;}
+  g.style.display = 'grid';e.style.display = 'none';
+  g.innerHTML = f.map(function (p, i) {return cardHTML(p, allProducts.indexOf(p), i);}).join('');
+}
+
+/* ══ Card HTML ═════════════════════════════════ */
+function cardHTML(p, idx, ai) {
+  var v = getMyVote(p),img = thumb(p);
+  var npt = safeText(p && p.newProductType, '').toLowerCase();
+  var isExtensionType = npt.includes('ext');
+  var sc = v ? v.status === 'Approved' ? 'approved' : 'rejected' : '';
+  var ov = v ? "<div class=\"voted-overlay\"><div class=\"voted-stamp " + (
+  v.status === 'Approved' ? 'approved-stamp' : 'rejected-stamp') + "\">" + (v.status === 'Approved' ? 'Đã duyệt' : 'Từ chối') + "</div></div>" :
+  '';
+  var delay = ai % 12 * 0.05;
+  return "\n<div class=\"product-card " +
+  sc + " enter\" style=\"animation-delay:" + delay + "s\" onclick=\"openModal(" + idx + ")\">\n  <div class=\"card-image-wrap\">\n    " + (
+
+  img ? "<img src=\"" + img + "\" alt=\"\" loading=\"lazy\" onerror=\"this.style.display='none'\">" : '') + "\n    <div class=\"card-image-placeholder\" " + (
+  img ? 'style="display:none"' : '') + ">\uD83C\uDFF7\uFE0F</div>\n    <div class=\"card-badge-row\">\n      " + (
+
+  p.newProductType ? "<span class=\"badge badge-type-full " + (isExtensionType ? 'badge-blue' : 'badge-amber') + "\">" + (isExtensionType ? 'Mở rộng từ sản phẩm hiện hữu' : 'Thay thế sản phẩm hiện hữu') + "</span>" : '') + "\n    </div>\n    " +
+
+  ov + "\n  </div>\n  <div class=\"card-body\">\n    <div class=\"card-no\">#" +
+
+
+  p.noPresent + "</div>\n    <div class=\"card-brand\">" + (
+  p.brandName || '—') + "</div>\n    <div class=\"card-title\">" +
+  p.productName + "</div>\n    <div class=\"card-meta\">\n      <span class=\"card-meta-item\">" + (
+
+  p.group || '—') + "</span>\n      <span class=\"card-meta-item\">" + (
+  p.category || '—') + "</span>\n      <span class=\"card-meta-item\">" +
+  subCategoryWithSku(p) + "</span>\n    </div>\n    <div class=\"card-price-row\">\n      <div class=\"price-cell\">\n        <div class=\"price-label\">T6</div>\n        <div class=\"price-val\">" +
+
+
+
+
+  fmtPrice(p.priceT6) + "</div>\n        <div class=\"price-gp " +
+  gpCls(p.gpPctT6) + "\">" + fmtPct(p.gpPctT6) + "</div>\n      </div>\n      <div class=\"price-cell\">\n        <div class=\"price-label\">T8</div>\n        <div class=\"price-val\">" +
+
+
+
+  fmtPrice(p.priceT8) + "</div>\n        <div class=\"price-gp " +
+  gpCls(p.gpPctT8) + "\">" + fmtPct(p.gpPctT8) + "</div>\n      </div>\n      <div class=\"price-cell\">\n        <div class=\"price-label\">PSP</div>\n        <div class=\"price-val\" style=\"font-size:10px\">" +
+
+
+
+  fmtPrice(p.purchasePrice) + "</div>\n        <div class=\"price-gp\" style=\"color:var(--text3)\">" +
+  function () {var vat = fmtNumber(p.inboundVAT, 2);return vat === '—' ? '—' : 'VAT ' + vat + '%';}() + "</div>\n      </div>\n    </div>\n    <div class=\"card-footer\">\n      <div style=\"display:flex;flex-direction:column;gap:3px;flex:1\">\n        <div class=\"card-country\">\uD83C\uDF0F " + (
+
+
+
+
+  p.countryOfOrigin || '—') + "</div>\n      </div>\n      <button class=\"btn-review\" onclick=\"event.stopPropagation();openModal(" +
+
+  idx + ")\">" + (v ? '✓ Xem' : 'Đánh giá →') + "</button>\n    </div>\n  </div>\n</div>";
+
+
+
+}
+
+/* ══ Modal ═════════════════════════════════════ */
+function openModal(idx) {
+  var p = allProducts[idx];
+  if (!p) return;
+  var v = getMyVote(p);
+  var img = thumb(p);
+  var allV = existingResults.filter(function (r) {return normKey(r.newProductId) === productKey(p);});
+  var hasRef = p.refProductId && !['NO', 'No', 'no', ''].includes(safeText(p.refProductId, '').trim());
+  var subCategoryLabel = subCategoryWithSku(p);
+  var whyVi = safeText(p.whyDoWeListThisProduct_VN || p.whyDoWeListThisProduct || '', '').trim();
+  var whyEn = safeText(p.whyDoWeListThisProduct_EN || '', '').trim();
+  var whyText = whyVi || whyEn;
+
+  function gpBar(pct) {
+    var raw = parseLooseNumber(pct);
+    if (isNaN(raw)) return fmtPct(pct);
+    var n = raw * (raw > 1 ? 1 : 100);
+    var c = n >= 35 ? '#16a34a' : n >= 28 ? '#d97706' : '#dc2626';
+    var text = n.toLocaleString(NUMBER_LOCALE, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    return "<span class=\"gp-bar\" style=\"color:" + c + ";font-weight:800\">" + text + "%</span>";
+  }
+
+  var tiers = [
+  { l: 'Tier 6', p: p.priceT6, gp: p.gpPctT6, ga: p.gpAmtT6, rp: p.refPriceT6, rg: p.refGpPctT6 },
+  { l: 'Tier 7', p: p.priceT7, gp: p.gpPctT7, ga: p.gpAmtT7, rp: p.refPriceT7, rg: p.refGpPctT7 },
+  { l: 'Tier 8', p: p.priceT8, gp: p.gpPctT8, ga: p.gpAmtT8, rp: p.refPriceT8, rg: p.refGpPctT8 },
+  { l: 'Tier 9', p: p.priceT9, gp: p.gpPctT9, ga: p.gpAmtT9, rp: p.refPriceT9, rg: p.refGpPctT9 },
+  { l: 'INTL', p: p.priceINTL, gp: p.gpPctINTL, ga: p.gpAmtINTL, rp: p.refPriceINTL, rg: p.refGpPctINTL }];
+
+
+  var rows = tiers.map(function (t, i) {return "\n    <tr " + (
+    i === 0 ? 'class="hi"' : '') + ">\n      <td>" +
+    t.l + "</td>\n      <td>" +
+    fmtPrice(t.p) + "</td>\n      <td>" +
+    gpBar(t.gp) + "</td>\n      <td>" +
+    fmtPrice(t.ga) + "</td>\n      " + (
+    hasRef ? "<td>" + (t.rp ? fmtPrice(t.rp) : '—') + "</td><td>" + (t.rg ? gpBar(t.rg) : '—') + "</td>" : '') + "\n    </tr>";}
+  ).join('');
+
+  var kpis = [
+  { lb: 'GP% Tier 6', v: fmtPct(p.gpPctT6), c: gpCls(p.gpPctT6) },
+  { lb: 'GP% Tier 8', v: fmtPct(p.gpPctT8), c: gpCls(p.gpPctT8) },
+  { lb: 'GP% Sub Category', v: fmtPct(p.gpPctSubcat), c: gpCls(p.gpPctSubcat) },
+  { lb: 'GP/Unit', v: fmtPrice(p.gpUnitSubcat, 0), c: '' },
+  { lb: 'FC UPSD', v: fmtNumber(p.fcUpsd, 2), c: '' }];
+
+  var kpiH = kpis.map(function (k, i) {return "\n    <div class=\"kpi-card\" style=\"animation-delay:" +
+    i * 0.05 + "s\">\n      <div class=\"kpi-label\">" +
+    k.lb + "</div>\n      <div class=\"kpi-val " +
+    k.c + "\">" + k.v + "</div>\n    </div>";}
+  ).join('');
+
+  var impactKpis = [
+  { lb: 'FC Sale/Tháng', v: fmtNumber(p.fcSalePerMonth, 0), c: '' },
+  { lb: 'FC GP/Tháng', v: fmtPrice(p.fcGpAmountPerMonth, 0), c: '' },
+  { lb: 'Sale Impact vs SubCategory', v: fmtSignedPct(p.saleImpactVsSubCategory), c: impactCls(p.saleImpactVsSubCategory) },
+  { lb: 'GP Impact vs SubCategory', v: fmtSignedPct(p.gpImpactVsSubCategory), c: impactCls(p.gpImpactVsSubCategory) }];
+
+  var impactH = impactKpis.map(function (k, i) {return "\n    <div class=\"kpi-card\" style=\"animation-delay:" +
+    i * 0.05 + "s\">\n      <div class=\"kpi-label\">" +
+    k.lb + "</div>\n      <div class=\"kpi-val " +
+    k.c + "\">" + k.v + "</div>\n    </div>";}
+  ).join('');
+
+  var voteH = allV.length ? "\n    <div class=\"section\">\n      <div class=\"section-title\">L\u1ECBch s\u1EED review</div>\n      <div style=\"display:flex;flex-direction:column;gap:6px\">\n        " +
+
+
+
+  allV.map(function (r, i) {return "\n          <div class=\"vote-item\" style=\"animation-delay:" +
+    i * .07 + "s\">\n            <span class=\"vote-pic\">" +
+    escHtml(r.pic || '') + "</span>\n            <span class=\"badge " + (
+    r.status === 'Approved' ? 'badge-green' : r.status === 'Rejected' ? 'badge-red' : 'badge-blue') + "\">" + (r.status === 'Approved' ? 'Đã duyệt' : r.status === 'Rejected' ? 'Từ chối' : r.status || 'Chờ xử lý') + "</span>\n            " + (
+    r.result ? "<span style=\"color:var(--gold);font-weight:800;font-size:12px\">" + escHtml(r.result) + "</span>" : '') + "\n            <span class=\"vote-date\">" +
+    escHtml(r.date || '') + "</span>\n          </div>";}
+  ).join('') + "\n      </div>\n    </div>" :
+
+  '';
+
+  var readOnlyNotice = "<div class=\"voted-notice approved-n\"><div><strong>Ch\u1EC9 xem</strong></div><div style=\"font-size:12px;opacity:.85\">Director view hi\u1EC7n t\u1EA1i kh\xF4ng c\xF3 quy\u1EC1n ch\u1EC9nh s\u1EEDa l\u1EF1a ch\u1ECDn n\xE0y.</div></div>";
+  var dec = !currentCanEdit ?
+  readOnlyNotice :
+  v ? "<div class=\"voted-notice " + (
+  v.status === 'Approved' ? 'approved-n' : 'rejected-n') + "\">\n        <div><strong>" + (
+  v.status === 'Approved' ? '✅ Đã duyệt' : '❌ Từ chối') + "</strong>" + (v.result ? ' — ' + escHtml(v.result) : '') + "</div>\n      </div>" : "<div class=\"decision-panel\">\n        <h4>\uD83D\uDCCB Quy\u1EBFt \u0111\u1ECBnh b\u1EDFi " +
+
+
+  escHtml(currentUser) + "</h4>\n        <div class=\"decision-grid\">\n          <button class=\"status-btn status-btn-approve\" id=\"modal-btn-approve\" onclick=\"setModalStatus('Approved')\">\u2705 Duy\u1EC7t</button>\n          <button class=\"status-btn status-btn-reject\" id=\"modal-btn-reject\" onclick=\"setModalStatus('Rejected')\">\u274C T\u1EEB ch\u1ED1i</button>\n        </div>\n        <div class=\"login-hint\" style=\"margin-top:8px\">Tr\u01B0\u1EDDng Note l\xE0 d\u1EEF li\u1EC7u tham kh\u1EA3o c\xF3 s\u1EB5n v\xE0 kh\xF4ng ch\u1EC9nh s\u1EEDa trong lu\u1ED3ng n\xE0y.</div>\n        <button class=\"btn-submit\" id=\"modal-submit\" disabled\n          onclick=\"submitDecision('" +
+
+
+
+
+
+
+  esc(productKey(p)) + "','" + esc(p.productName) + "')\">\n          <svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\">\n            <path d=\"M22 2 11 13\"/><path d=\"M22 2 15 22 11 13 2 9l20-7z\"/>\n          </svg>\n          X\xE1c nh\u1EADn quy\u1EBFt \u0111\u1ECBnh\n        </button>\n      </div>";
+
+
+
+
+
+
+
+  document.getElementById('modal-content').innerHTML = "\n<div class=\"modal-img-wrap\">\n  " + (
+
+  img ? "<img src=\"" +
+  img + "\" alt=\"" + escHtml(textOrDash(p.productName)) + "\" onerror=\"this.style.display='none'\">" :
+  '<div style="font-size:52px;opacity:.2">🏷️</div>') + "\n</div>\n<div class=\"modal-title-area\">\n  <div class=\"modal-brand-row\">\n    " + (
+
+
+
+  p.countryOfOrigin ? "<span class=\"modal-country\">\uD83C\uDF0F " + escHtml(p.countryOfOrigin) + "</span>" : '') + "\n    <span class=\"modal-brand-name\">" +
+  escHtml(textOrDash(p.brandName)) + "</span>\n    " + (
+  p.newProductType ? "<span class=\"modal-type\">" + escHtml(p.newProductType) + "</span>" : '') + "\n  </div>\n  <div class=\"modal-title\">" +
+
+  escHtml(textOrDash(p.productName)) + "</div>\n  <div class=\"modal-tags\">\n    <div class=\"modal-tags-main\">\n      " + (
+
+
+  p.group ? "<span class=\"badge badge-amber\">" + escHtml(p.group) + "</span>" : '') + "\n      " + (
+  p.category ? "<span class=\"badge badge-blue\">" + escHtml(p.category) + "</span>" : '') + "\n      " + (
+  subCategoryLabel !== '—' ? "<span class=\"badge badge-gold\">" + escHtml(subCategoryLabel) + "</span>" : '') + "\n    </div>\n    " + (
+
+  p.inventoryType ? "<span class=\"badge badge-green badge-stock\">" + escHtml(p.inventoryType) + "</span>" : '') + "\n  </div>\n  " + (
+
+  p.newProductId ? "<div style=\"margin-top:8px;font-size:11px;color:var(--text3)\">ID: <code style=\"background:var(--bg3);padding:1px 5px;border-radius:4px;font-size:11px\">" + escHtml(p.newProductId) + "</code> \xB7 #" + escHtml(textOrDash(p.noPresent)) + "</div>" : '') + "\n</div>\n<div class=\"modal-body\">\n  <div class=\"section\">\n    <div class=\"section-title\">KPI kinh doanh</div>\n    <div class=\"kpi-row\">" +
+
+
+
+
+  kpiH + "</div>\n  </div>\n\n  <div class=\"section\">\n    <div class=\"section-title\">D\u1EF1 b\xE1o & t\xE1c \u0111\u1ED9ng</div>\n    <div class=\"kpi-row\">" +
+
+
+
+
+  impactH + "</div>\n  </div>\n\n  <div class=\"section\">\n    <div class=\"section-title\">Gi\xE1 b\xE1n & GP theo Tier" + (
+
+
+
+  hasRef ? ' (so với ' + escHtml(p.refProductName || p.refProductId) + ')' : '') + "</div>\n    <div class=\"pricing-wrap\">\n      <table class=\"pricing-table\">\n        <thead><tr>\n          <th>Tier</th><th>Retail Price</th><th>GP%</th><th>GP Amount</th>\n          " + (
+
+
+
+
+  hasRef ? '<th>Ref Price</th><th>Ref GP%</th>' : '') + "\n        </tr></thead>\n        <tbody>" +
+
+  rows + "</tbody>\n      </table>\n    </div>\n  </div>\n\n  <div class=\"section\">\n    <div class=\"section-title\">Th\xF4ng tin s\u1EA3n ph\u1EA9m & nh\xE0 cung c\u1EA5p</div>\n    <div class=\"info-grid\">\n      <div class=\"info-item\"><div class=\"info-label\">New Product Type</div><div class=\"info-val\">" +
+
+
+
+
+
+
+
+  escHtml(textOrDash(p.newProductType)) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Premium Products</div><div class=\"info-val\">" +
+  escHtml(textOrDash(p.premiumProducts)) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Branded</div><div class=\"info-val\">" +
+  escHtml(textOrDash(p.branded)) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Supplier Name</div><div class=\"info-val\">" +
+  escHtml(textOrDash(p.supplierName)) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Country of Origin</div><div class=\"info-val\">" +
+  escHtml(textOrDash(p.countryOfOrigin)) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Brand Name</div><div class=\"info-val\">" +
+  escHtml(textOrDash(p.brandName)) + "</div></div>\n    </div>\n  </div>\n\n  <div class=\"section\">\n    <div class=\"section-title\">Nh\xF3m ng\xE0nh & \u0111\u1ECBnh h\u01B0\u1EDBng</div>\n    <div class=\"info-grid\">\n      <div class=\"info-item\"><div class=\"info-label\">Product Group</div><div class=\"info-val\">" +
+
+
+
+
+
+
+  escHtml(textOrDash(p.group)) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Category</div><div class=\"info-val\">" +
+  escHtml(textOrDash(p.category)) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Sub Category</div><div class=\"info-val\">" +
+  escHtml(subCategoryLabel) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">PIC Category</div><div class=\"info-val\">" +
+  escHtml(textOrDash(p.picCategory)) + "</div></div>\n      <div class=\"info-item full\"><div class=\"info-label\">Target Store Types</div><div class=\"info-val\">" +
+  multilineHtml(p.targetStoreTypes) + "</div></div>\n      <div class=\"info-item full\"><div class=\"info-label\">Target Customer Store Types</div><div class=\"info-val\">" +
+  multilineHtml(p.targetCustomerStoreTypes) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Pattern</div><div class=\"info-val\">" +
+  escHtml(textOrDash(p.pattern)) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Inventory Type</div><div class=\"info-val\">" +
+  escHtml(textOrDash(p.inventoryType)) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Pricing Strategy</div><div class=\"info-val\">" +
+  escHtml(textOrDash(p.pricingStrategy)) + "</div></div>\n    </div>\n  </div>\n\n  <div class=\"section\">\n    <div class=\"section-title\">M\xF4 t\u1EA3 & v\u1EADn h\xE0nh</div>\n    <div class=\"info-grid\">\n      <div class=\"info-item full\"><div class=\"info-label\">Product description (D\u01B0\u1EDBi 250 K\xED t\u1EF1)</div><div class=\"info-val\">" +
+
+
+
+
+
+
+  multilineHtml(p.productDescription) + "</div></div>\n      <div class=\"info-item full\"><div class=\"info-label\">UOM Information</div><div class=\"info-val\">" +
+  multilineHtml(p.uomInformation) + "</div></div>\n      <div class=\"info-item full\"><div class=\"info-label\">Display area (POG CONCEPT) B\u1EAFt Bu\u1ED9c</div><div class=\"info-val\">" +
+  multilineHtml(p.displayAreaPogConcept) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Preservation temperature</div><div class=\"info-val\">" +
+  escHtml(textOrDash(p.preservationTemperature)) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Other Income + Listing Fee</div><div class=\"info-val\">" +
+  escHtml(textOrDash(p.otherIncomeListingFee)) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Logistics Group South</div><div class=\"info-val\">" +
+  escHtml(textOrDash(p.logisticsGroupSouth)) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Logistics Group North</div><div class=\"info-val\">" +
+  escHtml(textOrDash(p.logisticsGroupNorth)) + "</div></div>\n    </div>\n  </div>\n\n  " + (
+
+
+
+  p.competitors ? "\n  <div class=\"section\">\n    <div class=\"section-title\">Benchmark gi\xE1 th\u1ECB tr\u01B0\u1EDDng</div>\n    <div class=\"competitor-block\">" +
+
+
+  multilineHtml(p.competitors) + "</div>\n  </div>" :
+  '') + "\n\n  " + (
+
+  whyText ? "\n  <div class=\"section\">\n    <div class=\"section-title\">L\xFD do listing s\u1EA3n ph\u1EA9m</div>\n    <div class=\"desc-block\">" +
+
+
+  multilineHtml(whyText) + "</div>\n  </div>" :
+  '') + "\n\n  <div class=\"section\">\n    <div class=\"section-title\">POG & k\u1EBF ho\u1EA1ch tri\u1EC3n khai</div>\n    <div class=\"info-grid\">\n      <div class=\"info-item full\"><div class=\"info-label\">POG choose to reduce</div><div class=\"info-val\">" +
+
+
+
+
+  multilineHtml(p.pogChooseReduce) + "</div></div>\n      <div class=\"info-item full\"><div class=\"info-label\">POG choose Type to reduce</div><div class=\"info-val\">" +
+  multilineHtml(p.pogChooseTypeReduce) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Total Sales of Product to be CUT</div><div class=\"info-val\">" +
+  escHtml(textOrDash(p.totalSaleCut)) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Total GP of Product to be CUT</div><div class=\"info-val\">" +
+  escHtml(textOrDash(p.totalGpCut)) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">URL Image</div><div class=\"info-val\">" +
+  escHtml(textOrDash(p.urlImage)) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Image Path</div><div class=\"info-val\">" +
+  escHtml(textOrDash(p.imagePath)) + "</div></div>\n    </div>\n  </div>\n\n  <div class=\"section\">\n    <div class=\"section-title\">Ghi ch\xFA tham kh\u1EA3o (Note)</div>\n    <div class=\"desc-block\">" +
+
+
+
+
+
+  multilineHtml(p.note) + "</div>\n  </div>\n\n  <div class=\"section\">\n    <div class=\"section-title\">H\u1ED9i tho\u1EA1i n\u1ED9i b\u1ED9 (SSV Note Product)</div>\n    <div class=\"director-chat-panel\" id=\"director-chat-panel\"></div>\n  </div>\n\n  " +
+
+
+
+
+
+
+
+  voteH + "\n\n  <div class=\"section\">\n    <div class=\"section-title\">Ph\xEA duy\u1EC7t</div>\n    " +
+
+
+
+  dec + "\n  </div>\n</div>";
+
+
+
+  var overlay = document.getElementById('modal-overlay');
+  overlay.classList.remove('hidden');
+  overlay.classList.add('entering');
+  setTimeout(function () {return overlay.classList.remove('entering');}, 300);
+  document.getElementById('modal-content').scrollTop = 0;
+  document.body.style.overflow = 'hidden';
+  loadDirectorProductChat(p);
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.add('hidden');
+  var passwordHidden = document.getElementById('password-overlay').classList.contains('hidden');
+  if (passwordHidden) document.body.style.overflow = '';
+  selectedStatus = '';
+  directorChatSeq++;
+}
+function closeModalOutside(e) {if (e.target === document.getElementById('modal-overlay')) closeModal();}
+
+function setModalStatus(s) {
+  if (!currentCanEdit) return;
+  selectedStatus = s;
+  document.getElementById('modal-btn-approve').classList.toggle('active', s === 'Approved');
+  document.getElementById('modal-btn-reject').classList.toggle('active', s === 'Rejected');
+  document.getElementById('modal-submit').disabled = false;
+}
+
+function submitDecision(pkey, pname) {
+  if (!currentCanEdit) {
+    showToast('View hiện tại chỉ được xem.', 'error');
+    return;
+  }
+  if (!selectedStatus) return;
+  // Guard: prevent double submission (case-insensitive)
+  var already = existingResults.find(function (r) {return normKey(r.newProductId) === normKey(pkey);});
+  if (already) {showToast('Bạn đã review sản phẩm này.', 'error');closeModal();return;}
+
+  var result = ROLE_META[currentUser] && ROLE_META[currentUser].result || '';
+  var btn = document.getElementById('modal-submit');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;border-top-color:#fff"></div> Saving...';
+
+  google.script.run.
+  withSuccessHandler(function (res) {
+    showToast('✅ Saved successfully!', 'success');
+    closeModal();
+    refreshResults(true);
+  }).
+  withFailureHandler(function (err) {
+    if (handleSessionError(err)) return;
+    showToast('❌ ' + toErrorText(err, 'Lưu thất bại'), 'error');
+    btn.disabled = false;
+    btn.innerHTML = 'Xác nhận quyết định';
+  }).
+  saveResult({ token: authToken, newProductId: pkey, productName: pname, status: selectedStatus, result: result, pic: currentUser });
+}
+
+/* ══ Toast ═════════════════════════════════════ */
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;t.className = 'show ' + (type || '');
+  setTimeout(function () {t.className = type || '';}, 3000);
+}
+
+function isSessionError(err) {
+  var txt = toErrorText(err, '').toLowerCase();
+  return txt.includes('token') || txt.includes('dang nhap') || txt.includes('sign in') || txt.includes('access denied');
+}
+
+function handleSessionError(err) {
+  if (!isSessionError(err)) return false;
+  goToLoginPage(currentEmail);
+  return true;
+}
+
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') {
+    var modalOpen = !document.getElementById('modal-overlay').classList.contains('hidden');
+    if (modalOpen) {closeModal();return;}
+    closePasswordModal();
+    closeUserMenu();
+  }
+});
+
+document.addEventListener('click', function (e) {
+  var wrap = document.getElementById('user-menu');
+  if (wrap && !wrap.contains(e.target)) closeUserMenu();
+});
+
+applyAdaptiveMobileLayout();
+window.addEventListener('resize', applyAdaptiveMobileLayout);
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', applyAdaptiveMobileLayout);
+}
+
+bootstrapFromServerSession();
+
+// ── Sync function: manual sync button + post-approve/reject sync ─────
+function refreshResults(silent) {
+  if (!currentUser || isSyncing) return;
+  if (!authToken) {
+    goToLoginPage(currentEmail);
+    return;
+  }
+  isSyncing = true;
+  setSyncButtonBusy(true);
+  if (!silent) showSyncOverlay();
+
+  new Promise(function (ok, er) {return google.script.run.
+    withSuccessHandler(ok).withFailureHandler(er).getProductsAndResults({ token: authToken });}).
+  then(function (data) {
+    var products = data && data.products || [];
+    allProducts = products;
+    existingResults = data && data.results || [];
+    buildFilterOptions();
+    updateStats();
+    applyFilters();
+    if (!silent) {
+      hideSyncOverlay(true);
+      showToast('🔄 Data synced', '');
+    }
+  }).
+  catch(function (err) {
+    if (handleSessionError(err)) return;
+    if (!silent) {
+      var msg = toErrorText(err, 'Không thể đồng bộ dữ liệu');
+      hideSyncOverlay(false, msg);
+      showToast('❌ ' + msg, 'error');
+    }
+  }).
+  finally(function () {
+    isSyncing = false;
+    setSyncButtonBusy(false);
+  });
+}
+</script>
 </body>
 
 </html>

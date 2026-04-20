@@ -547,6 +547,22 @@ function _safeErrorText_(err, fallback) {
   }
 }
 
+function _safeJsonForInlineScript_(value) {
+  var json = '{}';
+  try {
+    json = JSON.stringify(value);
+    if (json === undefined) json = 'null';
+  } catch (err) {
+    json = '{}';
+  }
+  return String(json)
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029');
+}
+
 // ========================================
 // ENTRY POINT — Role-based routing
 // ========================================
@@ -618,7 +634,7 @@ function doGet(e) {
 function _renderAppPage_(access, token) {
   var viewDef = _getViewDefinition_(_getSelectedViewCode_(access)) || _getViewDefinition_('CAT');
   var tpl = HtmlService.createTemplateFromFile(viewDef.htmlFile);
-  tpl.appUserJson = JSON.stringify({
+  tpl.appUserJson = _safeJsonForInlineScript_({
     email: access.email,
     fullName: access.fullName,
     role: access.role,
@@ -640,7 +656,7 @@ function _renderAppPage_(access, token) {
     selectedSheetName: access.selectedSheetName || '',
     selectedEditRule: access.selectedEditRule || '',
     authToken: token
-  }).replace(/</g, '\\u003c');
+  });
   var html = tpl.evaluate();
   html.setTitle(viewDef.title);
   html.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
@@ -3127,14 +3143,14 @@ function getMDProductIDs(params) {
 
 function _renderIndexAsGuest_() {
   var tpl = HtmlService.createTemplateFromFile('Index');
-  tpl.appUserJson = JSON.stringify({
+  tpl.appUserJson = _safeJsonForInlineScript_({
     email: 'guest@npa.local',
     fullName: 'Guest User',
     role: 'GUEST',
     scope: ['ALL'],
     canEdit: false,
     authToken: ''
-  }).replace(/</g, '\\u003c');
+  });
   var html = tpl.evaluate();
   html.setTitle('NPA Product Dashboard');
   html.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
@@ -3427,7 +3443,7 @@ function _renderLoginPage(message, prefillEmail, bootstrap) {
   var initialBootstrap = bootstrap || {};
   tpl.loginMessage = message || initialBootstrap.message || '';
   tpl.prefillEmail = prefillEmail || initialBootstrap.email || '';
-  tpl.loginBootstrapJson = JSON.stringify(initialBootstrap).replace(/</g, '\\u003c');
+  tpl.loginBootstrapJson = _safeJsonForInlineScript_(initialBootstrap);
   var out = tpl.evaluate();
   out.setTitle('NPA Login');
   out.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);

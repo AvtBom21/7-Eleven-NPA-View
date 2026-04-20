@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 
 <head>
@@ -8662,9 +8662,8 @@
       </div>
       <div class="process-toolbar">
         <div class="process-search">
-          <input type="text" id="processSearchInput" placeholder="Tìm mã, tên sản phẩm, barcode/UOM, Product Group" onkeydown="if (event.key === 'Enter') App.searchProcess()">
+          <input type="text" id="processSearchInput" placeholder="Tìm mã, tên sản phẩm, barcode/UOM, Product Group">
           <div class="process-search-actions">
-            <button class="btn btn-ghost btn-sm" onclick="App.searchProcess()">Tìm</button>
             <button class="btn btn-ghost btn-sm" onclick="App.reloadProcessQueue()">Tải lại</button>
           </div>
         </div>
@@ -9218,6 +9217,11 @@
         S.processSearchValue = txt;
         var input = document.getElementById('processSearchInput');
         if (input) input.value = txt;
+      }
+      function _getProcessSearchInputValue() {
+        var input = document.getElementById('processSearchInput');
+        if (input) return String(input.value == null ? '' : input.value);
+        return String(S.processSearchValue || '');
       }
       function _setProcessToolbarNote(text) {
         var el = document.getElementById('processToolbarNote');
@@ -10458,10 +10462,9 @@
         var opts = (options && typeof options === 'object') ? options : {};
         openProcessModal({ focusSearch: opts.focusSearch === true });
 
-        var input = document.getElementById('processSearchInput');
         var resolvedQuery = String(
           query == null
-            ? (input && input.value ? input.value : S.processSearchValue || '')
+            ? _getProcessSearchInputValue()
             : query
         ).trim();
         _setProcessSearchValue(resolvedQuery);
@@ -10472,6 +10475,10 @@
         }
 
         if (!S.processProductsLoaded && !S.processProductsLoading) {
+          if (opts.localOnly === true) {
+            _renderProcessList();
+            return;
+          }
           _requestProcessingProducts({
             query: resolvedQuery,
             syncInput: true,
@@ -10592,8 +10599,7 @@
       function lookupProcessExactCode(value) {
         if (!_isProcessTrackingEnabled()) return;
         openProcessModal({ focusSearch: true });
-        var input = document.getElementById('processSearchInput');
-        var query = String(value == null ? (input && input.value ? input.value : S.processSearchValue || '') : value).trim();
+        var query = String(value == null ? _getProcessSearchInputValue() : value).trim();
         _setProcessSearchValue(query);
         if (!query) {
           toast('Nhập mã trước khi tra mã chính xác.', 'info');
@@ -15852,6 +15858,21 @@
       (function () {
         document.getElementById('q').addEventListener('input', function () { doSearch(); });
         ['fZ', 'fS', 'fG', 'fChat'].forEach(function (id) { var el = document.getElementById(id); if (el) el.addEventListener('change', function () { doSearch(); }); });
+        var processSearchInput = document.getElementById('processSearchInput');
+        if (processSearchInput) {
+          processSearchInput.addEventListener('input', function () {
+            searchProcessQueue(this.value, {
+              focusSearch: false,
+              localOnly: true,
+              clearSelectionWhenMissing: true,
+              resetScroll: true
+            });
+          });
+          processSearchInput.addEventListener('keydown', function (e) {
+            if (e.key !== 'Enter') return;
+            e.preventDefault();
+          });
+        }
         // Overlay click close disabled per request
         // document.getElementById('overlay').addEventListener('click', function (e) { if (e.target === this) closeModal(); });
         // document.getElementById('bfillOverlay').addEventListener('click', function (e) { if (e.target === this) closeBatchFill(); });

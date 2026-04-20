@@ -661,6 +661,7 @@ function _shouldUseCategoryProductChatStorage_(access, flowState) {
 function _resolveProductChatStorageTarget_(payload, access, productId) {
   var placement = _buildProductChatPlacement_(payload || {}, access || {});
   var flowState = placement.flowState || _getProductChatFlowState_(access || {}, payload || {});
+  var requestedStorageMode = String(payload && (payload.storageMode || payload.storagePreference || '') || '').trim().toUpperCase();
   var baseOptions = {
     rowNumber: payload && payload.rowNumber,
     businessSheet: _resolveProductChatSheetContext_(payload || {}, access || {}),
@@ -668,6 +669,10 @@ function _resolveProductChatStorageTarget_(payload, access, productId) {
     flowState: flowState,
     placement: placement
   };
+
+  if (requestedStorageMode === 'DATABASE') {
+    return _getProductChatDatabaseTarget_(productId, baseOptions);
+  }
 
   if (_shouldUseCategoryProductChatStorage_(access, flowState)) {
     var categoryTarget = _getProductChatCategoryTarget_(productId, Object.assign({}, baseOptions, { allowMissing: true }));

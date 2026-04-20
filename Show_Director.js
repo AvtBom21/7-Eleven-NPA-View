@@ -6,14 +6,44 @@ var DIRECTOR_VIEW_CONFIG = {
   SHEET_NAME: 'Director'
 };
 
+function _getDirectorProtectedWriteFieldNames_() {
+  var out = ['SSV Note Product', 'CEO & OPs Note'];
+  try {
+    if (typeof CONFIG !== 'undefined' && CONFIG && CONFIG.CHAT_FIELD_NAME) out.push(CONFIG.CHAT_FIELD_NAME);
+  } catch (err) {
+    // Keep defaults when global CONFIG is unavailable.
+  }
+  return out;
+}
+
+function _isDirectorProtectedWriteField_(fieldName) {
+  var key = _directorNormHeader_(fieldName);
+  if (!key) return false;
+  var protectedFields = _getDirectorProtectedWriteFieldNames_();
+  for (var i = 0; i < protectedFields.length; i++) {
+    if (_directorNormHeader_(protectedFields[i]) === key) return true;
+  }
+  return false;
+}
+
+function _assertDirectorWriteChangesAllowed_(changes) {
+  var data = changes || {};
+  for (var field in data) {
+    if (!Object.prototype.hasOwnProperty.call(data, field)) continue;
+    if (_isDirectorProtectedWriteField_(field)) {
+      return _err('FORBIDDEN_FIELD', 'Truong "' + field + '" chi duoc cap nhat qua chat API.');
+    }
+  }
+  return _ok(true);
+}
+
 var DIRECTOR_VIEW_ALIAS_MAP = {
   'Product Name': ['Product Name', 'PIC input Product Name (Dưới 40 kí tự)'],
   'PIC input Product Name (Dưới 40 kí tự)': ['PIC input Product Name (Dưới 40 kí tự)', 'Product Name'],
   'Ticket ID': ['Ticket ID', 'New Product ID'],
   'Present Status': ['Present Status', 'Status'],
   'Status': ['Status', 'Present Status'],
-  'CEO & OPs Note': ['CEO & OPs Note', 'Note'],
-  'Note': ['Note', 'CEO & OPs Note'],
+  'Note': ['Note'],
   'Product Group': ['Product Group', 'Group'],
   'Group': ['Group', 'Product Group'],
   'Zone': ['Zone', 'PIC CATEGORY', 'PIC Category'],
@@ -30,7 +60,7 @@ var DIRECTOR_VIEW_ALIAS_MAP = {
 
 var DIRECTOR_WRITE_ALIAS_MAP = {
   'Status': ['Status', 'Present Status'],
-  'Note': ['Note', 'CEO & OPs Note']
+  'Note': ['Note']
 };
 
 var DIRECTOR_VIEW_REQUIRED_KEYS = [
@@ -48,11 +78,17 @@ var DIRECTOR_VIEW_REQUIRED_KEYS = [
   'Retail Price (+VAT) in Tier 6',
   'Retail Price (+VAT) in Tier 7',
   'Note',
-  'CEO & OPs Note',
   'URL Image',
   'Url Image',
   'Image Path',
-  'New Product ID'
+  'New Product ID',
+  'Other Income + Listing Fee',
+  'Product description (Dưới 250 Kí tự)',
+  'UOM Information',
+  'Display area (POG CONCEPT) Bắt Buộc',
+  'Preservation temperature',
+  'Logistics Group South',
+  'Logistics Group North'
 ];
 
 var DIRECTOR_VIEW_PREFERRED_HEADERS = [
@@ -70,7 +106,13 @@ var DIRECTOR_VIEW_PREFERRED_HEADERS = [
   'Retail Price (+VAT) in Tier 6',
   'Retail Price (+VAT) in Tier 7',
   'Note',
-  'CEO & OPs Note',
+  'Other Income + Listing Fee',
+  'Product description (Dưới 250 Kí tự)',
+  'UOM Information',
+  'Display area (POG CONCEPT) Bắt Buộc',
+  'Preservation temperature',
+  'Logistics Group South',
+  'Logistics Group North',
   'URL Image',
   'Url Image',
   'Image',
@@ -165,12 +207,6 @@ function _normalizeDirectorRowForView_(rowObj) {
   }
   if (!_directorHasValue_(out['Present Status']) && _directorHasValue_(out['Status'])) {
     out['Present Status'] = out['Status'];
-  }
-  if (!_directorHasValue_(out['CEO & OPs Note']) && _directorHasValue_(out['Note'])) {
-    out['CEO & OPs Note'] = out['Note'];
-  }
-  if (!_directorHasValue_(out['Note']) && _directorHasValue_(out['CEO & OPs Note'])) {
-    out['Note'] = out['CEO & OPs Note'];
   }
   if (!_directorHasValue_(out['Product Group']) && _directorHasValue_(out['Group'])) {
     out['Product Group'] = out['Group'];
@@ -272,6 +308,7 @@ function _mapDirectorChangesToSheet_(headers, changes) {
   for (var field in changes) {
     if (!Object.prototype.hasOwnProperty.call(changes, field)) continue;
     var target = _resolveDirectorHeaderName_(headers, field) || field;
+    if (_isDirectorProtectedWriteField_(target)) continue;
     out[target] = changes[field];
   }
   return out;
@@ -382,6 +419,9 @@ function updateDirectorRow(payload) {
     accessRes = _assertDirectorAccess_(accessRes);
     if (!accessRes.ok) return accessRes;
 
+    var protection = _assertDirectorWriteChangesAllowed_(payload.changes);
+    if (!protection.ok) return protection;
+
     var validation = _validateChanges(payload.changes);
     if (!validation.ok) return validation;
 
@@ -448,6 +488,13 @@ function updateDirectorBatch(payload) {
       if (!update || !update.rowNumber || !update.changes) {
         failed++;
         results.push({ rowNumber: update && update.rowNumber ? update.rowNumber : null, success: false, error: { code: 'INVALID_PAYLOAD', message: 'Missing rowNumber or changes' } });
+        continue;
+      }
+
+      var protection = _assertDirectorWriteChangesAllowed_(update.changes);
+      if (!protection.ok) {
+        failed++;
+        results.push({ rowNumber: update.rowNumber, success: false, error: protection.error });
         continue;
       }
 
@@ -522,7 +569,7 @@ var DIRECTOR_MOBILE_FIELD_ALIASES = {
   noPresent: ['No.Present', 'No Present'],
   presentDate: ['Present Date'],
   status: ['Status', 'Present Status'],
-  note: ['Note', 'CEO & OPs Note'],
+  note: ['Note'],
   productName: [
     'PIC input Product Name (Duoi 40 ki tu)',
     'PIC input Product Name (Duoi 40 ky tu)',
@@ -572,9 +619,15 @@ var DIRECTOR_MOBILE_FIELD_ALIASES = {
   fcUpsd: ['FC UPSD of NEW SKU', 'UPSD per SKU by Subcategory'],
   skuCountSubcat: ['#SKU by subcategory', '# SKU by subcategory'],
   competitors: ['Competitors (Retail Price)', 'Competitors'],
-  ssvNote: [],
-  ceoNote: ['CEO & OPs Note'],
+  ssvNote: ['SSV Note Product'],
   newProductId: ['New Product ID', 'Ticket ID'],
+  otherIncomeListingFee: ['Other Income + Listing Fee'],
+  productDescription: ['Product description (Dưới 250 Kí tự)', 'Product description (Duoi 250 Ki tu)', 'Product description'],
+  uomInformation: ['UOM Information', 'UOM info'],
+  displayAreaPogConcept: ['Display area (POG CONCEPT) Bắt Buộc', 'Display area (POG CONCEPT) Bat Buoc', 'Display area (POG CONCEPT)', 'Display area'],
+  preservationTemperature: ['Preservation temperature'],
+  logisticsGroupSouth: ['Logistics Group South'],
+  logisticsGroupNorth: ['Logistics Group North'],
   pattern: ['Pattern'],
   inventoryType: ['Inventory Type'],
   refPriceT6: ['REF PRODUCT Retail Price (+VAT) in Tier 6'],
@@ -718,10 +771,6 @@ function _directorMobileNormalizeStatus_(value) {
   if (s === 'approved' || s === 'approve') return 'Approved';
   if (s === 'rejected' || s === 'reject') return 'Rejected';
   return 'Pending';
-}
-
-function _directorMobileIsOtherNoPresent_(value) {
-  return /^other_\d+$/i.test(_directorMobileSafeString_(value, '').trim());
 }
 
 function _directorMobileReadUsers_() {
@@ -923,8 +972,14 @@ function _directorMobileBuildProduct_(row, rowNumber, colMap) {
     skuCountSubcat: _directorMobileGetValue_(row, colMap, 'skuCountSubcat'),
     competitors: _directorMobileGetValue_(row, colMap, 'competitors'),
     ssvNote: _directorMobileGetValue_(row, colMap, 'ssvNote'),
-    ceoNote: _directorMobileGetValue_(row, colMap, 'ceoNote'),
     newProductId: _directorMobileCoalesce_(newProductId, _directorMobileCoalesce_(productName, '')),
+    otherIncomeListingFee: _directorMobileGetValue_(row, colMap, 'otherIncomeListingFee'),
+    productDescription: _directorMobileGetValue_(row, colMap, 'productDescription'),
+    uomInformation: _directorMobileGetValue_(row, colMap, 'uomInformation'),
+    displayAreaPogConcept: _directorMobileGetValue_(row, colMap, 'displayAreaPogConcept'),
+    preservationTemperature: _directorMobileGetValue_(row, colMap, 'preservationTemperature'),
+    logisticsGroupSouth: _directorMobileGetValue_(row, colMap, 'logisticsGroupSouth'),
+    logisticsGroupNorth: _directorMobileGetValue_(row, colMap, 'logisticsGroupNorth'),
     pattern: _directorMobileGetValue_(row, colMap, 'pattern'),
     inventoryType: _directorMobileGetValue_(row, colMap, 'inventoryType'),
     refPriceT6: _directorMobileGetValue_(row, colMap, 'refPriceT6'),
@@ -1012,9 +1067,7 @@ function getProductsAndResults(params) {
       products.push(product);
 
       var status = _directorMobileNormalizeStatus_(_directorMobileGetValue_(row, colMap, 'status'));
-      var note = _directorMobileSafeString_(_directorMobileGetValue_(row, colMap, 'note'), '').trim();
-      var isOther = _directorMobileIsOtherNoPresent_(product.noPresent);
-      var includeVote = status !== 'Pending' || (isOther && note);
+      var includeVote = status !== 'Pending';
       if (!includeVote) continue;
 
       var key = _directorMobileSafeString_(product.newProductId || product.productName || '', '').trim();
@@ -1024,7 +1077,7 @@ function getProductsAndResults(params) {
         newProductId: key,
         productName: product.productName,
         status: status,
-        note: note,
+        note: '',
         pic: DIRECTOR_MOBILE_ROLE_DIRECTOR,
         result: '',
         uniqueKey: ''
@@ -1048,7 +1101,6 @@ function saveResult(payload) {
     if (status !== 'Approved' && status !== 'Rejected' && status !== 'Pending') {
       throw new Error('Status must be Approved, Rejected or Pending');
     }
-    var note = _directorMobileSafeString_(data.note || '', '').trim();
 
     var sheet = _openDirectorSheet_();
     var headers = _trimTrailingEmptyHeaders_(_getHeaders(sheet));
@@ -1070,56 +1122,9 @@ function saveResult(payload) {
 
     var targetRow = CONFIG.DATA_START_ROW + rowOffset;
     sheet.getRange(targetRow, colMap.status + 1).setValue(status);
-    if (colMap.note !== undefined && colMap.note >= 0) {
-      sheet.getRange(targetRow, colMap.note + 1).setValue(note);
-    }
 
     return { success: true, rowNumber: targetRow, status: status };
   } catch (err) {
     throw new Error('saveResult error: ' + _directorSafeErrorText_(err, 'Unknown error'));
-  }
-}
-
-function saveOtherNote(payload) {
-  try {
-    var data = payload || {};
-    _requireDirectorAccessOrThrow_(data, true);
-    var key = _directorMobileSafeString_(data.newProductId || data.productName || '', '').trim();
-    var note = _directorMobileSafeString_(data.note || '', '').trim();
-
-    if (!key) throw new Error('Missing product identifier');
-    if (!note) throw new Error('Please enter note');
-
-    var sheet = _openDirectorSheet_();
-    var headers = _trimTrailingEmptyHeaders_(_getHeaders(sheet));
-    var lastRow = sheet.getLastRow();
-    if (headers.length === 0 || lastRow < CONFIG.DATA_START_ROW) {
-      throw new Error('Director sheet has no data rows');
-    }
-
-    var rowCount = lastRow - CONFIG.DATA_START_ROW + 1;
-    var rows = sheet.getRange(CONFIG.DATA_START_ROW, 1, rowCount, headers.length).getValues();
-    var colMap = _directorMobileBuildColumnMap_(headers);
-
-    var rowOffset = _directorMobileFindRowByKey_(rows, colMap, key, data.productName);
-    if (rowOffset < 0) throw new Error('Product not found in Director sheet');
-
-    if (colMap.note === undefined || colMap.note < 0) {
-      throw new Error('Note column not found in Director sheet');
-    }
-
-    var targetRow = CONFIG.DATA_START_ROW + rowOffset;
-    sheet.getRange(targetRow, colMap.note + 1).setValue(note);
-
-    if (colMap.status !== undefined && colMap.status >= 0) {
-      var currentStatus = _directorMobileNormalizeStatus_(rows[rowOffset][colMap.status]);
-      if (currentStatus === 'Pending') {
-        sheet.getRange(targetRow, colMap.status + 1).setValue('Pending');
-      }
-    }
-
-    return { success: true, rowNumber: targetRow, message: 'Note saved' };
-  } catch (err) {
-    throw new Error('saveOtherNote error: ' + _directorSafeErrorText_(err, 'Unknown error'));
   }
 }
