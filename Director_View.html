@@ -3,6 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
+  <base target="_top">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -3549,7 +3550,7 @@
           <button class="user-menu-item" type="button" id="switch-view-item" onclick="openViewSelector()"
             style="display:none">Switch View</button>
           <button class="user-menu-item" type="button" onclick="openPasswordModal()">Đổi mật khẩu</button>
-          <button class="user-menu-item danger" type="button" onclick="switchUser()">Log Out</button>
+          <button class="user-menu-item danger" type="button" id="logout-menu-item" onclick="switchUser()">Log Out</button>
         </div>
       </div>
     </div>
@@ -3741,6 +3742,7 @@
 var DIRECTOR_CLIENT_BUILD = 'director-readonly-note-flow-20260420-v94';
 var currentUser = '',currentEmail = '',allProducts = [],existingResults = [],activeTab = 'all',selectedStatus = '';
 var authToken = '',currentCanEdit = false,availableViews = [];
+var directorLogoutBusy = false;
 var directorChatSeq = 0,directorChatProductId = '',directorChatHistory = null,directorChatLoading = false,directorChatError = null,directorChatBusy = false,directorChatEditId = '',directorChatDraft = '',directorChatEditDraft = '';
 var REQUEST_TOKEN = String(new URLSearchParams(window.location.search || '').get('token') || '').trim();
 function readServerUser() {
@@ -4002,12 +4004,64 @@ function enterApp() {
   loadData();
 }
 
-function goToLoginPage(prefillEmail) {
+function navigateTopTo(target) {
+  var url = String(target || '?page=login');
+  try {
+    if (window.top && window.top.location) {
+      window.top.location.replace(url);
+      return;
+    }
+  } catch (topErr) {
+    // Fall back to a top-targeted link for Apps Script iframe sandbox cases.
+  }
+  try {
+    var link = document.createElement('a');
+    link.href = url;
+    link.target = '_top';
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    return;
+  } catch (linkErr) {
+    // Last resort keeps navigation functional even outside the Apps Script shell.
+  }
+  window.location.replace(url);
+}
+
+function goToLoginPage(prefillEmail, loginUrl) {
   var email = String(prefillEmail || '').trim().toLowerCase();
-  var target = email ?
+  var target = loginUrl || (email ?
   '?page=login&email=' + encodeURIComponent(email) :
-  '?page=login';
-  window.location.href = target;
+  '?page=login');
+  navigateTopTo(target);
+}
+
+function clearDirectorSessionState() {
+  currentUser = '';
+  currentEmail = '';
+  authToken = '';
+  currentCanEdit = false;
+  availableViews = [];
+  selectedStatus = '';
+  directorChatSeq++;
+  directorChatProductId = '';
+  directorChatHistory = null;
+  directorChatLoading = false;
+  directorChatError = null;
+  directorChatBusy = false;
+  directorChatEditId = '';
+  directorChatDraft = '';
+  directorChatEditDraft = '';
+}
+
+function setLogoutBusy(busy) {
+  directorLogoutBusy = !!busy;
+  var btn = document.getElementById('logout-menu-item');
+  if (!btn) return;
+  btn.disabled = !!busy;
+  btn.textContent = busy ? 'Logging out...' : 'Log Out';
+  btn.style.opacity = busy ? '.65' : '1';
+  btn.style.cursor = busy ? 'wait' : 'pointer';
 }
 
 function bootstrapFromServerSession() {
@@ -4022,7 +4076,7 @@ function bootstrapFromServerSession() {
 
   if (!selectedView) {
     if (token) {
-      window.location.href = '?page=login&token=' + encodeURIComponent(token);
+      navigateTopTo('?page=login&token=' + encodeURIComponent(token));
       return;
     }
     goToLoginPage(email);
@@ -4031,7 +4085,7 @@ function bootstrapFromServerSession() {
 
   if (selectedView !== 'DIR') {
     if (token) {
-      window.location.href = '?page=' + encodeURIComponent(selectedPage || 'index') + '&token=' + encodeURIComponent(token);
+      navigateTopTo('?page=' + encodeURIComponent(selectedPage || 'index') + '&token=' + encodeURIComponent(token));
       return;
     }
     goToLoginPage(email);
@@ -4148,25 +4202,41 @@ function submitPasswordChange() {
 }
 
 function switchUser() {
+  if (directorLogoutBusy) return;
   if (!confirm('Log out?')) return;
   var emailForPrefill = String(currentEmail || '').trim().toLowerCase();
+  var tokenForLogout = String(authToken || '').trim();
   closeUserMenu();
   closePasswordModal();
-  currentUser = '';
-  currentEmail = '';
-  authToken = '';
-  currentCanEdit = false;
-  availableViews = [];
-  var target = emailForPrefill ?
-  '?page=login&email=' + encodeURIComponent(emailForPrefill) :
-  '?page=login';
-  window.location.href = target;
+
+  if (!tokenForLogout) {
+    clearDirectorSessionState();
+    goToLoginPage(emailForPrefill);
+    return;
+  }
+
+  setLogoutBusy(true);
+  google.script.run.
+  withSuccessHandler(function (res) {
+    if (!res || !res.ok) {
+      setLogoutBusy(false);
+      showToast('Logout failed: ' + (res && res.error && res.error.message ? res.error.message : 'Không thể đóng phiên đăng nhập.'), 'error');
+      return;
+    }
+    clearDirectorSessionState();
+    goToLoginPage(emailForPrefill, res && res.data && res.data.loginUrl);
+  }).
+  withFailureHandler(function (err) {
+    setLogoutBusy(false);
+    showToast('Logout failed: ' + toErrorText(err, 'Không thể đóng phiên đăng nhập.'), 'error');
+  }).
+  logoutSession({ token: tokenForLogout });
 }
 
 function openViewSelector() {
   if (!authToken || availableViews.length <= 1) return;
   closeUserMenu();
-  window.location.href = '?page=login&token=' + encodeURIComponent(authToken);
+  navigateTopTo('?page=login&token=' + encodeURIComponent(authToken));
 }
 
 /* ══ Data ══════════════════════════════════════ */

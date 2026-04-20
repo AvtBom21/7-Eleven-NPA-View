@@ -436,6 +436,13 @@ function _storeAccessByToken_(token, accessData) {
   CacheService.getScriptCache().put('AUTH_' + token, JSON.stringify(accessData || {}), AUTH_CACHE_TTL_SECONDS);
 }
 
+function _removeAccessByToken_(token) {
+  var tk = String(token || '').trim();
+  if (!tk) return false;
+  CacheService.getScriptCache().remove('AUTH_' + tk);
+  return true;
+}
+
 function _buildAppUrl_(page, token, viewCode) {
   var parts = ['page=' + encodeURIComponent(page || 'login')];
   if (token) parts.push('token=' + encodeURIComponent(token));
@@ -448,6 +455,10 @@ function _buildAppUrl_(page, token, viewCode) {
     baseUrl = '';
   }
   return baseUrl ? (baseUrl + '?' + qs) : ('?' + qs);
+}
+
+function _buildCleanLoginUrl_() {
+  return _buildAppUrl_('login', '', '');
 }
 
 function _renderClientRedirect_(url) {
@@ -3436,6 +3447,47 @@ function selectUserView(token, viewCode) {
 
 function getCurrentUserAccess(token) {
   return _getAccessByToken_(token);
+}
+
+function logoutSession(payload) {
+  try {
+    var data = payload || {};
+    var token = String(data.token || data.authToken || '').trim();
+    var loginUrl = _buildCleanLoginUrl_();
+    if (!token) {
+      return _ok({
+        loggedOut: true,
+        alreadyLoggedOut: true,
+        loginUrl: loginUrl,
+        message: 'No active session token was provided.'
+      });
+    }
+
+    var accessRes = _getAccessByToken_(token);
+    if (!accessRes.ok) {
+      var code = accessRes.error && accessRes.error.code ? String(accessRes.error.code).toUpperCase() : '';
+      if (code === 'MISSING_TOKEN' || code === 'TOKEN_EXPIRED' || code === 'INVALID_TOKEN' || code === 'TOKEN_READ_ERROR') {
+        _removeAccessByToken_(token);
+        return _ok({
+          loggedOut: true,
+          alreadyLoggedOut: true,
+          loginUrl: loginUrl,
+          message: accessRes.error && accessRes.error.message ? accessRes.error.message : 'Session was already invalid.'
+        });
+      }
+      return accessRes;
+    }
+
+    _removeAccessByToken_(token);
+    return _ok({
+      loggedOut: true,
+      email: accessRes.data && accessRes.data.email ? accessRes.data.email : '',
+      loginUrl: loginUrl,
+      timestamp: new Date().toISOString()
+    });
+  } catch (err) {
+    return _err('LOGOUT_ERROR', _safeErrorText_(err, 'Logout failed'), err && err.stack ? err.stack : '');
+  }
 }
 
 function _renderLoginPage(message, prefillEmail, bootstrap) {

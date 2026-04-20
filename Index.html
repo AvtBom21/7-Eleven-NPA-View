@@ -7334,6 +7334,7 @@
         <div class="conn-dot"></div><span id="connTxt">Đang kết nối...</span>
       </div>
       <button class="btn btn-ghost" id="btnSwitchView" onclick="App.openViewSelector()" style="display:none">↺ Chọn view</button>
+      <button class="btn btn-ghost" id="btnLogout" onclick="App.logout()">Đăng xuất</button>
       <button class="btn btn-ghost" id="btnRef" onclick="App.reload()">↺ Refresh</button>
       <button class="btn btn-orange" id="btnSaveAll" onclick="App.saveAll()" disabled>💾 Lưu tất cả</button>
     </div>
@@ -8737,6 +8738,7 @@
       var AVAILABLE_VIEWS = Array.isArray(APP_USER.allowedViews) ? APP_USER.allowedViews.slice() : [];
       var USER_CAN_EDIT = APP_USER.currentViewCanEdit === true;
       var USER_SCOPE = Array.isArray(APP_USER.scope) ? APP_USER.scope.slice() : [];
+      var logoutBusy = false;
 
       var EMOJIS = {
         'Confectionery': '🍬', 'Candy': '🍭', 'Snack': '🍟', 'Chip': '🥔', 'Beverage': '🥤',
@@ -15646,7 +15648,89 @@
       }
       function openViewSelector() {
         if (!AUTH_TOKEN || AVAILABLE_VIEWS.length <= 1) return;
-        window.location.href = '?page=login&token=' + encodeURIComponent(AUTH_TOKEN);
+        navigateTopTo('?page=login&token=' + encodeURIComponent(AUTH_TOKEN));
+      }
+      function getLogoutErrorMessage(payload, fallback) {
+        if (payload && payload.error && payload.error.message) return String(payload.error.message);
+        if (payload && payload.message) return String(payload.message);
+        if (payload && payload.message === '') return fallback || 'Không thể đăng xuất.';
+        if (payload && payload.toString && payload.toString() !== '[object Object]') return String(payload.toString());
+        return fallback || 'Không thể đăng xuất.';
+      }
+      function navigateTopTo(target) {
+        var url = String(target || '?page=login');
+        try {
+          if (window.top && window.top.location) {
+            window.top.location.replace(url);
+            return;
+          }
+        } catch (topErr) {
+          // Apps Script may sandbox the user iframe; use a top-targeted link next.
+        }
+        try {
+          var link = document.createElement('a');
+          link.href = url;
+          link.target = '_top';
+          link.style.display = 'none';
+          document.body.appendChild(link);
+          link.click();
+          return;
+        } catch (linkErr) {
+          // Last-resort local navigation for non-Apps-Script contexts.
+        }
+        window.location.replace(url);
+      }
+      function clearSessionState() {
+        APP_USER = {};
+        AUTH_TOKEN = '';
+        SELECTED_VIEW = '';
+        SELECTED_VIEW_NAME = '';
+        SELECTED_DATA_MODE = '';
+        SELECTED_SHEET_NAME = '';
+        SELECTED_EDIT_RULE = '';
+        AVAILABLE_VIEWS = [];
+        USER_CAN_EDIT = false;
+        USER_SCOPE = [];
+      }
+      function goToCleanLogin(loginUrl) {
+        navigateTopTo(loginUrl || '?page=login');
+      }
+      function setLogoutBusy(busy) {
+        logoutBusy = !!busy;
+        var btn = document.getElementById('btnLogout');
+        if (!btn) return;
+        btn.disabled = !!busy;
+        btn.textContent = busy ? 'Đang đăng xuất...' : 'Đăng xuất';
+        btn.style.opacity = busy ? '.65' : '1';
+        btn.style.cursor = busy ? 'wait' : 'pointer';
+      }
+      function logout() {
+        if (logoutBusy) return;
+        if (!confirm('Log out?')) return;
+
+        var tokenForLogout = String(AUTH_TOKEN || '').trim();
+        if (!tokenForLogout) {
+          clearSessionState();
+          goToCleanLogin();
+          return;
+        }
+
+        setLogoutBusy(true);
+        google.script.run
+          .withSuccessHandler(function (res) {
+            if (!res || !res.ok) {
+              setLogoutBusy(false);
+              toast('Logout failed: ' + getLogoutErrorMessage(res, 'Không thể đóng phiên đăng nhập.'), 'error');
+              return;
+            }
+            clearSessionState();
+            goToCleanLogin(res && res.data && res.data.loginUrl);
+          })
+          .withFailureHandler(function (err) {
+            setLogoutBusy(false);
+            toast('Logout failed: ' + getLogoutErrorMessage(err, 'Không thể đóng phiên đăng nhập.'), 'error');
+          })
+          .logoutSession({ token: tokenForLogout });
       }
       function rpcErr(e) {
         if (handleAuthIssue(e)) return;
@@ -15912,7 +15996,7 @@
         modalPogSlotChange: modalPogSlotChange, modalAddPogSlot: modalAddPogSlot, modalClearPogSlot: modalClearPogSlot,
         setToggle: setToggle,
         otherIncomeToggle: otherIncomeToggle, otherIncomeAmountInput: otherIncomeAmountInput,
-        goSection: goSection, clearActiveProduct: clearActiveProduct, openViewSelector: openViewSelector,
+        goSection: goSection, clearActiveProduct: clearActiveProduct, openViewSelector: openViewSelector, logout: logout,
         selectBatchPreviewProduct: selectBatchPreviewProduct,
         openSelectedModal: openSelectedModal, previewSelected: previewSelected,
         openProcess: openProcess, openProcessModal: openProcessModal, openProcessKey: openProcessKey,
