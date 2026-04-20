@@ -7,7 +7,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="npa-director-build" content="director-es5-parsefix-20260420-v91">
+  <meta name="npa-director-build" content="director-readonly-note-flow-20260420-v94">
   <title>NPA RATING</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
@@ -2197,6 +2197,108 @@
       line-height: 1.7;
     }
 
+    .desc-block-prewrap {
+      white-space: pre-wrap;
+    }
+
+    .replacement-impact-wrap {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .replacement-impact-head,
+    .replacement-impact-row {
+      display: grid;
+      grid-template-columns: minmax(116px, 1.1fr) minmax(0, 2.2fr) minmax(120px, 1fr) minmax(124px, 1fr) minmax(152px, 1.2fr);
+      gap: 10px;
+      align-items: center;
+    }
+
+    .replacement-impact-head {
+      padding: 10px 12px;
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .replacement-impact-col {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--text3);
+      line-height: 1.35;
+    }
+
+    .replacement-impact-row {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      animation: fadeUp .24s ease both;
+      min-width: 0;
+    }
+
+    .replacement-impact-row:last-child {
+      border-bottom: none;
+    }
+
+    .replacement-impact-cell {
+      min-width: 0;
+    }
+
+    .replacement-impact-cell-label {
+      display: none;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: var(--text3);
+      line-height: 1.3;
+    }
+
+    .replacement-impact-cell-value {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text2);
+      line-height: 1.45;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    .replacement-impact-id {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .replacement-impact-name {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .replacement-impact-empty {
+      color: var(--text3);
+      font-weight: 700;
+    }
+
+    .impact-type-chip {
+      font-size: 11px;
+      letter-spacing: .01em;
+      text-transform: none;
+      font-weight: 800;
+      width: fit-content;
+      max-width: 100%;
+      white-space: normal;
+      line-height: 1.25;
+    }
+
+    .replacement-impact-empty-state {
+      padding: 12px;
+      font-size: 13px;
+      color: var(--text3);
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+    }
+
     /* Decision panel */
     .decision-panel {
       background: var(--bg);
@@ -3097,6 +3199,34 @@
       .sync-table tbody td:nth-child(3) {
         width: 48%;
       }
+
+      .replacement-impact-head {
+        display: none;
+      }
+
+      .replacement-impact-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        padding: 12px;
+      }
+
+      .replacement-impact-cell {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+
+      .replacement-impact-cell-label {
+        display: block;
+      }
+
+      .replacement-impact-cell-value {
+        font-size: 14px;
+      }
+
+      .impact-type-chip {
+        width: fit-content;
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -3608,7 +3738,7 @@
   <script>
 
 /* ══ State ══════════════════════════════════════ */
-var DIRECTOR_CLIENT_BUILD = 'director-es5-parsefix-20260420-v91';
+var DIRECTOR_CLIENT_BUILD = 'director-readonly-note-flow-20260420-v94';
 var currentUser = '',currentEmail = '',allProducts = [],existingResults = [],activeTab = 'all',selectedStatus = '';
 var authToken = '',currentCanEdit = false,availableViews = [];
 var directorChatSeq = 0,directorChatProductId = '',directorChatHistory = null,directorChatLoading = false,directorChatError = null,directorChatBusy = false,directorChatEditId = '',directorChatDraft = '',directorChatEditDraft = '';
@@ -4474,6 +4604,158 @@ function thumb(p) {
 }
 function esc(s) {return safeText(s, '').replace(/'/g, "\\'").replace(/"/g, '&quot;');}
 
+function normalizeWhitespace(s) {
+  return safeText(s, '').replace(/\s+/g, ' ').trim();
+}
+
+function normalizeMultiLineText(s) {
+  return safeText(s, '')
+    .replace(/\r\n?/g, '\n')
+    .replace(/[\uFF1B]/g, ';')
+    .replace(/[\uFF0C]/g, ',')
+    .replace(/[\u2022\u25CF\u25AA\u25E6]/g, '\n');
+}
+
+function splitTextList(raw) {
+  var base = normalizeMultiLineText(raw);
+  if (!base.trim()) return [];
+  return base.split(/[\n;,|]+/).map(normalizeWhitespace).filter(Boolean);
+}
+
+function splitMetricList(raw) {
+  var base = normalizeMultiLineText(raw);
+  var compact;
+  var clean;
+  if (!base.trim()) return [];
+  if (/[\n;|]/.test(base)) return base.split(/[\n;|]+/).map(normalizeWhitespace).filter(Boolean);
+  if (base.indexOf(',') < 0) {
+    clean = normalizeWhitespace(base);
+    return clean ? [clean] : [];
+  }
+  if (/\,\s+/.test(base)) return base.split(/,\s+/).map(normalizeWhitespace).filter(Boolean);
+  compact = base.replace(/[^\d,.-]/g, '');
+  if (/^-?\d{1,3}(,\d{3})+(\.\d+)?$/.test(compact) || /^-?\d+(\.\d+)?$/.test(compact)) {
+    clean = normalizeWhitespace(base);
+    return clean ? [clean] : [];
+  }
+  clean = normalizeWhitespace(base);
+  return clean ? [clean] : [];
+}
+
+function isReplacementType(value) {
+  var text = normalizeWhitespace(value).toLowerCase();
+  if (!text) return false;
+  return text.indexOf('replacement') >= 0 && text.indexOf('existing') >= 0;
+}
+
+function normalizeReplacementActionType(rawType) {
+  var text = normalizeWhitespace(rawType).toLowerCase();
+  if (!text) return '';
+  if (/cut\s*product/.test(text)) return 'Cut';
+  if (/reduce\s*facing\s*product/.test(text) || /reduce\s*facing/.test(text)) return 'Reduce Facing';
+  return '';
+}
+
+function replacementDash() {
+  return '\u2014';
+}
+
+function parseReplacementProductItem(rawValue) {
+  var raw = normalizeWhitespace(rawValue);
+  var underscorePos;
+  var explicitMatch;
+  var leadingCodeMatch;
+  if (!raw) return { productId: replacementDash(), productName: replacementDash() };
+  underscorePos = raw.indexOf('_');
+  if (underscorePos >= 0) {
+    return {
+      productId: normalizeWhitespace(raw.slice(0, underscorePos)) || replacementDash(),
+      productName: normalizeWhitespace(raw.slice(underscorePos + 1)) || replacementDash()
+    };
+  }
+  explicitMatch = raw.match(/^([A-Za-z0-9-]{6,})\s[-:|]\s(.+)$/);
+  if (explicitMatch) {
+    return {
+      productId: normalizeWhitespace(explicitMatch[1]) || replacementDash(),
+      productName: normalizeWhitespace(explicitMatch[2]) || replacementDash()
+    };
+  }
+  leadingCodeMatch = raw.match(/^([A-Za-z0-9-]{6,})\s+(.+)$/);
+  if (leadingCodeMatch) {
+    return {
+      productId: normalizeWhitespace(leadingCodeMatch[1]) || replacementDash(),
+      productName: normalizeWhitespace(leadingCodeMatch[2]) || replacementDash()
+    };
+  }
+  if (/^[A-Za-z0-9-]{6,}$/.test(raw)) return { productId: raw, productName: replacementDash() };
+  return { productId: replacementDash(), productName: raw };
+}
+
+function formatReplacementMetric(raw, asPrice) {
+  var text;
+  var n;
+  if (raw === undefined || raw === null) return replacementDash();
+  text = normalizeWhitespace(raw);
+  if (!text) return replacementDash();
+  n = parseLooseNumber(text);
+  if (isNaN(n)) return replacementDash();
+  return asPrice ? fmtPrice(n, 0) : fmtNumber(n, 2);
+}
+
+function pickReplacementMetricValue(metrics, rowCount, index) {
+  if (!Array.isArray(metrics) || !metrics.length) return undefined;
+  if (rowCount <= 1) return metrics[0];
+  if (metrics.length === 1) return metrics[0];
+  if (metrics.length === rowCount) return metrics[index];
+  return undefined;
+}
+
+function buildReplacementImpactRows(p) {
+  var products = splitTextList(p && (p.pogReduceFacingProducts || p.pogChooseReduce));
+  var types = splitTextList(p && (p.pogReduceFacingType || p.pogChooseTypeReduce));
+  var saleMetrics = splitMetricList(p && (p.totalSaleCutReduceFacing || p.totalSaleCut));
+  var gpMetrics = splitMetricList(p && (p.totalGpCutReduceFacing || p.totalGpCut));
+  var rowCount = Math.max(products.length, types.length);
+  var rows = [];
+  var i;
+  var productParts;
+  var actionType;
+  var saleValue;
+  var gpValue;
+  if (!rowCount) return [];
+  for (i = 0; i < rowCount; i++) {
+    productParts = parseReplacementProductItem(products[i]);
+    actionType = normalizeReplacementActionType(types[i]);
+    saleValue = pickReplacementMetricValue(saleMetrics, rowCount, i);
+    gpValue = pickReplacementMetricValue(gpMetrics, rowCount, i);
+    rows.push({
+      productId: productParts.productId,
+      productName: productParts.productName,
+      actionType: actionType,
+      avgSalePerMonth: formatReplacementMetric(saleValue, true),
+      avgGpAmountPerMonth: formatReplacementMetric(gpValue, true)
+    });
+  }
+  return rows;
+}
+
+function renderReplacementImpactSection(p) {
+  var rows;
+  var rowsHtml;
+  if (!isReplacementType(p && p.newProductType)) return '';
+  rows = buildReplacementImpactRows(p);
+  if (!rows.length) {
+    return '\n  <div class="section">\n    <div class="section-title">Replacement Impact Detail</div>\n    <div class="replacement-impact-wrap">\n      <div class="replacement-impact-empty-state">No replacement impact detail available.</div>\n    </div>\n  </div>';
+  }
+  rowsHtml = rows.map(function (row, i) {
+    var typeBadge = row.actionType ?
+      '<span class="badge impact-type-chip ' + (row.actionType === 'Cut' ? 'badge-amber' : 'badge-blue') + '">' + row.actionType + '</span>' :
+      '<span class="replacement-impact-empty">&mdash;</span>';
+    return '\n      <div class="replacement-impact-row" style="animation-delay:' + i * 0.03 + 's">\n        <div class="replacement-impact-cell">\n          <div class="replacement-impact-cell-label">Product ID</div>\n          <div class="replacement-impact-cell-value replacement-impact-id">' + escHtml(row.productId) + '</div>\n        </div>\n        <div class="replacement-impact-cell">\n          <div class="replacement-impact-cell-label">Product Name</div>\n          <div class="replacement-impact-cell-value replacement-impact-name">' + escHtml(row.productName) + '</div>\n        </div>\n        <div class="replacement-impact-cell">\n          <div class="replacement-impact-cell-label">Action Type</div>\n          <div class="replacement-impact-cell-value">' + typeBadge + '</div>\n        </div>\n        <div class="replacement-impact-cell">\n          <div class="replacement-impact-cell-label">AVG Sale per Month</div>\n          <div class="replacement-impact-cell-value">' + row.avgSalePerMonth + '</div>\n        </div>\n        <div class="replacement-impact-cell">\n          <div class="replacement-impact-cell-label">AVG GP Amount per Month</div>\n          <div class="replacement-impact-cell-value">' + row.avgGpAmountPerMonth + '</div>\n        </div>\n      </div>';
+  }).join('');
+  return '\n  <div class="section">\n    <div class="section-title">Replacement Impact Detail</div>\n    <div class="replacement-impact-wrap">\n      <div class="replacement-impact-head">\n        <div class="replacement-impact-col">Product ID</div>\n        <div class="replacement-impact-col">Product Name</div>\n        <div class="replacement-impact-col">Action Type</div>\n        <div class="replacement-impact-col">AVG Sale per Month</div>\n        <div class="replacement-impact-col">AVG GP Amount per Month</div>\n      </div>\n      ' + rowsHtml + '\n    </div>\n  </div>';
+}
+
 /* ══ Stats ═════════════════════════════════════ */
 function updateStats() {
   var tot = allProducts.length;
@@ -4596,237 +4878,171 @@ function cardHTML(p, idx, ai) {
 /* ══ Modal ═════════════════════════════════════ */
 function openModal(idx) {
   var p = allProducts[idx];
+  var v;
+  var img;
+  var allV;
+  var hasRef;
+  var subCategoryLabel;
+  var roleKey;
+  var isTuRole;
+  var whyVi;
+  var whyEn;
+  var whyText;
+  var otherIncomeListingFeeText;
+  var competitorBenchmarkText;
+  var competitorBenchmarkHtml;
+  var otherIncomeListingFeeHtml;
+  var noteText;
+  var replacementImpactHtml;
+  var tiers;
+  var rows;
+  var kpis;
+  var kpiH;
+  var impactKpis;
+  var impactH;
+  var voteH;
+  var readOnlyNotice;
+  var dec;
+  var modalHtml;
+  var overlay;
+
   if (!p) return;
-  var v = getMyVote(p);
-  var img = thumb(p);
-  var allV = existingResults.filter(function (r) {return normKey(r.newProductId) === productKey(p);});
-  var hasRef = p.refProductId && !['NO', 'No', 'no', ''].includes(safeText(p.refProductId, '').trim());
-  var subCategoryLabel = subCategoryWithSku(p);
-  var whyVi = safeText(p.whyDoWeListThisProduct_VN || p.whyDoWeListThisProduct || '', '').trim();
-  var whyEn = safeText(p.whyDoWeListThisProduct_EN || '', '').trim();
-  var whyText = whyVi || whyEn;
+
+  v = getMyVote(p);
+  img = thumb(p);
+  allV = existingResults.filter(function (r) { return normKey(r.newProductId) === productKey(p); });
+  hasRef = p.refProductId && safeText(p.refProductId, '').trim().toUpperCase() !== 'NO';
+  subCategoryLabel = subCategoryWithSku(p);
+  roleKey = normKey(currentUser);
+  try {
+    roleKey = roleKey.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  } catch (roleErr) {
+    // Keep normalized lower-case role when Unicode normalization is unavailable.
+  }
+  isTuRole = roleKey === 'tu';
+  whyVi = safeText(p.whyDoWeListThisProduct_VN || p.whyDoWeListThisProduct || '', '').trim();
+  whyEn = safeText(p.whyDoWeListThisProduct_EN || '', '').trim();
+  whyText = isTuRole ? (whyEn || whyVi) : (whyVi || whyEn);
+  otherIncomeListingFeeText = safeText(p.otherIncomeListingFee, '').trim();
+  competitorBenchmarkText = safeText(isTuRole ? p.retailPriceBenchmark : p.competitors, '').trim();
+  competitorBenchmarkHtml = escHtml(competitorBenchmarkText).replace(/\n/g, '<br>');
+  otherIncomeListingFeeHtml = escHtml(otherIncomeListingFeeText).replace(/\n/g, '<br>');
+  noteText = safeText(p.note, '').trim();
+  replacementImpactHtml = renderReplacementImpactSection(p);
 
   function gpBar(pct) {
     var raw = parseLooseNumber(pct);
+    var n;
+    var c;
+    var text;
     if (isNaN(raw)) return fmtPct(pct);
-    var n = raw * (raw > 1 ? 1 : 100);
-    var c = n >= 35 ? '#16a34a' : n >= 28 ? '#d97706' : '#dc2626';
-    var text = n.toLocaleString(NUMBER_LOCALE, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-    return "<span class=\"gp-bar\" style=\"color:" + c + ";font-weight:800\">" + text + "%</span>";
+    n = raw * (raw > 1 ? 1 : 100);
+    c = n >= 35 ? '#16a34a' : n >= 28 ? '#d97706' : '#dc2626';
+    text = n.toLocaleString(NUMBER_LOCALE, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    return '<span class="gp-bar" style="color:' + c + ';font-weight:800">' + text + '%</span>';
   }
 
-  var tiers = [
-  { l: 'Tier 6', p: p.priceT6, gp: p.gpPctT6, ga: p.gpAmtT6, rp: p.refPriceT6, rg: p.refGpPctT6 },
-  { l: 'Tier 7', p: p.priceT7, gp: p.gpPctT7, ga: p.gpAmtT7, rp: p.refPriceT7, rg: p.refGpPctT7 },
-  { l: 'Tier 8', p: p.priceT8, gp: p.gpPctT8, ga: p.gpAmtT8, rp: p.refPriceT8, rg: p.refGpPctT8 },
-  { l: 'Tier 9', p: p.priceT9, gp: p.gpPctT9, ga: p.gpAmtT9, rp: p.refPriceT9, rg: p.refGpPctT9 },
-  { l: 'INTL', p: p.priceINTL, gp: p.gpPctINTL, ga: p.gpAmtINTL, rp: p.refPriceINTL, rg: p.refGpPctINTL }];
-
-
-  var rows = tiers.map(function (t, i) {return "\n    <tr " + (
-    i === 0 ? 'class="hi"' : '') + ">\n      <td>" +
-    t.l + "</td>\n      <td>" +
-    fmtPrice(t.p) + "</td>\n      <td>" +
-    gpBar(t.gp) + "</td>\n      <td>" +
-    fmtPrice(t.ga) + "</td>\n      " + (
-    hasRef ? "<td>" + (t.rp ? fmtPrice(t.rp) : '—') + "</td><td>" + (t.rg ? gpBar(t.rg) : '—') + "</td>" : '') + "\n    </tr>";}
-  ).join('');
-
-  var kpis = [
-  { lb: 'GP% Tier 6', v: fmtPct(p.gpPctT6), c: gpCls(p.gpPctT6) },
-  { lb: 'GP% Tier 8', v: fmtPct(p.gpPctT8), c: gpCls(p.gpPctT8) },
-  { lb: 'GP% Sub Category', v: fmtPct(p.gpPctSubcat), c: gpCls(p.gpPctSubcat) },
-  { lb: 'GP/Unit', v: fmtPrice(p.gpUnitSubcat, 0), c: '' },
-  { lb: 'FC UPSD', v: fmtNumber(p.fcUpsd, 2), c: '' }];
-
-  var kpiH = kpis.map(function (k, i) {return "\n    <div class=\"kpi-card\" style=\"animation-delay:" +
-    i * 0.05 + "s\">\n      <div class=\"kpi-label\">" +
-    k.lb + "</div>\n      <div class=\"kpi-val " +
-    k.c + "\">" + k.v + "</div>\n    </div>";}
-  ).join('');
-
-  var impactKpis = [
-  { lb: 'FC Sale/Tháng', v: fmtNumber(p.fcSalePerMonth, 0), c: '' },
-  { lb: 'FC GP/Tháng', v: fmtPrice(p.fcGpAmountPerMonth, 0), c: '' },
-  { lb: 'Sale Impact vs SubCategory', v: fmtSignedPct(p.saleImpactVsSubCategory), c: impactCls(p.saleImpactVsSubCategory) },
-  { lb: 'GP Impact vs SubCategory', v: fmtSignedPct(p.gpImpactVsSubCategory), c: impactCls(p.gpImpactVsSubCategory) }];
-
-  var impactH = impactKpis.map(function (k, i) {return "\n    <div class=\"kpi-card\" style=\"animation-delay:" +
-    i * 0.05 + "s\">\n      <div class=\"kpi-label\">" +
-    k.lb + "</div>\n      <div class=\"kpi-val " +
-    k.c + "\">" + k.v + "</div>\n    </div>";}
-  ).join('');
-
-  var voteH = allV.length ? "\n    <div class=\"section\">\n      <div class=\"section-title\">L\u1ECBch s\u1EED review</div>\n      <div style=\"display:flex;flex-direction:column;gap:6px\">\n        " +
-
-
-
-  allV.map(function (r, i) {return "\n          <div class=\"vote-item\" style=\"animation-delay:" +
-    i * .07 + "s\">\n            <span class=\"vote-pic\">" +
-    escHtml(r.pic || '') + "</span>\n            <span class=\"badge " + (
-    r.status === 'Approved' ? 'badge-green' : r.status === 'Rejected' ? 'badge-red' : 'badge-blue') + "\">" + (r.status === 'Approved' ? 'Đã duyệt' : r.status === 'Rejected' ? 'Từ chối' : r.status || 'Chờ xử lý') + "</span>\n            " + (
-    r.result ? "<span style=\"color:var(--gold);font-weight:800;font-size:12px\">" + escHtml(r.result) + "</span>" : '') + "\n            <span class=\"vote-date\">" +
-    escHtml(r.date || '') + "</span>\n          </div>";}
-  ).join('') + "\n      </div>\n    </div>" :
-
-  '';
-
-  var readOnlyNotice = "<div class=\"voted-notice approved-n\"><div><strong>Ch\u1EC9 xem</strong></div><div style=\"font-size:12px;opacity:.85\">Director view hi\u1EC7n t\u1EA1i kh\xF4ng c\xF3 quy\u1EC1n ch\u1EC9nh s\u1EEDa l\u1EF1a ch\u1ECDn n\xE0y.</div></div>";
-  var dec = !currentCanEdit ?
-  readOnlyNotice :
-  v ? "<div class=\"voted-notice " + (
-  v.status === 'Approved' ? 'approved-n' : 'rejected-n') + "\">\n        <div><strong>" + (
-  v.status === 'Approved' ? '✅ Đã duyệt' : '❌ Từ chối') + "</strong>" + (v.result ? ' — ' + escHtml(v.result) : '') + "</div>\n      </div>" : "<div class=\"decision-panel\">\n        <h4>\uD83D\uDCCB Quy\u1EBFt \u0111\u1ECBnh b\u1EDFi " +
-
-
-  escHtml(currentUser) + "</h4>\n        <div class=\"decision-grid\">\n          <button class=\"status-btn status-btn-approve\" id=\"modal-btn-approve\" onclick=\"setModalStatus('Approved')\">\u2705 Duy\u1EC7t</button>\n          <button class=\"status-btn status-btn-reject\" id=\"modal-btn-reject\" onclick=\"setModalStatus('Rejected')\">\u274C T\u1EEB ch\u1ED1i</button>\n        </div>\n        <div class=\"login-hint\" style=\"margin-top:8px\">Tr\u01B0\u1EDDng Note l\xE0 d\u1EEF li\u1EC7u tham kh\u1EA3o c\xF3 s\u1EB5n v\xE0 kh\xF4ng ch\u1EC9nh s\u1EEDa trong lu\u1ED3ng n\xE0y.</div>\n        <button class=\"btn-submit\" id=\"modal-submit\" disabled\n          onclick=\"submitDecision('" +
-
-
-
-
-
-
-  esc(productKey(p)) + "','" + esc(p.productName) + "')\">\n          <svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\">\n            <path d=\"M22 2 11 13\"/><path d=\"M22 2 15 22 11 13 2 9l20-7z\"/>\n          </svg>\n          X\xE1c nh\u1EADn quy\u1EBFt \u0111\u1ECBnh\n        </button>\n      </div>";
-
-
-
-
-
-
-
-  document.getElementById('modal-content').innerHTML = "\n<div class=\"modal-img-wrap\">\n  " + (
-
-  img ? "<img src=\"" +
-  img + "\" alt=\"" + escHtml(textOrDash(p.productName)) + "\" onerror=\"this.style.display='none'\">" :
-  '<div style="font-size:52px;opacity:.2">🏷️</div>') + "\n</div>\n<div class=\"modal-title-area\">\n  <div class=\"modal-brand-row\">\n    " + (
-
-
-
-  p.countryOfOrigin ? "<span class=\"modal-country\">\uD83C\uDF0F " + escHtml(p.countryOfOrigin) + "</span>" : '') + "\n    <span class=\"modal-brand-name\">" +
-  escHtml(textOrDash(p.brandName)) + "</span>\n    " + (
-  p.newProductType ? "<span class=\"modal-type\">" + escHtml(p.newProductType) + "</span>" : '') + "\n  </div>\n  <div class=\"modal-title\">" +
-
-  escHtml(textOrDash(p.productName)) + "</div>\n  <div class=\"modal-tags\">\n    <div class=\"modal-tags-main\">\n      " + (
-
-
-  p.group ? "<span class=\"badge badge-amber\">" + escHtml(p.group) + "</span>" : '') + "\n      " + (
-  p.category ? "<span class=\"badge badge-blue\">" + escHtml(p.category) + "</span>" : '') + "\n      " + (
-  subCategoryLabel !== '—' ? "<span class=\"badge badge-gold\">" + escHtml(subCategoryLabel) + "</span>" : '') + "\n    </div>\n    " + (
-
-  p.inventoryType ? "<span class=\"badge badge-green badge-stock\">" + escHtml(p.inventoryType) + "</span>" : '') + "\n  </div>\n  " + (
-
-  p.newProductId ? "<div style=\"margin-top:8px;font-size:11px;color:var(--text3)\">ID: <code style=\"background:var(--bg3);padding:1px 5px;border-radius:4px;font-size:11px\">" + escHtml(p.newProductId) + "</code> \xB7 #" + escHtml(textOrDash(p.noPresent)) + "</div>" : '') + "\n</div>\n<div class=\"modal-body\">\n  <div class=\"section\">\n    <div class=\"section-title\">KPI kinh doanh</div>\n    <div class=\"kpi-row\">" +
-
-
-
-
-  kpiH + "</div>\n  </div>\n\n  <div class=\"section\">\n    <div class=\"section-title\">D\u1EF1 b\xE1o & t\xE1c \u0111\u1ED9ng</div>\n    <div class=\"kpi-row\">" +
-
-
-
-
-  impactH + "</div>\n  </div>\n\n  <div class=\"section\">\n    <div class=\"section-title\">Gi\xE1 b\xE1n & GP theo Tier" + (
-
-
-
-  hasRef ? ' (so với ' + escHtml(p.refProductName || p.refProductId) + ')' : '') + "</div>\n    <div class=\"pricing-wrap\">\n      <table class=\"pricing-table\">\n        <thead><tr>\n          <th>Tier</th><th>Retail Price</th><th>GP%</th><th>GP Amount</th>\n          " + (
-
-
-
-
-  hasRef ? '<th>Ref Price</th><th>Ref GP%</th>' : '') + "\n        </tr></thead>\n        <tbody>" +
-
-  rows + "</tbody>\n      </table>\n    </div>\n  </div>\n\n  <div class=\"section\">\n    <div class=\"section-title\">Th\xF4ng tin s\u1EA3n ph\u1EA9m & nh\xE0 cung c\u1EA5p</div>\n    <div class=\"info-grid\">\n      <div class=\"info-item\"><div class=\"info-label\">New Product Type</div><div class=\"info-val\">" +
-
-
-
-
-
-
-
-  escHtml(textOrDash(p.newProductType)) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Premium Products</div><div class=\"info-val\">" +
-  escHtml(textOrDash(p.premiumProducts)) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Branded</div><div class=\"info-val\">" +
-  escHtml(textOrDash(p.branded)) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Supplier Name</div><div class=\"info-val\">" +
-  escHtml(textOrDash(p.supplierName)) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Country of Origin</div><div class=\"info-val\">" +
-  escHtml(textOrDash(p.countryOfOrigin)) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Brand Name</div><div class=\"info-val\">" +
-  escHtml(textOrDash(p.brandName)) + "</div></div>\n    </div>\n  </div>\n\n  <div class=\"section\">\n    <div class=\"section-title\">Nh\xF3m ng\xE0nh & \u0111\u1ECBnh h\u01B0\u1EDBng</div>\n    <div class=\"info-grid\">\n      <div class=\"info-item\"><div class=\"info-label\">Product Group</div><div class=\"info-val\">" +
-
-
-
-
-
-
-  escHtml(textOrDash(p.group)) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Category</div><div class=\"info-val\">" +
-  escHtml(textOrDash(p.category)) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Sub Category</div><div class=\"info-val\">" +
-  escHtml(subCategoryLabel) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">PIC Category</div><div class=\"info-val\">" +
-  escHtml(textOrDash(p.picCategory)) + "</div></div>\n      <div class=\"info-item full\"><div class=\"info-label\">Target Store Types</div><div class=\"info-val\">" +
-  multilineHtml(p.targetStoreTypes) + "</div></div>\n      <div class=\"info-item full\"><div class=\"info-label\">Target Customer Store Types</div><div class=\"info-val\">" +
-  multilineHtml(p.targetCustomerStoreTypes) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Pattern</div><div class=\"info-val\">" +
-  escHtml(textOrDash(p.pattern)) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Inventory Type</div><div class=\"info-val\">" +
-  escHtml(textOrDash(p.inventoryType)) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Pricing Strategy</div><div class=\"info-val\">" +
-  escHtml(textOrDash(p.pricingStrategy)) + "</div></div>\n    </div>\n  </div>\n\n  <div class=\"section\">\n    <div class=\"section-title\">M\xF4 t\u1EA3 & v\u1EADn h\xE0nh</div>\n    <div class=\"info-grid\">\n      <div class=\"info-item full\"><div class=\"info-label\">Product description (D\u01B0\u1EDBi 250 K\xED t\u1EF1)</div><div class=\"info-val\">" +
-
-
-
-
-
-
-  multilineHtml(p.productDescription) + "</div></div>\n      <div class=\"info-item full\"><div class=\"info-label\">UOM Information</div><div class=\"info-val\">" +
-  multilineHtml(p.uomInformation) + "</div></div>\n      <div class=\"info-item full\"><div class=\"info-label\">Display area (POG CONCEPT) B\u1EAFt Bu\u1ED9c</div><div class=\"info-val\">" +
-  multilineHtml(p.displayAreaPogConcept) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Preservation temperature</div><div class=\"info-val\">" +
-  escHtml(textOrDash(p.preservationTemperature)) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Other Income + Listing Fee</div><div class=\"info-val\">" +
-  escHtml(textOrDash(p.otherIncomeListingFee)) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Logistics Group South</div><div class=\"info-val\">" +
-  escHtml(textOrDash(p.logisticsGroupSouth)) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Logistics Group North</div><div class=\"info-val\">" +
-  escHtml(textOrDash(p.logisticsGroupNorth)) + "</div></div>\n    </div>\n  </div>\n\n  " + (
-
-
-
-  p.competitors ? "\n  <div class=\"section\">\n    <div class=\"section-title\">Benchmark gi\xE1 th\u1ECB tr\u01B0\u1EDDng</div>\n    <div class=\"competitor-block\">" +
-
-
-  multilineHtml(p.competitors) + "</div>\n  </div>" :
-  '') + "\n\n  " + (
-
-  whyText ? "\n  <div class=\"section\">\n    <div class=\"section-title\">L\xFD do listing s\u1EA3n ph\u1EA9m</div>\n    <div class=\"desc-block\">" +
-
-
-  multilineHtml(whyText) + "</div>\n  </div>" :
-  '') + "\n\n  <div class=\"section\">\n    <div class=\"section-title\">POG & k\u1EBF ho\u1EA1ch tri\u1EC3n khai</div>\n    <div class=\"info-grid\">\n      <div class=\"info-item full\"><div class=\"info-label\">POG choose to reduce</div><div class=\"info-val\">" +
-
-
-
-
-  multilineHtml(p.pogChooseReduce) + "</div></div>\n      <div class=\"info-item full\"><div class=\"info-label\">POG choose Type to reduce</div><div class=\"info-val\">" +
-  multilineHtml(p.pogChooseTypeReduce) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Total Sales of Product to be CUT</div><div class=\"info-val\">" +
-  escHtml(textOrDash(p.totalSaleCut)) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Total GP of Product to be CUT</div><div class=\"info-val\">" +
-  escHtml(textOrDash(p.totalGpCut)) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">URL Image</div><div class=\"info-val\">" +
-  escHtml(textOrDash(p.urlImage)) + "</div></div>\n      <div class=\"info-item\"><div class=\"info-label\">Image Path</div><div class=\"info-val\">" +
-  escHtml(textOrDash(p.imagePath)) + "</div></div>\n    </div>\n  </div>\n\n  <div class=\"section\">\n    <div class=\"section-title\">Ghi ch\xFA tham kh\u1EA3o (Note)</div>\n    <div class=\"desc-block\">" +
-
-
-
-
-
-  multilineHtml(p.note) + "</div>\n  </div>\n\n  <div class=\"section\">\n    <div class=\"section-title\">H\u1ED9i tho\u1EA1i n\u1ED9i b\u1ED9 (SSV Note Product)</div>\n    <div class=\"director-chat-panel\" id=\"director-chat-panel\"></div>\n  </div>\n\n  " +
-
-
-
-
-
-
-
-  voteH + "\n\n  <div class=\"section\">\n    <div class=\"section-title\">Ph\xEA duy\u1EC7t</div>\n    " +
-
-
-
-  dec + "\n  </div>\n</div>";
-
-
-
-  var overlay = document.getElementById('modal-overlay');
+  tiers = [
+    { l: 'Tier 6', p: p.priceT6, gp: p.gpPctT6, ga: p.gpAmtT6, rp: p.refPriceT6, rg: p.refGpPctT6 },
+    { l: 'Tier 7', p: p.priceT7, gp: p.gpPctT7, ga: p.gpAmtT7, rp: p.refPriceT7, rg: p.refGpPctT7 },
+    { l: 'Tier 8', p: p.priceT8, gp: p.gpPctT8, ga: p.gpAmtT8, rp: p.refPriceT8, rg: p.refGpPctT8 },
+    { l: 'Tier 9', p: p.priceT9, gp: p.gpPctT9, ga: p.gpAmtT9, rp: p.refPriceT9, rg: p.refGpPctT9 },
+    { l: 'INTL', p: p.priceINTL, gp: p.gpPctINTL, ga: p.gpAmtINTL, rp: p.refPriceINTL, rg: p.refGpPctINTL }
+  ];
+
+  rows = tiers.map(function (t, i) {
+    return '\n    <tr ' + (i === 0 ? 'class="hi"' : '') + '>\n      <td>' +
+      t.l + '</td>\n      <td>' +
+      fmtPrice(t.p) + '</td>\n      <td>' +
+      gpBar(t.gp) + '</td>\n      <td>' +
+      fmtPrice(t.ga) + '</td>\n      ' +
+      (hasRef ? '<td>' + (t.rp ? fmtPrice(t.rp) : '&mdash;') + '</td><td>' + (t.rg ? gpBar(t.rg) : '&mdash;') + '</td>' : '') + '\n    </tr>';
+  }).join('');
+
+  kpis = [
+    { lb: 'GP% T6', v: fmtPct(p.gpPctT6), c: gpCls(p.gpPctT6) },
+    { lb: 'GP% T8', v: fmtPct(p.gpPctT8), c: gpCls(p.gpPctT8) },
+    { lb: 'GP% SubCat', v: fmtPct(p.gpPctSubcat), c: gpCls(p.gpPctSubcat) },
+    { lb: '$GP/ Unit', v: fmtPrice(p.gpUnitSubcat, 0), c: '' },
+    { lb: 'FC UPSD', v: fmtNumber(p.fcUpsd, 2), c: '' }
+  ];
+
+  kpiH = kpis.map(function (k, i) {
+    return '\n    <div class="kpi-card" style="animation-delay:' +
+      i * 0.05 + 's">\n      <div class="kpi-label">' +
+      k.lb + '</div>\n      <div class="kpi-val ' +
+      k.c + '">' + k.v + '</div>\n    </div>';
+  }).join('');
+
+  impactKpis = [
+    { lb: 'FC Sale per Month', v: fmtNumber(p.fcSalePerMonth, 0), c: '' },
+    { lb: 'FC GP Amount per Month', v: fmtPrice(p.fcGpAmountPerMonth, 0), c: '' },
+    { lb: 'Sale Impact vs Sub Category', v: fmtSignedPct(p.saleImpactVsSubCategory), c: impactCls(p.saleImpactVsSubCategory) },
+    { lb: 'GP$ Impact vs Sub Category', v: fmtSignedPct(p.gpImpactVsSubCategory), c: impactCls(p.gpImpactVsSubCategory) }
+  ];
+
+  impactH = impactKpis.map(function (k, i) {
+    return '\n    <div class="kpi-card" style="animation-delay:' +
+      i * 0.05 + 's">\n      <div class="kpi-label">' +
+      k.lb + '</div>\n      <div class="kpi-val ' +
+      k.c + '">' + k.v + '</div>\n    </div>';
+  }).join('');
+
+  voteH = allV.length ? '\n    <div class="section">\n      <div class="section-title">Review Results</div>\n      <div style="display:flex;flex-direction:column;gap:6px">\n        ' +
+    allV.map(function (r, i) {
+      return '\n          <div class="vote-item" style="animation-delay:' +
+        i * .07 + 's">\n            <span class="vote-pic">' +
+        escHtml(r.pic || '') + '</span>\n            <span class="badge ' +
+        (r.status === 'Approved' ? 'badge-green' : r.status === 'Rejected' ? 'badge-red' : 'badge-blue') + '">' +
+        escHtml(r.status || 'Noted') + '</span>\n            ' +
+        (r.result ? '<span style="color:var(--gold);font-weight:800;font-size:12px">' + escHtml(r.result) + '</span>' : '') + '\n            <span class="vote-note">' +
+        escHtml(r.note || '') + '</span>\n            <span class="vote-date">' +
+        escHtml(r.date || '') + '</span>\n          </div>';
+    }).join('') + '\n      </div>\n    </div>' : '';
+
+  readOnlyNotice = '<div class="voted-notice approved-n"><div><strong>View only</strong></div><div style="font-size:12px;opacity:.85">Director view is read-only for this selection.</div></div>';
+  dec = !currentCanEdit ? readOnlyNotice :
+    (v ? '<div class="voted-notice ' +
+      (v.status === 'Approved' ? 'approved-n' : 'rejected-n') + '">\n        <div><strong>' +
+      (v.status === 'Approved' ? 'Approved' : 'Rejected') + '</strong>' + (v.result ? ' - ' + escHtml(v.result) : '') + '</div>\n        ' +
+      (v.note ? '<div style="font-size:12px;opacity:.8">' + escHtml(v.note) + '</div>' : '') + '\n      </div>' :
+      '<div class="decision-panel">\n        <h4>Decision by ' +
+      escHtml(currentUser) + '</h4>\n        <div class="decision-grid">\n          <button class="status-btn status-btn-approve" id="modal-btn-approve" onclick="setModalStatus(\'Approved\')">Approved</button>\n          <button class="status-btn status-btn-reject" id="modal-btn-reject" onclick="setModalStatus(\'Rejected\')">Rejected</button>\n        </div>\n        <button class="btn-submit" id="modal-submit" disabled\n          onclick="submitDecision(\'' +
+      esc(productKey(p)) + '\',\'' + esc(p.productName) + '\')">\n          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">\n            <path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9l20-7z"/>\n          </svg>\n          Submit Decision\n        </button>\n      </div>');
+
+  modalHtml = '\n<div class="modal-img-wrap">\n  ' +
+    (img ? '<img src="' + img + '" alt="' + escHtml(textOrDash(p.productName)) + '" onerror="this.style.display=\'none\'">' : '<div style="font-size:52px;opacity:.2">&nbsp;</div>') +
+    '\n</div>\n<div class="modal-title-area">\n  <div class="modal-brand-row">\n    ' +
+    (p.countryOfOrigin ? '<span class="modal-country">' + escHtml(p.countryOfOrigin) + '</span>' : '') + '\n    <span class="modal-brand-name">' +
+    escHtml(textOrDash(p.brandName)) + '</span>\n    ' +
+    (p.newProductType ? '<span class="modal-type">' + escHtml(p.newProductType) + '</span>' : '') + '\n  </div>\n  <div class="modal-title">' +
+    escHtml(textOrDash(p.productName)) + '</div>\n  <div class="modal-tags">\n    <div class="modal-tags-main">\n      ' +
+    (p.group ? '<span class="badge badge-amber">' + escHtml(p.group) + '</span>' : '') + '\n      ' +
+    (p.category ? '<span class="badge badge-blue">' + escHtml(p.category) + '</span>' : '') + '\n      ' +
+    (safeText(subCategoryLabel, '').trim() && subCategoryLabel !== textOrDash('') ? '<span class="badge badge-gold">' + escHtml(subCategoryLabel) + '</span>' : '') + '\n    </div>\n    ' +
+    (p.inventoryType ? '<span class="badge badge-green badge-stock">' + escHtml(p.inventoryType) + '</span>' : '') + '\n  </div>\n  ' +
+    (p.newProductId ? '<div style="margin-top:8px;font-size:11px;color:var(--text3)">ID: <code style="background:var(--bg3);padding:1px 5px;border-radius:4px;font-size:11px">' + escHtml(p.newProductId) + '</code> &middot; #' + escHtml(textOrDash(p.noPresent)) + '</div>' : '') +
+    '\n</div>\n<div class="modal-body">\n  <div class="section">\n    <div class="section-title">Economic KPIs</div>\n    <div class="kpi-row">' +
+    kpiH + '</div>\n  </div>\n\n  <div class="section">\n    <div class="section-title">Forecast & Impact</div>\n    <div class="kpi-row">' +
+    impactH + '</div>\n  </div>\n\n  ' +
+    replacementImpactHtml + '\n\n  <div class="section">\n    <div class="section-title">Price & GP by Tier' +
+    (hasRef ? ' (vs ' + escHtml(p.refProductName || p.refProductId) + ')' : '') + '</div>\n    <div class="pricing-wrap">\n      <table class="pricing-table">\n        <thead><tr>\n          <th>Tier</th><th>Retail Price</th><th>GP%</th><th>GP Amount</th>\n          ' +
+    (hasRef ? '<th>Ref Price</th><th>Ref GP%</th>' : '') + '\n        </tr></thead>\n        <tbody>' +
+    rows + '</tbody>\n      </table>\n    </div>\n  </div>\n\n  <div class="section">\n    <div class="section-title">Supplier Information</div>\n    <div class="info-grid info-grid-product">\n      <div class="info-item"><div class="info-label">Supplier</div><div class="info-val">' +
+    escHtml(textOrDash(p.supplierName)) + '</div></div>\n      <div class="info-item info-item-compact"><div class="info-label">Pattern / Region</div><div class="info-val">' +
+    escHtml(textOrDash(p.pattern)) + '</div></div>\n    </div>\n  </div>\n\n  ' +
+    (competitorBenchmarkText ? '\n  <div class="section">\n    <div class="section-title">' + (isTuRole ? 'Retail Price Benchmark' : 'Competitors (Retail Price)') + '</div>\n    <div class="' + (isTuRole ? 'desc-block desc-block-prewrap' : 'competitor-block') + '">' + competitorBenchmarkHtml + '</div>\n  </div>' : '') + '\n\n  ' +
+    (otherIncomeListingFeeText ? '\n  <div class="section">\n    <div class="section-title">Other Income + Listing Fee</div>\n    <div class="desc-block desc-block-prewrap">' + otherIncomeListingFeeHtml + '</div>\n  </div>' : '') + '\n\n  ' +
+    (whyText ? '\n  <div class="section">\n    <div class="section-title">Why Do We List This Product?</div>\n    <div class="desc-block">' + multilineHtml(whyText) + '</div>\n  </div>' : '') + '\n\n  ' +
+    (noteText ? '\n  <div class="section">\n    <div class="section-title">Business Note</div>\n    <div class="desc-block">' + multilineHtml(noteText) + '</div>\n  </div>' : '') + '\n\n  <div class="section">\n    <div class="section-title">Internal Chat</div>\n    <div class="director-chat-panel" id="director-chat-panel"></div>\n  </div>\n\n  ' +
+    voteH + '\n\n  <div class="section">\n    <div class="section-title">Approval</div>\n    ' +
+    dec + '\n  </div>\n</div>';
+
+  document.getElementById('modal-content').innerHTML = modalHtml;
+  overlay = document.getElementById('modal-overlay');
   overlay.classList.remove('hidden');
   overlay.classList.add('entering');
-  setTimeout(function () {return overlay.classList.remove('entering');}, 300);
+  setTimeout(function () { return overlay.classList.remove('entering'); }, 300);
   document.getElementById('modal-content').scrollTop = 0;
   document.body.style.overflow = 'hidden';
   loadDirectorProductChat(p);
@@ -4874,7 +5090,7 @@ function submitDecision(pkey, pname) {
     if (handleSessionError(err)) return;
     showToast('❌ ' + toErrorText(err, 'Lưu thất bại'), 'error');
     btn.disabled = false;
-    btn.innerHTML = 'Xác nhận quyết định';
+    btn.innerHTML = 'Submit Decision';
   }).
   saveResult({ token: authToken, newProductId: pkey, productName: pname, status: selectedStatus, result: result, pic: currentUser });
 }

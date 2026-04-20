@@ -114,7 +114,21 @@ function addProductChatMessage(payload) {
       noteNew: rawEntry,
       actorEmail: actorEmail,
       sheetContext: sheetContext,
-      requestId: requestId
+      requestId: requestId,
+      logEntry: _buildProductChatLogEntry_({
+        action: 'ADD',
+        newProductId: target.newProductId,
+        messageId: message.id,
+        messagePic: message.pic,
+        actorEmail: actorEmail,
+        sheetContext: sheetContext,
+        viewContext: viewContext,
+        oldRawEntry: '',
+        newRawEntry: rawEntry,
+        storageSheet: target.targetSheetName,
+        storageRow: target.rowNumber,
+        requestId: requestId
+      })
     });
     if (!commitRes.ok) return commitRes;
 
@@ -662,10 +676,13 @@ function _resolveProductChatStorageTarget_(payload, access, productId) {
   var placement = _buildProductChatPlacement_(payload || {}, access || {});
   var flowState = placement.flowState || _getProductChatFlowState_(access || {}, payload || {});
   var requestedStorageMode = String(payload && (payload.storageMode || payload.storagePreference || '') || '').trim().toUpperCase();
+  var sheetContext = _resolveProductChatSheetContext_(payload || {}, access || {});
+  var uiPlacement = flowState && flowState.shouldUseWorkspaceChat ? 'WORKSPACE' : 'PROCESS';
+  if (sheetContext === 'Director') uiPlacement = 'DIRECTOR';
   var baseOptions = {
     rowNumber: payload && payload.rowNumber,
-    businessSheet: _resolveProductChatSheetContext_(payload || {}, access || {}),
-    uiPlacement: flowState && flowState.shouldUseWorkspaceChat ? 'WORKSPACE' : 'PROCESS',
+    businessSheet: sheetContext,
+    uiPlacement: uiPlacement,
     flowState: flowState,
     placement: placement
   };

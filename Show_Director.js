@@ -7,7 +7,7 @@ var DIRECTOR_VIEW_CONFIG = {
 };
 
 function _getDirectorProtectedWriteFieldNames_() {
-  var out = ['SSV Note Product', 'CEO & OPs Note'];
+  var out = ['SSV Note Product'];
   try {
     if (typeof CONFIG !== 'undefined' && CONFIG && CONFIG.CHAT_FIELD_NAME) out.push(CONFIG.CHAT_FIELD_NAME);
   } catch (err) {
@@ -619,7 +619,7 @@ var DIRECTOR_MOBILE_FIELD_ALIASES = {
   fcUpsd: ['FC UPSD of NEW SKU', 'UPSD per SKU by Subcategory'],
   skuCountSubcat: ['#SKU by subcategory', '# SKU by subcategory'],
   competitors: ['Competitors (Retail Price)', 'Competitors'],
-  ssvNote: ['SSV Note Product'],
+  retailPriceBenchmark: ['Retail Price Benchmark'],
   newProductId: ['New Product ID', 'Ticket ID'],
   otherIncomeListingFee: ['Other Income + Listing Fee'],
   productDescription: ['Product description (Dưới 250 Kí tự)', 'Product description (Duoi 250 Ki tu)', 'Product description'],
@@ -655,6 +655,10 @@ var DIRECTOR_MOBILE_FIELD_ALIASES = {
   pogChooseTypeReduce: ['POG choose Type to reduce'],
   totalSaleCut: ['Total Sales of Product to be CUT'],
   totalGpCut: ['Total GP of Product to be CUT'],
+  pogReduceFacingProducts: ['POG_Choose Reduce product facing', 'POG choose to reduce'],
+  pogReduceFacingType: ['POG_Choose type Reduce product facing', 'POG choose Type to reduce'],
+  totalSaleCutReduceFacing: ['Total Sales per month to CUT Reduce Facing Product', 'Total Sales of Product to be CUT'],
+  totalGpCutReduceFacing: ['Total GP per month to CUT Reduce Facing Product', 'Total GP of Product to be CUT'],
   fcSalePerMonth: ['FC Sale per month of new product'],
   fcGpAmountPerMonth: ['FC GP per month of new product'],
   saleImpactVsSubCategory: ['%Sale Impact vs Subcategory'],
@@ -971,7 +975,7 @@ function _directorMobileBuildProduct_(row, rowNumber, colMap) {
     fcUpsd: _directorMobileGetValue_(row, colMap, 'fcUpsd'),
     skuCountSubcat: _directorMobileGetValue_(row, colMap, 'skuCountSubcat'),
     competitors: _directorMobileGetValue_(row, colMap, 'competitors'),
-    ssvNote: _directorMobileGetValue_(row, colMap, 'ssvNote'),
+    retailPriceBenchmark: _directorMobileGetValue_(row, colMap, 'retailPriceBenchmark'),
     newProductId: _directorMobileCoalesce_(newProductId, _directorMobileCoalesce_(productName, '')),
     otherIncomeListingFee: _directorMobileGetValue_(row, colMap, 'otherIncomeListingFee'),
     productDescription: _directorMobileGetValue_(row, colMap, 'productDescription'),
@@ -1007,6 +1011,10 @@ function _directorMobileBuildProduct_(row, rowNumber, colMap) {
     pogChooseTypeReduce: _directorMobileGetValue_(row, colMap, 'pogChooseTypeReduce'),
     totalSaleCut: _directorMobileGetValue_(row, colMap, 'totalSaleCut'),
     totalGpCut: _directorMobileGetValue_(row, colMap, 'totalGpCut'),
+    pogReduceFacingProducts: _directorMobileGetValue_(row, colMap, 'pogReduceFacingProducts'),
+    pogReduceFacingType: _directorMobileGetValue_(row, colMap, 'pogReduceFacingType'),
+    totalSaleCutReduceFacing: _directorMobileGetValue_(row, colMap, 'totalSaleCutReduceFacing'),
+    totalGpCutReduceFacing: _directorMobileGetValue_(row, colMap, 'totalGpCutReduceFacing'),
     fcSalePerMonth: _directorMobileGetValue_(row, colMap, 'fcSalePerMonth'),
     fcGpAmountPerMonth: _directorMobileGetValue_(row, colMap, 'fcGpAmountPerMonth'),
     saleImpactVsSubCategory: _directorMobileGetValue_(row, colMap, 'saleImpactVsSubCategory'),
@@ -1077,7 +1085,7 @@ function getProductsAndResults(params) {
         newProductId: key,
         productName: product.productName,
         status: status,
-        note: '',
+        note: _directorMobileGetValue_(row, colMap, 'note'),
         pic: DIRECTOR_MOBILE_ROLE_DIRECTOR,
         result: '',
         uniqueKey: ''
@@ -1121,9 +1129,14 @@ function saveResult(payload) {
     }
 
     var targetRow = CONFIG.DATA_START_ROW + rowOffset;
+    var hasNotePayload = Object.prototype.hasOwnProperty.call(data, 'note');
+    var note = _directorMobileSafeString_(data.note, '').trim();
     sheet.getRange(targetRow, colMap.status + 1).setValue(status);
+    if (hasNotePayload && colMap.note !== undefined && colMap.note >= 0) {
+      sheet.getRange(targetRow, colMap.note + 1).setValue(note);
+    }
 
-    return { success: true, rowNumber: targetRow, status: status };
+    return { success: true, rowNumber: targetRow, status: status, noteUpdated: !!(hasNotePayload && colMap.note !== undefined && colMap.note >= 0) };
   } catch (err) {
     throw new Error('saveResult error: ' + _directorSafeErrorText_(err, 'Unknown error'));
   }
