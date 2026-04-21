@@ -3061,70 +3061,14 @@
     .s1-flow {
       display: flex;
       flex-direction: column;
-      gap: 10px
+      gap: 8px
     }
 
     .s1-panel {
       background: #fff;
       border: 1px solid #e2e8f0;
       border-radius: 10px;
-      padding: 12px
-    }
-
-    .s1-overline {
-      font: 700 10px var(--mono);
-      color: #64748b;
-      letter-spacing: .08em;
-      text-transform: uppercase
-    }
-
-    .s1-product-name {
-      margin-top: 6px;
-      font: 700 24px/1.2 var(--font);
-      color: #0f172a
-    }
-
-    .s1-context-sub {
-      margin-top: 8px;
-      max-width: 780px;
-      font: 500 13px/1.55 var(--font);
-      color: #475569
-    }
-
-    .s1-top-grid {
-      margin-top: 14px;
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px
-    }
-
-    .s1-baseline-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1.45fr) minmax(260px, .72fr);
-      gap: 14px;
-      align-items: start
-    }
-
-    .s1-fact {
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      background: #f8fafc;
-      padding: 8px 10px
-    }
-
-    .s1-label {
-      font: 600 9px var(--mono);
-      color: #94a3b8;
-      letter-spacing: .06em;
-      text-transform: uppercase
-    }
-
-    .s1-value {
-      margin-top: 3px;
-      font: 600 13px/1.4 var(--font);
-      color: #1f2937;
-      white-space: pre-wrap;
-      word-break: break-word
+      padding: 10px
     }
 
     .s1-section-title {
@@ -3134,50 +3078,6 @@
       text-transform: uppercase;
       margin-bottom: 8px
     }
-
-    .s1-image-card {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      min-width: 0
-    }
-
-    .s1-image-frame {
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      background: #fff;
-      min-height: 230px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 10px
-    }
-
-    .s1-image-frame.is-empty::before {
-      content: 'Chưa có ảnh';
-      font: 500 12px var(--font);
-      color: #94a3b8
-    }
-
-    .s1-image {
-      display: block;
-      width: 100%;
-      max-height: 210px;
-      object-fit: contain
-    }
-
-    .s1-image-link {
-      font: 500 11px var(--mono);
-      color: #2563eb;
-      text-decoration: none;
-      border-bottom: 1px solid rgba(37, 99, 235, .28);
-      width: fit-content
-    }
-
-    .s1-image-link:hover {
-      border-bottom-color: rgba(37, 99, 235, .72)
-    }
-
     .s1-section-head {
       display: flex;
       justify-content: space-between;
@@ -3192,36 +3092,82 @@
       color: #64748b
     }
 
-    .s1-section-badge {
+    .s1-source-details {
+      display: block
+    }
+
+    .s1-source-toggle {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      cursor: pointer;
+      border-radius: 9px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 8px 10px
+    }
+
+    .s1-source-toggle::-webkit-details-marker {
+      display: none
+    }
+
+    .s1-source-toggle-main {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px
+    }
+
+    .s1-source-toggle-title {
+      font: 800 11px/1.3 var(--font);
+      color: #0f172a
+    }
+
+    .s1-source-hide-label {
+      display: none
+    }
+
+    .s1-source-details[open] .s1-source-show-label {
+      display: none
+    }
+
+    .s1-source-details[open] .s1-source-hide-label {
+      display: inline
+    }
+
+    .s1-source-toggle-sub {
+      font: 600 10px/1.35 var(--font);
+      color: #64748b
+    }
+
+    .s1-source-caret {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 28px;
-      padding: 0 10px;
-      border-radius: 999px;
-      border: 1px solid transparent;
-      font: 700 10px var(--mono);
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      white-space: nowrap
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      color: #64748b;
+      font: 900 13px/1 var(--font);
+      transition: transform .16s ease
     }
 
-    .s1-section-badge.is-source {
-      border-color: #d8e1ec;
-      background: #f8fafc;
-      color: #475569
+    .s1-source-details[open] .s1-source-caret {
+      transform: rotate(90deg)
     }
 
-    .s1-section-badge.is-filled {
-      border-color: #bfdbfe;
-      background: #eff6ff;
-      color: #1d4ed8
+    .s1-source-body {
+      padding-top: 10px
     }
 
     .s1-overview-groups {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px
+      gap: 8px
     }
 
     .s1-panel.is-source-panel {
@@ -3235,12 +3181,11 @@
       box-shadow: inset 0 1px 0 rgba(191, 219, 254, .55)
     }
 
-    .s1-group-card,
-    .s1-health-card {
+    .s1-group-card {
       border: 1px solid #e2e8f0;
-      border-radius: 12px;
+      border-radius: 10px;
       background: #fff;
-      padding: 14px;
+      padding: 10px;
       min-width: 0
     }
 
@@ -3263,7 +3208,7 @@
       display: flex;
       flex-direction: column;
       gap: 4px;
-      margin-bottom: 12px
+      margin-bottom: 8px
     }
 
     .s1-group-head-top {
@@ -3273,14 +3218,12 @@
       gap: 10px
     }
 
-    .s1-group-title,
-    .s1-mini-title {
+    .s1-group-title {
       font: 700 12px/1.35 var(--font);
       color: #0f172a
     }
 
-    .s1-group-sub,
-    .s1-mini-sub {
+    .s1-group-sub {
       font: 500 11px/1.45 var(--font);
       color: #64748b
     }
@@ -3293,38 +3236,15 @@
       color: #52637a
     }
 
-    .s1-group-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 22px;
-      padding: 0 8px;
-      border-radius: 999px;
-      border: 1px solid transparent;
-      font: 700 9px var(--mono);
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      white-space: nowrap
-    }
-
-    .s1-group-badge.is-supplier {
-      border-color: #dbe3ee;
-      background: #f8fafc;
-      color: #475569
-    }
-
-    .s1-group-badge.is-filled {
-      border-color: #bfdbfe;
-      background: #dbeafe;
-      color: #1d4ed8
-    }
-
-    .s1-field-list,
-    .s1-issue-list,
-    .s1-step-list {
-      display: flex;
-      flex-direction: column;
+    .s1-field-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      align-items: start;
       gap: 8px
+    }
+
+    .s1-group-card.is-wide .s1-field-list {
+      grid-template-columns: repeat(auto-fit, minmax(236px, 1fr))
     }
 
     .s1-field-row {
@@ -3341,7 +3261,8 @@
     }
 
     .s1-field-row.is-stack {
-      grid-template-columns: 1fr
+      grid-template-columns: 1fr;
+      grid-column: 1 / -1
     }
 
     .s1-field-row.is-supplier {
@@ -3359,18 +3280,39 @@
       margin-top: 2px
     }
 
-    .s1-field-row.is-filled.is-edited {
-      background: linear-gradient(90deg, rgba(219, 234, 254, .95) 0%, rgba(248, 250, 252, .96) 100%);
-      box-shadow: inset 3px 0 0 #2563eb
+    .s1-field-list>.s1-field-row {
+      border-top: 0
     }
 
-    .s1-field-row.is-filled.is-empty {
-      background: linear-gradient(90deg, rgba(255, 247, 237, .98) 0%, rgba(255, 251, 235, .92) 100%);
-      box-shadow: inset 3px 0 0 #f59e0b
+    .s1-field-row.is-compact {
+      grid-template-columns: 1fr;
+      gap: 6px;
+      padding: 8px 10px;
+      min-height: 62px;
+      align-content: start
     }
 
-    .s1-field-row.is-filled.is-key {
-      background: linear-gradient(90deg, rgba(239, 246, 255, .98) 0%, rgba(248, 250, 252, .94) 100%)
+    .s1-field-row.is-compact.is-filled {
+      background: rgba(239, 246, 255, .46)
+    }
+
+    .s1-field-row.is-compact .s1-field-key-wrap {
+      gap: 2px
+    }
+
+    .s1-field-row.is-compact .s1-field-body {
+      gap: 5px
+    }
+
+    .s1-field-row.is-compact .s1-field-top {
+      align-items: center;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      gap: 6px
+    }
+
+    .s1-field-row.is-compact .s1-field-val {
+      line-height: 1.25
     }
 
     .s1-field-key {
@@ -3384,15 +3326,6 @@
       display: flex;
       flex-direction: column;
       gap: 5px
-    }
-
-    .s1-field-origin {
-      font: 600 10px/1.4 var(--font);
-      color: #64748b
-    }
-
-    .s1-group-card.is-filled .s1-field-origin {
-      color: #2563eb
     }
 
     .s1-field-body {
@@ -3419,266 +3352,63 @@
       white-space: normal
     }
 
-    .s1-field-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      justify-content: flex-end
-    }
-
-    .s1-state-tag {
+    .s1-value-pill {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      min-height: 20px;
-      padding: 0 7px;
+      max-width: 100%;
+      min-height: 24px;
+      padding: 3px 9px;
       border-radius: 999px;
-      border: 1px solid transparent;
-      font: 700 9px var(--mono);
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      white-space: nowrap
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      color: #334155;
+      font: 800 11px/1.2 var(--font);
+      overflow-wrap: anywhere
     }
 
-    .s1-state-tag.is-workspace {
-      border-color: #bfdbfe;
-      background: #eff6ff;
-      color: #1d4ed8
+    .s1-value-pill.is-yes {
+      border-color: #86efac;
+      background: #dcfce7;
+      color: #166534
     }
 
-    .s1-state-tag.is-edited {
-      border-color: #93c5fd;
-      background: #dbeafe;
-      color: #1e40af
+    .s1-value-pill.is-no {
+      border-color: #fecaca;
+      background: #fff1f2;
+      color: #991b1b
     }
 
-    .s1-state-tag.is-empty {
-      border-color: #fcd34d;
-      background: #fffbeb;
-      color: #b45309
-    }
-
-    .s1-state-tag.is-key {
+    .s1-value-pill.is-neutral {
       border-color: #cbd5e1;
       background: #f8fafc;
       color: #475569
     }
 
-    .s1-field-compare {
-      font: 500 11px/1.45 var(--font);
-      color: #64748b
-    }
-
-    .s1-field-row.is-filled.is-edited .s1-field-compare {
+    .s1-value-pill.is-enum {
+      border-color: #bfdbfe;
+      background: #eff6ff;
       color: #1d4ed8
     }
 
-    .s1-field-row.is-filled.is-empty .s1-field-compare {
-      color: #b45309
+    .s1-value-pill.is-money {
+      border-color: #fde68a;
+      background: #fffbeb;
+      color: #92400e
     }
 
-    .s1-field-val .blank,
-    .s1-empty-state {
-      color: #94a3b8;
-      font-style: italic
-    }
-
-    .s1-field-row.is-filled .s1-field-val .blank {
-      color: #b45309;
-      font-style: normal;
-      font-weight: 700
-    }
-
-    .s1-health-readiness {
-      min-width: 280px;
-      max-width: 360px;
-      padding: 14px;
-      border: 1px solid #dbe3ee;
-      border-radius: 14px;
-      background: linear-gradient(180deg, #f8fbff 0%, #fff 100%);
-      display: flex;
-      flex-direction: column;
-      gap: 8px
-    }
-
-    .s1-health-label {
-      font: 700 10px var(--mono);
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      color: #64748b
-    }
-
-    .s1-health-state {
-      display: inline-flex;
-      align-items: center;
-      width: fit-content;
-      gap: 8px;
-      padding: 7px 12px;
-      border-radius: 999px;
-      border: 1px solid transparent;
-      font: 700 10px var(--mono);
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      white-space: nowrap
-    }
-
-    .s1-health-note {
-      font: 500 12px/1.5 var(--font);
-      color: #475569
-    }
-
-    .s1-health-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 38px;
-      width: fit-content;
-      padding: 0 14px;
-      border-radius: 10px;
-      border: 1px solid #bfdbfe;
-      background: #eff6ff;
-      color: #1d4ed8;
-      font: 700 12px var(--font);
-      cursor: pointer;
-      transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease
-    }
-
-    .s1-health-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 18px rgba(37, 99, 235, .14);
-      border-color: #93c5fd
-    }
-
-    .s1-health-metrics {
-      margin-top: 14px;
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 10px
-    }
-
-    .s1-health-metric {
-      padding: 12px 14px;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      background: #f8fafc
-    }
-
-    .s1-health-metric .lbl {
-      display: block;
-      font: 700 9px var(--mono);
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: #64748b
-    }
-
-    .s1-health-metric strong {
-      display: block;
-      margin-top: 7px;
-      font: 700 18px/1.1 var(--font);
-      color: #0f172a
-    }
-
-    .s1-health-grid {
-      margin-top: 14px;
-      display: grid;
-      grid-template-columns: minmax(0, 1.02fr) minmax(320px, .98fr);
-      gap: 12px
-    }
-
-    .s1-step-item {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-      width: 100%;
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px solid #dbe3ee;
-      background: #fff;
-      color: inherit;
-      text-align: left;
-      cursor: pointer;
-      transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease
-    }
-
-    .s1-step-item:hover {
-      transform: translateY(-1px);
-      border-color: #bfdbfe;
-      box-shadow: 0 10px 20px rgba(15, 23, 42, .05)
-    }
-
-    .s1-step-copy {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      min-width: 0
-    }
-
-    .s1-step-title {
-      font: 700 12px/1.35 var(--font);
-      color: #0f172a
-    }
-
-    .s1-step-meta {
-      font: 500 12px/1.45 var(--font);
-      color: #64748b
-    }
-
-    .s1-step-state {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 28px;
-      padding: 0 10px;
-      border-radius: 999px;
-      border: 1px solid transparent;
-      font: 700 9px var(--mono);
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      flex-shrink: 0
-    }
-
-    .s1-issue {
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px solid #dbe3ee;
-      background: #fff;
-      font: 600 12px/1.5 var(--font);
-      color: #1f2937
-    }
-
-    .s1-issue.is-warn {
-      border-color: #fed7aa;
-      background: #fff7ed;
-      color: #9a3412
-    }
-
-    .s1-issue.is-ok {
-      border-color: #bbf7d0;
-      background: #f0fdf4;
-      color: #166534
+    .s1-value-pill.is-percent {
+      border-color: #ddd6fe;
+      background: #f5f3ff;
+      color: #5b21b6
     }
 
     @media(max-width:1180px) {
-      .s1-top-grid,
-      .s1-overview-groups,
-      .s1-health-metrics {
+      .s1-overview-groups {
         grid-template-columns: repeat(2, minmax(0, 1fr))
-      }
-
-      .s1-baseline-grid,
-      .s1-health-grid {
-        grid-template-columns: 1fr
       }
 
       .s1-section-head {
         flex-direction: column
-      }
-
-      .s1-health-readiness {
-        min-width: 0;
-        max-width: none;
-        width: 100%
       }
     }
 
@@ -3687,18 +3417,8 @@
         padding: 10px
       }
 
-      .s1-product-name {
-        font-size: 20px
-      }
-
-      .s1-top-grid,
-      .s1-overview-groups,
-      .s1-health-metrics {
+      .s1-overview-groups {
         grid-template-columns: 1fr
-      }
-
-      .s1-image-frame {
-        min-height: 180px
       }
 
       .s1-field-row {
@@ -3710,14 +3430,6 @@
         align-items: flex-start
       }
 
-      .s1-field-tags {
-        justify-content: flex-start
-      }
-
-      .s1-step-item {
-        flex-direction: column;
-        align-items: flex-start
-      }
     }
 
     /* ─ Mini card ─ */
@@ -7904,129 +7616,32 @@
         <div class="m-step-pane on" id="detailStep1">
           <div class="m-static-wrap">
             <div class="s1-flow">
-              <section class="s1-panel" aria-label="Product Overview">
-                <div class="s1-overline">Overview · Product Context</div>
-                <h3 class="s1-product-name" id="st_product">—</h3>
-                <div class="s1-context-sub">Identify the product first, then review supplier baseline, current workspace data, and readiness before editing or saving.</div>
-                <div class="s1-top-grid">
-                  <div class="s1-fact">
-                    <div class="s1-label">Ticket ID</div>
-                    <div class="s1-value" id="st_ticket">—</div>
+              <section class="s1-panel is-source-panel" id="ovSourcePanel" aria-label="Supplier Source Information">
+                <details class="s1-source-details" id="ovSourceDetails">
+                  <summary class="s1-source-toggle">
+                    <span class="s1-source-toggle-main">
+                      <span class="s1-source-toggle-title">
+                        <span class="s1-source-show-label">Show source info</span>
+                        <span class="s1-source-hide-label">Hide source info</span>
+                      </span>
+                      <span class="s1-source-toggle-sub">Supplier baseline is hidden by default and only shows fields with data.</span>
+                    </span>
+                    <span class="s1-source-caret">›</span>
+                  </summary>
+                  <div class="s1-source-body">
+                    <div class="s1-overview-groups" id="ovSupplierGroups"></div>
                   </div>
-                  <div class="s1-fact">
-                    <div class="s1-label">Status</div>
-                    <div class="s1-value" id="st_status">—</div>
-                  </div>
-                  <div class="s1-fact">
-                    <div class="s1-label">Present Date</div>
-                    <div class="s1-value" id="st_present">—</div>
-                  </div>
-                  <div class="s1-fact">
-                    <div class="s1-label">Supplier</div>
-                    <div class="s1-value" id="st_supplier">—</div>
-                  </div>
-                  <div class="s1-fact">
-                    <div class="s1-label">Brand</div>
-                    <div class="s1-value" id="st_brand">—</div>
-                  </div>
-                  <div class="s1-fact">
-                    <div class="s1-label">Zone</div>
-                    <div class="s1-value" id="st_zone">—</div>
-                  </div>
-                </div>
+                </details>
               </section>
 
-              <section class="s1-panel is-source-panel" aria-label="Supplier Baseline">
+              <section class="s1-panel is-filled-panel" id="ovWorkspacePanel" aria-label="Workspace Information Summary">
                 <div class="s1-section-head">
                   <div>
-                    <div class="s1-section-title">Supplier Baseline</div>
-                    <div class="s1-section-sub">Source data from supplier submission and existing record. This is the baseline you compare against before editing.</div>
+                    <div class="s1-section-title">Workspace Info</div>
+                    <div class="s1-section-sub">Only fields that already have values are shown.</div>
                   </div>
-                  <div class="s1-section-badge is-source">Source Data</div>
-                </div>
-                <div class="s1-baseline-grid">
-                  <div class="s1-overview-groups" id="ovSupplierGroups"></div>
-                  <aside class="s1-group-card is-supplier s1-image-card" aria-label="Supplier Image Reference">
-                    <div class="s1-group-head">
-                      <div class="s1-group-head-top">
-                        <div class="s1-group-title">Source Image</div>
-                        <div class="s1-group-badge is-supplier">Reference</div>
-                      </div>
-                      <div class="s1-group-sub">Kiểm tra nhanh ảnh gốc được gửi cùng dữ liệu nhà cung cấp.</div>
-                    </div>
-                    <figure class="s1-image-frame is-empty" id="st_img_frame">
-                      <img class="s1-image" id="st_img" alt="Ảnh sản phẩm" loading="lazy" style="display:none" />
-                    </figure>
-                    <a id="st_url" class="s1-image-link" href="#" target="_blank" rel="noopener noreferrer" style="display:none">Mở ảnh gốc</a>
-                  </aside>
-                </div>
-              </section>
-
-              <section class="s1-panel is-filled-panel" aria-label="Filled Information Summary">
-                <div class="s1-section-head">
-                  <div>
-                    <div class="s1-section-title">Filled Information Summary</div>
-                    <div class="s1-section-sub">Current workspace-managed values grouped by workflow logic. This is the user-entered layer that is moving toward save.</div>
-                  </div>
-                  <div class="s1-section-badge is-filled">Workspace Data</div>
                 </div>
                 <div class="s1-overview-groups" id="ovFilledGroups"></div>
-              </section>
-
-              <section class="s1-panel" aria-label="Workspace Health and Readiness">
-                <div class="s1-section-head">
-                  <div>
-                    <div class="s1-section-title">Workspace Health / Readiness</div>
-                    <div class="s1-section-sub">See what is complete, what is missing, what changed, and where the next edit should happen before saving.</div>
-                  </div>
-                  <div class="s1-health-readiness">
-                    <div class="s1-health-label">Save readiness</div>
-                    <div class="s1-health-state state-idle" id="ovReadyState">Ready to start</div>
-                    <div class="s1-health-note" id="ovReadyNote">Review supplier baseline, then open the right workspace step.</div>
-                    <button type="button" class="s1-health-btn" id="ovNextFocusBtn" onclick="App.openDetailWorkspaceStep(1)">Open Identity</button>
-                  </div>
-                </div>
-
-                <div class="s1-health-metrics">
-                  <div class="s1-health-metric">
-                    <span class="lbl">Pending Changes</span>
-                    <strong id="ovMetricPending">0</strong>
-                  </div>
-                  <div class="s1-health-metric">
-                    <span class="lbl">Required Complete</span>
-                    <strong id="ovMetricRequired">0/0</strong>
-                  </div>
-                  <div class="s1-health-metric">
-                    <span class="lbl">Warnings</span>
-                    <strong id="ovMetricWarnings">0</strong>
-                  </div>
-                  <div class="s1-health-metric">
-                    <span class="lbl">Missing Inputs</span>
-                    <strong id="ovMetricMissing">0</strong>
-                  </div>
-                </div>
-
-                <div class="s1-health-grid">
-                  <div class="s1-health-card">
-                    <div class="s1-mini-title">Step / Section Status</div>
-                    <div class="s1-mini-sub">Jump into the correct edit step without guessing.</div>
-                    <div class="s1-step-list" id="ovStepStates"></div>
-                  </div>
-                  <div class="s1-health-card">
-                    <div class="s1-mini-title">Missing Inputs</div>
-                    <div class="s1-mini-sub">Required inputs that still block a clean save.</div>
-                    <div class="s1-issue-list" id="ovMissingList"></div>
-                    <div class="s1-mini-title" style="margin-top:14px">Warnings</div>
-                    <div class="s1-mini-sub">Validation or quality signals that still need attention.</div>
-                    <div class="s1-issue-list" id="ovWarningList"></div>
-                  </div>
-                </div>
-
-                <div class="s1-health-card" style="margin-top:16px">
-                  <div class="s1-mini-title">High-signal Changes</div>
-                  <div class="s1-mini-sub">Most important edits stay visible in one summary before you enter or save.</div>
-                  <div class="dwov-summary-list" id="ovChangeSummary"></div>
-                </div>
               </section>
             </div>
           </div>
@@ -14384,26 +13999,54 @@
         return String(num) + '%';
       }
 
+      var OVERVIEW_BOOLEAN_FIELDS = [
+        'Premium products',
+        'Branded',
+        'SAME PRICE PRODUCT'
+      ];
+      var OVERVIEW_ENUM_SHORT_FIELDS = [
+        'New product type',
+        'Sub Category',
+        'Pattern',
+        'Inventory Type',
+        PRICING_STRATEGY_FIELD,
+        'PRIMARY USAGE SEGMENT',
+        'TARGET STORE TYPES',
+        'TARGET CUSTOMER STORE TYPES',
+        'Logistics Group South',
+        'Logistics Group North'
+      ];
+      var OVERVIEW_MULTILINE_FIELDS = [
+        'Why Do We List This Product?',
+        OTHER_INCOME_FIELD,
+        'Product description (Dưới 250 Kí tự)',
+        'Competitors (Retail Price) <Tên đối thủ: Giá tiền>',
+        'Display area (POG CONCEPT) Bắt Buộc',
+        POG_PRODUCT_FIELD,
+        POG_ACTION_FIELD,
+        'UOM Information',
+        'Note',
+        'NOTE'
+      ];
+
       var OVERVIEW_SUPPLIER_GROUPS = [
         {
           title: 'Commercial Baseline',
-          subtitle: 'Commercial inputs already supplied before workspace edits begin.',
           fields: [
             { label: "Supplier's Suggested Retail Price", keys: ["Supplier's Suggested Retail Price", "SUPPLIER'S SUGGESTED RETAIL PRICE", 'Supplier’s Suggested Retail Price'], format: 'money' },
             { label: 'Purchase Price Excluded VAT', keys: ['Purchase Price Excluded VAT', 'PURCHASE PRICE EXCLUDED VAT'], format: 'money' },
             { label: 'Inbound VAT', keys: ['Inbound VAT', 'INBOUND VAT'], format: 'vat' },
-            { label: 'Country of Origin', keys: ['Country of Origin'] }
+            { label: 'Country of Origin', keys: ['Country of Origin'], kind: 'enumShort' }
           ]
         },
         {
           title: 'Operations Baseline',
-          subtitle: 'Operational and source reference fields already present from supplier data.',
           wide: true,
           fields: [
-            { label: 'Storage Conditions', keys: ['Storage Conditions', 'STORAGE CONDITIONS'] },
-            { label: 'Shelf Life', keys: ['Shelf Life', 'SHELF LIFE'] },
-            { label: 'UOM Information', keys: ['UOM Information', 'UOM INFORMATION'], multiline: true },
-            { label: 'Source Note', keys: ['Note', 'NOTE'], multiline: true }
+            { label: 'Storage Conditions', keys: ['Storage Conditions', 'STORAGE CONDITIONS'], kind: 'enumShort' },
+            { label: 'Shelf Life', keys: ['Shelf Life', 'SHELF LIFE'], kind: 'short' },
+            { label: 'UOM Information', keys: ['UOM Information', 'UOM INFORMATION'], kind: 'multiline', multiline: true },
+            { label: 'Source Note', keys: ['Note', 'NOTE'], kind: 'multiline', multiline: true }
           ]
         }
       ];
@@ -14411,81 +14054,58 @@
       var OVERVIEW_FILLED_GROUPS = [
         {
           title: 'Product Identity',
-          subtitle: 'Identity and reference setup currently managed inside the Edit Workspace.',
           fields: [
-            { field: 'New product type' },
+            { field: 'New product type', kind: 'enumShort' },
             { field: 'PIC input Product Name (Dưới 40 kí tự)' },
             { field: 'REFERENCE PRODUCT ID (Nếu không có điền NO)' },
-            { field: 'SAME PRICE PRODUCT' },
-            { field: 'Sub Category' }
+            { field: 'SAME PRICE PRODUCT', kind: 'boolean' },
+            { field: 'Sub Category', kind: 'enumShort' }
           ]
         },
         {
           title: 'Commercial & Positioning',
-          subtitle: 'Why it is listed, how it is positioned, and which commercial inputs support the decision.',
           wide: true,
           fields: [
-            { field: 'Why Do We List This Product?', multiline: true },
-            { field: OTHER_INCOME_FIELD, multiline: true },
-            { field: 'Premium products' },
-            { field: 'Branded' },
-            { field: 'Product description (Dưới 250 Kí tự)', multiline: true },
-            { field: 'PRIMARY USAGE SEGMENT' },
-            { field: 'TARGET STORE TYPES' },
-            { field: 'TARGET CUSTOMER STORE TYPES' },
+            { field: 'Why Do We List This Product?', kind: 'multiline', multiline: true },
+            { field: OTHER_INCOME_FIELD, kind: 'multiline', multiline: true },
+            { field: 'Premium products', kind: 'boolean' },
+            { field: 'Branded', kind: 'boolean' },
+            { field: 'Product description (Dưới 250 Kí tự)', kind: 'multiline', multiline: true },
+            { field: 'PRIMARY USAGE SEGMENT', kind: 'enumShort' },
+            { field: 'TARGET STORE TYPES', kind: 'enumShort' },
+            { field: 'TARGET CUSTOMER STORE TYPES', kind: 'enumShort' },
             { field: 'Retail Price (+VAT) in Tier 6', format: 'money' },
             { field: 'FC UPSD of NEW SKU' },
-            { field: 'Competitors (Retail Price) <Tên đối thủ: Giá tiền>', multiline: true }
+            { field: 'Competitors (Retail Price) <Tên đối thủ: Giá tiền>', kind: 'multiline', multiline: true }
           ]
         },
         {
           title: 'Pricing & POG Decision',
-          subtitle: 'The pricing focus and facing reduction choices that are currently being managed together in the workspace.',
           wide: true,
           fields: [
-            { field: PRICING_STRATEGY_FIELD },
-            { label: 'POG Reduce / Facing Decision', field: POG_PRODUCT_FIELD, compareFields: [POG_PRODUCT_FIELD, POG_ACTION_FIELD], multiline: true, format: 'pog-decisions' }
+            { field: PRICING_STRATEGY_FIELD, kind: 'enumShort' },
+            { label: 'POG Reduce / Facing Decision', field: POG_PRODUCT_FIELD, compareFields: [POG_PRODUCT_FIELD, POG_ACTION_FIELD], kind: 'pog-decisions', multiline: true, format: 'pog-decisions' }
           ]
         },
         {
           title: 'Operations & Logistics',
-          subtitle: 'Execution setup and logistics routing derived from the current workspace configuration.',
           fields: [
-            { field: 'Display area (POG CONCEPT) Bắt Buộc' },
-            { field: 'Inventory Type' },
+            { field: 'Display area (POG CONCEPT) Bắt Buộc', kind: 'multiline', multiline: true },
+            { field: 'Inventory Type', kind: 'enumShort' },
             { field: 'Preservation temperature' },
-            { field: 'Pattern' },
-            { field: 'Logistics Group South' },
-            { field: 'Logistics Group North' }
+            { field: 'Pattern', kind: 'enumShort' },
+            { field: 'Logistics Group South', kind: 'enumShort' },
+            { field: 'Logistics Group North', kind: 'enumShort' }
           ]
         },
         {
           title: 'UOM / Packaging / Image',
-          subtitle: 'Packaging structure and barcode or image details that support execution.',
           wide: true,
           fields: [
-            { field: 'UOM Information', multiline: true }
+            { field: 'UOM Information', kind: 'multiline', multiline: true }
           ]
-        },
-      ];
-
-      function _getOverviewContextValue(values, row, field, rowKeys) {
-        if (values && Object.prototype.hasOwnProperty.call(values, field)) {
-          return _cleanDisplayValue(values[field]);
         }
-        return _pickRowValue(row, rowKeys || [field]) || '';
-      }
-
-      function _renderOverviewContext(row, values) {
-        if (!row) return;
-        setText('st_product', _pickRowValue(row, ['Product Name']) || '—');
-        setText('st_ticket', _pickRowValue(row, ['Ticket ID']) || '—');
-        setText('st_supplier', _pickRowValue(row, ['Supplier Name']) || '—');
-        setText('st_brand', _pickRowValue(row, ['Brand Name']) || '—');
-        setText('st_zone', _pickRowValue(row, ['Zone']) || '—');
-        setText('st_status', _getOverviewContextValue(values, row, 'Status', ['Status']) || '—');
-        setText('st_present', _getOverviewContextValue(values, row, 'Present Date', ['Present Date']) || '—');
-      }
+      ];
 
       function _getMissingRequiredFields(values) {
         return _getRequiredProductFieldsForValues(values).filter(function (field) {
@@ -14601,212 +14221,154 @@
         return _cleanDisplayValue(raw);
       }
 
-      function _formatOverviewFullValueHtml(value, multiline, blankLabel) {
-        var txt = _cleanDisplayValue(value);
-        if (!txt) return '<span class="blank">' + esc(blankLabel || 'Blank') + '</span>';
-        return multiline ? esc(txt).replace(/\n/g, '<br>') : esc(txt);
+      function _overviewHasValue(value) {
+        return _cleanDisplayValue(value).trim() !== '';
       }
 
-      function _formatOverviewCompareHtml(value, multiline) {
-        var txt = _cleanDisplayValue(value);
-        if (!txt) return '<span class="blank">No source value</span>';
-        if (!multiline) txt = _truncateReviewText(txt, 88);
-        return multiline ? esc(txt).replace(/\n/g, '<br>') : esc(txt);
+      function _getOverviewBooleanTone(value) {
+        var txt = _cleanDisplayValue(value).trim().toLowerCase();
+        if (['yes', 'true', 'y', 'có', 'co'].indexOf(txt) >= 0) return 'yes';
+        if (['no', 'false', 'n', 'không', 'khong'].indexOf(txt) >= 0) return 'no';
+        return 'neutral';
       }
 
-      function _isOverviewKeyField(field) {
-        return [
-          'Why Do We List This Product?',
-          'Product description (Dưới 250 Kí tự)',
-          'Competitors (Retail Price) <Tên đối thủ: Giá tiền>',
-          'Display area (POG CONCEPT) Bắt Buộc',
-          OTHER_INCOME_FIELD,
-          POG_PRODUCT_FIELD,
-          POG_ACTION_FIELD,
-          'UOM Information'
-        ].indexOf(field) >= 0;
+      function _getOverviewFieldKind(def, field, value) {
+        if (def && def.kind) return def.kind;
+        if (def && def.format === 'pog-decisions') return 'pog-decisions';
+        if (def && def.format === 'money') return 'money';
+        if (def && def.format === 'vat') return 'percent';
+        if ((def && def.multiline) || OVERVIEW_MULTILINE_FIELDS.indexOf(field) >= 0) return 'multiline';
+        if (OVERVIEW_BOOLEAN_FIELDS.indexOf(field) >= 0) return 'boolean';
+        if (OVERVIEW_ENUM_SHORT_FIELDS.indexOf(field) >= 0) return 'enumShort';
+        var txt = _cleanDisplayValue(value);
+        if (txt.indexOf('\n') >= 0 || txt.length > 90) return 'multiline';
+        return 'short';
+      }
+
+      function _isOverviewCompactKind(kind) {
+        return ['boolean', 'enumShort', 'money', 'percent', 'short'].indexOf(kind) >= 0;
+      }
+
+      function _isOverviewWideKind(kind) {
+        return kind === 'multiline' || kind === 'pog-decisions';
+      }
+
+      function _formatOverviewKindValueHtml(value, kind) {
+        var txt = _cleanDisplayValue(value);
+        if (!txt) return '';
+        if (kind === 'boolean') {
+          return '<span class="s1-value-pill is-' + _getOverviewBooleanTone(txt) + '">' + esc(txt) + '</span>';
+        }
+        if (kind === 'enumShort') {
+          return '<span class="s1-value-pill is-enum">' + esc(_truncateReviewText(txt, 54)) + '</span>';
+        }
+        if (kind === 'money') {
+          return '<span class="s1-value-pill is-money">' + esc(txt) + '</span>';
+        }
+        if (kind === 'percent') {
+          return '<span class="s1-value-pill is-percent">' + esc(txt) + '</span>';
+        }
+        if (kind === 'short') {
+          return esc(_truncateReviewText(txt, 72));
+        }
+        return esc(txt).replace(/\n/g, '<br>');
+      }
+
+      function _formatOverviewPogDecisionSummary(productValue, actionValue) {
+        var products = _trimTrailingEmptyTokens(_splitCsvListPreserve(productValue));
+        var actions = _trimTrailingEmptyTokens(_splitCsvListPreserve(actionValue));
+        var max = Math.max(products.length, actions.length);
+        if (!max) return '';
+        var lines = [];
+        for (var i = 0; i < max; i++) {
+          var product = _getPogDisplayValue(products[i] || '');
+          var intent = _getPogActionIntent(actions[i] || '');
+          var actionLabel = intent === 'cut'
+            ? 'Cut'
+            : (intent === 'reduce' ? 'Reduce facing' : '');
+          if (product && actionLabel) {
+            lines.push('Product ' + (i + 1) + ': ' + product + ' \u2192 ' + actionLabel);
+          } else if (product) {
+            lines.push('Product ' + (i + 1) + ': ' + product);
+          } else if (actionLabel) {
+            lines.push('Action ' + (i + 1) + ': ' + actionLabel);
+          }
+        }
+        return lines.join('\n');
       }
 
       function _renderOverviewGroups(containerId, groups, row, values, mode) {
         var container = document.getElementById(containerId);
-        if (!container) return;
-        container.innerHTML = (groups || []).map(function (group) {
+        if (!container) return 0;
+        var renderedCount = 0;
+        var groupHtml = (groups || []).map(function (group) {
           var rows = (group.fields || []).map(function (def) {
             var field = def.field || def.label || '';
             if (mode === 'filled' && field && !_isFieldActiveForPattern(field, values)) return '';
             var label = def.label || _fieldUiLabel(field);
             var raw = '';
-            var baseRaw = '';
-            var compareFields = Array.isArray(def.compareFields) && def.compareFields.length ? def.compareFields.slice() : [field];
             if (mode === 'supplier') {
               raw = _pickRowValue(row, def.keys || [field]);
             } else {
               if (def.format === 'pog-decisions') {
-                raw = _formatPogDecisionSummary(values && values[POG_PRODUCT_FIELD], values && values[POG_ACTION_FIELD]);
-                baseRaw = _formatPogDecisionSummary(_getRowFieldValue(row, POG_PRODUCT_FIELD), _getRowFieldValue(row, POG_ACTION_FIELD));
+                raw = _formatOverviewPogDecisionSummary(values && values[POG_PRODUCT_FIELD], values && values[POG_ACTION_FIELD]);
               } else {
                 raw = values && field ? values[field] : '';
-                baseRaw = _getRowFieldValue(row, field);
               }
             }
             var val = _getOverviewDisplayValue(raw, def.format);
-            var multiline = !!def.multiline;
+            if (!_overviewHasValue(val)) return '';
+
+            var kind = _getOverviewFieldKind(def, field, val);
+            var multiline = _isOverviewWideKind(kind);
+            var compact = _isOverviewCompactKind(kind);
             var rowClasses = ['s1-field-row', mode === 'supplier' ? 'is-supplier' : 'is-filled'];
+            rowClasses.push('is-' + kind.replace(/([A-Z])/g, '-$1').toLowerCase());
             if (multiline) rowClasses.push('is-stack');
-            var fieldOrigin = mode === 'supplier' ? '' : 'Current workspace value';
-            var compareHtml = '';
-            var tagsHtml = '';
-
-            if (mode === 'filled') {
-              var currentNorm = compareFields.map(function (name) {
-                return _normalizeFieldValue(name, values && values[name]);
-              }).join(' || ');
-              var baseNorm = compareFields.map(function (name) {
-                return _normalizeFieldValue(name, _getRowFieldValue(row, name));
-              }).join(' || ');
-              var isEmpty = !String(currentNorm || '').trim();
-              var isEdited = currentNorm !== baseNorm;
-              var isKey = multiline || _isOverviewKeyField(field);
-              if (isEmpty) rowClasses.push('is-empty');
-              if (isEdited) rowClasses.push('is-edited');
-              if (isKey) rowClasses.push('is-key');
-
-              var tags = ['<span class="s1-state-tag is-workspace">Workspace</span>'];
-              if (isEdited) tags.push('<span class="s1-state-tag is-edited">Đã sửa</span>');
-              if (isEmpty) tags.push('<span class="s1-state-tag is-empty">Pending input</span>');
-              if (isKey) tags.push('<span class="s1-state-tag is-key">' + (multiline ? 'Long text' : 'Key field') + '</span>');
-              tagsHtml = '<div class="s1-field-tags">' + tags.join('') + '</div>';
-
-              if (isEdited) {
-                compareHtml = '<div class="s1-field-compare">Source: ' + _formatOverviewCompareHtml(_getOverviewDisplayValue(baseRaw, def.format), multiline) + '</div>';
-              } else if (isEmpty) {
-                compareHtml = '<div class="s1-field-compare">Awaiting workspace input' + (String(baseNorm || '').trim() ? ' · Source: ' + _formatOverviewCompareHtml(_getOverviewDisplayValue(baseRaw, def.format), false) : '') + '</div>';
-              }
-            }
+            if (compact) rowClasses.push('is-compact');
+            renderedCount++;
 
             return '<div class="' + rowClasses.join(' ') + '">'
               + '<div class="s1-field-key-wrap">'
               + '<div class="s1-field-key">' + esc(label) + '</div>'
-              + (fieldOrigin ? ('<div class="s1-field-origin">' + esc(fieldOrigin) + '</div>') : '')
               + '</div>'
               + '<div class="s1-field-body">'
               + '<div class="s1-field-top">'
-              + '<div class="s1-field-val' + (multiline ? ' is-multiline' : '') + '">' + _formatOverviewFullValueHtml(val, multiline, mode === 'filled' ? 'Pending input' : 'Blank') + '</div>'
-              + tagsHtml
+              + '<div class="s1-field-val' + (multiline ? ' is-multiline' : '') + '">' + _formatOverviewKindValueHtml(val, kind) + '</div>'
               + '</div>'
-              + compareHtml
               + '</div>'
               + '</div>';
           }).filter(Boolean).join('');
-          if (!rows) rows = '<div class="s1-empty-state">No fields to review in this section yet.</div>';
+          if (!rows) return '';
           return '<article class="s1-group-card ' + (mode === 'supplier' ? 'is-supplier' : 'is-filled') + (group.wide ? ' is-wide' : '') + '">'
             + '<div class="s1-group-head">'
             + '<div class="s1-group-head-top">'
             + '<div class="s1-group-title">' + esc(group.title || 'Section') + '</div>'
-            + '<div class="s1-group-badge ' + (mode === 'supplier' ? 'is-supplier">Supplier source' : 'is-filled">User managed') + '</div>'
             + '</div>'
-            + (group.subtitle ? ('<div class="s1-group-sub">' + esc(group.subtitle) + '</div>') : '')
             + '</div>'
             + '<div class="s1-field-list">' + rows + '</div>'
             + '</article>';
-        }).join('');
-      }
-
-      function _getOverviewNextFocus(stepStates, totalDiffs) {
-        var list = stepStates || [];
-        for (var i = 0; i < list.length; i++) {
-          if (list[i].tone === 'warn') return list[i];
-        }
-        for (var j = 0; j < list.length; j++) {
-          if (list[j].tone === 'idle') return list[j];
-        }
-        if (totalDiffs > 0) {
-          for (var k = 0; k < list.length; k++) {
-            if (list[k].changesCount) return list[k];
-          }
-        }
-        return list.length ? list[0] : null;
-      }
-
-      function _renderOverviewHealth(diffs, values, validationWarnings, reqOk, reqTotal, stepStates) {
-        var missingFields = _getMissingRequiredFields(values);
-        var readyState = document.getElementById('ovReadyState');
-        var readyNote = document.getElementById('ovReadyNote');
-        var nextFocusBtn = document.getElementById('ovNextFocusBtn');
-        var pendingMetric = document.getElementById('ovMetricPending');
-        var requiredMetric = document.getElementById('ovMetricRequired');
-        var warningMetric = document.getElementById('ovMetricWarnings');
-        var missingMetric = document.getElementById('ovMetricMissing');
-        if (pendingMetric) pendingMetric.textContent = String(diffs.length);
-        if (requiredMetric) requiredMetric.textContent = reqOk + '/' + reqTotal;
-        if (warningMetric) warningMetric.textContent = String(validationWarnings.length);
-        if (missingMetric) missingMetric.textContent = String(missingFields.length);
-
-        var nextFocus = _getOverviewNextFocus(stepStates, diffs.length);
-        var stateClass = 'state-idle';
-        var stateLabel = 'Ready to start';
-        var stateNote = 'Review supplier baseline, then open the workspace section you want to edit.';
-        if (missingFields.length) {
-          stateClass = 'state-warn';
-          stateLabel = 'Needs input';
-          stateNote = missingFields.length + ' required input(s) still need completion before a clean save.';
-        } else if (validationWarnings.length) {
-          stateClass = 'state-warn';
-          stateLabel = 'Review warnings';
-          stateNote = validationWarnings[0];
-        } else if (diffs.length) {
-          stateClass = 'state-ready';
-          stateLabel = 'Ready to save';
-          stateNote = diffs.length + ' change(s) are ready to save.';
-        }
-        if (readyState) {
-          readyState.className = 's1-health-state ' + stateClass;
-          readyState.textContent = stateLabel;
-        }
-        if (readyNote) readyNote.textContent = stateNote;
-        if (nextFocusBtn) {
-          nextFocusBtn.textContent = nextFocus ? nextFocus.buttonLabel : 'Open Identity';
-          nextFocusBtn.setAttribute('onclick', 'App.openDetailWorkspaceStep(' + (nextFocus ? nextFocus.step : 1) + ')');
-        }
-
-        var stepBox = document.getElementById('ovStepStates');
-        if (stepBox) {
-          stepBox.innerHTML = (stepStates || []).map(function (state) {
-            return '<button type="button" class="s1-step-item" onclick="App.openDetailWorkspaceStep(' + state.step + ')">'
-              + '<span class="s1-step-copy">'
-              + '<span class="s1-step-title">' + esc(state.title) + '</span>'
-              + '<span class="s1-step-meta">' + esc(state.meta || state.hint || '') + '</span>'
-              + '</span>'
-              + '<span class="s1-step-state ' + _stepStateToneClass(state.tone) + '">' + esc(state.label) + '</span>'
-              + '</button>';
-          }).join('');
-        }
-
-        var missingBox = document.getElementById('ovMissingList');
-        if (missingBox) {
-          missingBox.innerHTML = missingFields.length
-            ? missingFields.map(function (field) {
-                return '<div class="s1-issue is-warn">Missing required · ' + esc(_fieldUiLabel(field)) + '</div>';
-              }).join('')
-            : '<div class="s1-issue is-ok">All required inputs currently look complete.</div>';
-        }
-
-        var warningBox = document.getElementById('ovWarningList');
-        if (warningBox) {
-          warningBox.innerHTML = validationWarnings.length
-            ? validationWarnings.map(function (warning) {
-                return '<div class="s1-issue is-warn">' + esc(warning) + '</div>';
-              }).join('')
-            : '<div class="s1-issue is-ok">No validation warnings at the moment.</div>';
-        }
+        }).filter(Boolean).join('');
+        container.innerHTML = groupHtml;
+        return renderedCount;
       }
 
       function _renderDetailOverviewStep(row, diffs, values, validationWarnings, reqOk, reqTotal, stepStates) {
         if (!row) return;
-        _renderOverviewContext(row, values);
-        _renderOverviewGroups('ovSupplierGroups', OVERVIEW_SUPPLIER_GROUPS, row, values, 'supplier');
-        _renderOverviewGroups('ovFilledGroups', OVERVIEW_FILLED_GROUPS, row, values, 'filled');
-        _renderOverviewHealth(diffs, values, validationWarnings, reqOk, reqTotal, stepStates);
+        var sourceCount = _renderOverviewGroups('ovSupplierGroups', OVERVIEW_SUPPLIER_GROUPS, row, values, 'supplier');
+        var workspaceCount = _renderOverviewGroups('ovFilledGroups', OVERVIEW_FILLED_GROUPS, row, values, 'filled');
+        var sourcePanel = document.getElementById('ovSourcePanel');
+        var workspacePanel = document.getElementById('ovWorkspacePanel');
+        var sourceDetails = document.getElementById('ovSourceDetails');
+        if (sourcePanel) sourcePanel.hidden = sourceCount === 0;
+        if (workspacePanel) workspacePanel.hidden = workspaceCount === 0;
+        if (sourceDetails) {
+          var rowKey = String(row._rowNumber || _pickRowValue(row, ['Ticket ID', 'New Product ID', 'Product Name']) || '');
+          if (sourceDetails.getAttribute('data-row-key') !== rowKey) {
+            sourceDetails.open = false;
+            sourceDetails.setAttribute('data-row-key', rowKey);
+          }
+        }
       }
 
       function _buildStep2State(step, diffs, values) {
@@ -14972,7 +14534,7 @@
                 + '</div>';
             }).join('')
           : '<div class="dwov-empty">No edits yet. Start with identity, positioning, or operations when you are ready.</div>';
-        ['dwChangeSummary', 'ovChangeSummary'].forEach(function (id) {
+        ['dwChangeSummary'].forEach(function (id) {
           var summary = document.getElementById(id);
           if (summary) summary.innerHTML = html;
         });
