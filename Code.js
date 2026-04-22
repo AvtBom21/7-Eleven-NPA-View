@@ -565,6 +565,55 @@ function _isAllowedProductGroup_(value) {
   return !!v && PRODUCT_GROUP_OPTIONS.indexOf(v) >= 0;
 }
 
+function _stripVietnameseToneForPattern_(value) {
+  var txt = String(value == null ? '' : value).toLowerCase().trim();
+  try {
+    if (txt && txt.normalize) txt = txt.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  } catch (err) {
+    // Apps Script may run older V8 contexts; keep the original text if normalize fails.
+  }
+  return txt.replace(/đ/g, 'd');
+}
+
+function _normalizePatternToken_(value) {
+  var raw = _stripVietnameseToneForPattern_(value)
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!raw) return '';
+  var hasSouth = raw.indexOf('mien nam') >= 0 || raw.indexOf('south') >= 0 || /(^| )nam( |$)/.test(raw);
+  var hasNorth = raw.indexOf('mien bac') >= 0 || raw.indexOf('north') >= 0 || /(^| )bac( |$)/.test(raw);
+  if (
+    raw.indexOf('hai mien') >= 0 ||
+    raw.indexOf('ca hai') >= 0 ||
+    raw.indexOf('ca 2') >= 0 ||
+    raw.indexOf('2 mien') >= 0 ||
+    raw.indexOf('both') >= 0 ||
+    (hasSouth && hasNorth)
+  ) return 'both';
+  if (hasSouth) return 'south';
+  if (hasNorth) return 'north';
+  return '';
+}
+
+function _normalizePatternValue_(value) {
+  var token = _normalizePatternToken_(value);
+  if (token === 'south') return 'South';
+  if (token === 'north') return 'North';
+  if (token === 'both') return 'South, North';
+  return String(value == null ? '' : value).trim();
+}
+
+function _isAllowedPatternValue_(value) {
+  var v = _normalizePatternValue_(value);
+  return !v || v === 'South' || v === 'North' || v === 'South, North';
+}
+
+function _normalizeProductWriteValue_(field, value) {
+  if (field === 'Pattern') return _normalizePatternValue_(value);
+  return value;
+}
+
 function _safeErrorText_(err, fallback) {
   var fb = fallback || 'Unknown error';
   try {
@@ -2744,7 +2793,7 @@ function _writeChangesToSheet_(sheet, headers, rowNumber, changes, allowedFields
     }
 
     var before = currentRow[field] == null ? '' : String(currentRow[field]);
-    var valueToWrite = changes[field];
+    var valueToWrite = _normalizeProductWriteValue_(field, changes[field]);
     if (field === 'Present Date' && valueToWrite) {
       var d = new Date(valueToWrite);
       if (!isNaN(d.getTime())) valueToWrite = d;
@@ -3060,6 +3109,14 @@ function _validateChanges(changes) {
   if ('Product Group' in changes) {
     if (!_isAllowedProductGroup_(changes['Product Group'])) {
       errors.push('Product Group khong hop le.');
+    }
+  }
+
+  if ('Pattern' in changes) {
+    if (!_isAllowedPatternValue_(changes['Pattern'])) {
+      errors.push('Pattern phải là South, North hoặc South, North.');
+    } else {
+      changes['Pattern'] = _normalizePatternValue_(changes['Pattern']);
     }
   }
 

@@ -3459,7 +3459,7 @@
         </div>
         <div class="login-message" id="login-message"></div>
         <div class="btn-enter-wrap">
-          <button class="btn-enter" id="btn-enter" type="submit">Sign In</button>
+          <button class="btn-enter" id="btn-enter" type="submit">Đăng nhập</button>
         </div>
       </form>
     </div>
@@ -3550,7 +3550,7 @@
           <button class="user-menu-item" type="button" id="switch-view-item" onclick="openViewSelector()"
             style="display:none">Switch View</button>
           <button class="user-menu-item" type="button" onclick="openPasswordModal()">Đổi mật khẩu</button>
-          <button class="user-menu-item danger" type="button" id="logout-menu-item" onclick="switchUser()">Log Out</button>
+          <button class="user-menu-item danger" type="button" id="logout-menu-item" onclick="switchUser()">Đăng xuất</button>
         </div>
       </div>
     </div>
@@ -3645,9 +3645,9 @@
   <div class="sync-overlay hidden" id="sync-overlay">
     <div class="sync-panel">
       <div class="sync-head">
-        <span class="sync-chip">LIVE SYNC</span>
+        <span class="sync-chip">ĐANG CẬP NHẬT</span>
         <h3>Đang đồng bộ dữ liệu review 7-Eleven</h3>
-        <p>Refreshing products, approvals, and KPI insights from the latest sheet snapshot.</p>
+        <p>Vui lòng chờ trong giây lát.</p>
       </div>
 
       <div class="sync-video" role="status" aria-live="polite">
@@ -3665,36 +3665,36 @@
         <div class="sync-progress-line">
           <div class="sync-progress-fill" id="sync-progress-fill"></div>
         </div>
-        <div class="sync-progress-caption" id="sync-progress-caption">Initializing sync pipeline...</div>
+        <div class="sync-progress-caption" id="sync-progress-caption">Đang chuẩn bị...</div>
       </div>
 
       <div class="sync-table-wrap">
         <table class="sync-table">
           <thead>
             <tr>
-              <th>Pipeline</th>
+              <th>Bước</th>
               <th>Status</th>
-              <th>Details</th>
+              <th>Ghi chú</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td class="sync-step-name">Connect</td>
+              <td class="sync-step-name">Kết nối</td>
               <td><span class="sync-state pending" id="sync-state-connect">Đang chờ</span></td>
-              <td class="sync-step-note" id="sync-note-connect">Open secure connection</td>
+              <td class="sync-step-note" id="sync-note-connect">Chuẩn bị</td>
             </tr>
             <tr>
-              <td class="sync-step-name">Fetch</td>
+              <td class="sync-step-name">Tải dữ liệu</td>
               <td><span class="sync-state pending" id="sync-state-fetch">Đang chờ</span></td>
-              <td class="sync-step-note" id="sync-note-fetch">Read latest rows from source</td>
+              <td class="sync-step-note" id="sync-note-fetch">Đang chờ</td>
             </tr>
             <tr>
-              <td class="sync-step-name">Rebuild</td>
+              <td class="sync-step-name">Cập nhật</td>
               <td><span class="sync-state pending" id="sync-state-rebuild">Đang chờ</span></td>
-              <td class="sync-step-note" id="sync-note-rebuild">Refresh cards and statistics</td>
+              <td class="sync-step-note" id="sync-note-rebuild">Cập nhật danh sách</td>
             </tr>
             <tr>
-              <td class="sync-step-name">Complete</td>
+              <td class="sync-step-name">Hoàn tất</td>
               <td><span class="sync-state pending" id="sync-state-complete">Đang chờ</span></td>
               <td class="sync-step-note" id="sync-note-complete">Kiểm tra cuối cùng</td>
             </tr>
@@ -3763,7 +3763,7 @@ var ROLE_DIRECTOR = 'DIRECTOR';
 var ROLE_META = {
   DIRECTOR: { initial: 'D', cssClass: 'director', result: '' }
 };
-var isSyncing = false,syncProgressValue = 0,syncProgressTimer = null,syncStoryboardTimer = null,syncOverlayHideTimer = null;
+var isSyncing = false,directorDecisionBusy = false,syncProgressValue = 0,syncProgressTimer = null,syncStoryboardTimer = null,syncOverlayHideTimer = null;
 
 function applyAdaptiveMobileLayout() {
   var ua = navigator.userAgent || '';
@@ -3845,13 +3845,13 @@ function setSyncStep(step, state, note) {
 
 function runSyncStoryboard() {
   var story = [
-  { delay: 250, step: 'connect', state: 'running', note: 'Authenticating workspace session', progress: 11, caption: 'Connecting to secure source...' },
-  { delay: 450, step: 'connect', state: 'done', note: 'Secure connection established' },
-  { delay: 380, step: 'fetch', state: 'running', note: 'Reading products and approval records', progress: 36, caption: 'Fetching latest product and voting data...' },
-  { delay: 520, step: 'fetch', state: 'done', note: 'Rows loaded successfully' },
-  { delay: 380, step: 'rebuild', state: 'running', note: 'Recomputing product cards and KPI chips', progress: 63, caption: 'Rebuilding dashboard layers...' },
-  { delay: 520, step: 'rebuild', state: 'done', note: 'Interface data model rebuilt' },
-  { delay: 360, step: 'complete', state: 'running', note: 'Kiểm tra toàn vẹn và độ mới dữ liệu', progress: 82, caption: 'Đang kiểm tra chất lượng cuối cùng...' }];
+  { delay: 250, step: 'connect', state: 'running', note: 'Đang chuẩn bị', progress: 11, caption: 'Đang kết nối...' },
+  { delay: 450, step: 'connect', state: 'done', note: 'Đã sẵn sàng' },
+  { delay: 380, step: 'fetch', state: 'running', note: 'Đang tải dữ liệu', progress: 36, caption: 'Đang tải danh sách sản phẩm...' },
+  { delay: 520, step: 'fetch', state: 'done', note: 'Đã tải dữ liệu' },
+  { delay: 380, step: 'rebuild', state: 'running', note: 'Đang cập nhật giao diện', progress: 63, caption: 'Đang cập nhật thẻ sản phẩm...' },
+  { delay: 520, step: 'rebuild', state: 'done', note: 'Giao diện đã cập nhật' },
+  { delay: 360, step: 'complete', state: 'running', note: 'Đang hoàn tất', progress: 82, caption: 'Đang hoàn tất...' }];
 
   var index = 0;
 
@@ -3883,11 +3883,11 @@ function showSyncOverlay() {
   overlay.classList.remove('hidden');
   overlay.classList.add('active');
 
-  setSyncStep('connect', 'pending', 'Open secure connection');
-  setSyncStep('fetch', 'pending', 'Read latest rows from source');
-  setSyncStep('rebuild', 'pending', 'Refresh cards and statistics');
+  setSyncStep('connect', 'pending', 'Chuẩn bị');
+  setSyncStep('fetch', 'pending', 'Đang chờ');
+  setSyncStep('rebuild', 'pending', 'Cập nhật danh sách');
   setSyncStep('complete', 'pending', 'Kiểm tra cuối cùng');
-  setSyncProgress(4, 'Initializing sync pipeline...');
+  setSyncProgress(4, 'Đang chuẩn bị...');
   runSyncStoryboard();
 }
 
@@ -3897,11 +3897,11 @@ function hideSyncOverlay(success, message) {
 
   clearSyncAnimationTimers();
   if (success) {
-    setSyncStep('connect', 'done', 'Secure connection established');
-    setSyncStep('fetch', 'done', 'Latest rows loaded');
-    setSyncStep('rebuild', 'done', 'Cards and KPIs refreshed');
-    setSyncStep('complete', 'done', 'Gói đồng bộ đã sẵn sàng');
-    setSyncProgress(100, 'Đồng bộ hoàn tất. Dashboard đã được cập nhật.');
+    setSyncStep('connect', 'done', 'Đã sẵn sàng');
+    setSyncStep('fetch', 'done', 'Đã tải dữ liệu');
+    setSyncStep('rebuild', 'done', 'Danh sách đã cập nhật');
+    setSyncStep('complete', 'done', 'Hoàn tất');
+    setSyncProgress(100, 'Cập nhật xong.');
     syncOverlayHideTimer = setTimeout(function () {overlay.classList.add('hidden');overlay.classList.remove('active');}, 760);
   } else {
     var err = message || 'Không thể hoàn tất đồng bộ.';
@@ -3923,7 +3923,7 @@ function setLoginButtonBusy(busy) {
   var btn = document.getElementById('btn-enter');
   if (!btn) return;
   btn.disabled = !!busy;
-  btn.textContent = busy ? 'Signing In...' : 'Sign In';
+  btn.textContent = busy ? 'Đang đăng nhập...' : 'Đăng nhập';
 }
 
 function handleCredentialLogin() {
@@ -3947,7 +3947,7 @@ function handleCredentialLogin() {
   }
 
   setLoginButtonBusy(true);
-  setLoginMessage('Verifying account...', '');
+  setLoginMessage('Đang kiểm tra tài khoản...', '');
 
   google.script.run.
   withSuccessHandler(function (res) {
@@ -3964,7 +3964,7 @@ function handleCredentialLogin() {
     authToken = String(res && res.authToken || '').trim();
     currentCanEdit = !!(res && res.currentViewCanEdit);
     availableViews = Array.isArray(res && res.allowedViews) ? res.allowedViews.slice() : [];
-    setLoginMessage('Login successful. Opening portal...', 'ok');
+    setLoginMessage('Đăng nhập thành công. Đang mở trang...', 'ok');
     setTimeout(function () {
       setLoginButtonBusy(false);
       enterApp();
@@ -4059,7 +4059,7 @@ function setLogoutBusy(busy) {
   var btn = document.getElementById('logout-menu-item');
   if (!btn) return;
   btn.disabled = !!busy;
-  btn.textContent = busy ? 'Logging out...' : 'Log Out';
+  btn.textContent = busy ? 'Đang đăng xuất...' : 'Đăng xuất';
   btn.style.opacity = busy ? '.65' : '1';
   btn.style.cursor = busy ? 'wait' : 'pointer';
 }
@@ -4203,7 +4203,7 @@ function submitPasswordChange() {
 
 function switchUser() {
   if (directorLogoutBusy) return;
-  if (!confirm('Log out?')) return;
+  if (!confirm('Đăng xuất khỏi tài khoản này?')) return;
   var emailForPrefill = String(currentEmail || '').trim().toLowerCase();
   var tokenForLogout = String(authToken || '').trim();
   closeUserMenu();
@@ -4220,7 +4220,7 @@ function switchUser() {
   withSuccessHandler(function (res) {
     if (!res || !res.ok) {
       setLogoutBusy(false);
-      showToast('Logout failed: ' + (res && res.error && res.error.message ? res.error.message : 'Không thể đóng phiên đăng nhập.'), 'error');
+      showToast('Không thể đăng xuất: ' + (res && res.error && res.error.message ? res.error.message : 'Vui lòng thử lại.'), 'error');
       return;
     }
     clearDirectorSessionState();
@@ -4228,7 +4228,7 @@ function switchUser() {
   }).
   withFailureHandler(function (err) {
     setLogoutBusy(false);
-    showToast('Logout failed: ' + toErrorText(err, 'Không thể đóng phiên đăng nhập.'), 'error');
+    showToast('Không thể đăng xuất: ' + toErrorText(err, 'Vui lòng thử lại.'), 'error');
   }).
   logoutSession({ token: tokenForLogout });
 }
@@ -4247,6 +4247,7 @@ function loadData() {
   }
   document.getElementById('loading').style.display = 'flex';
   document.getElementById('product-grid').style.display = 'none';
+  setSyncButtonBusy(true);
   // Single call: get products + results together — ensures key resolution is consistent
   new Promise(function (ok, er) {return google.script.run.
     withSuccessHandler(ok).withFailureHandler(er).getProductsAndResults({ token: authToken });}).
@@ -4259,8 +4260,10 @@ function loadData() {
     applyFilters();
     document.getElementById('loading').style.display = 'none';
     document.getElementById('product-grid').style.display = 'grid';
+    setSyncButtonBusy(false);
   }).
   catch(function (err) {
+    setSyncButtonBusy(false);
     if (handleSessionError(err)) return;
     document.getElementById('loading').innerHTML = "<div style=\"color:var(--red);text-align:center;padding:20px\">\u274C " +
     escHtml(toErrorText(err, 'Không thể tải dữ liệu')) + "</div>";
@@ -4438,7 +4441,7 @@ function renderDirectorChat() {
 }
 function applyDirectorChatResult(res, fallbackMessage) {
   if (!res || !res.ok) {
-    var msg = res && res.error && res.error.message || fallbackMessage || 'Không thể cập nhật chat.';
+    var msg = res && res.error && res.error.message || fallbackMessage || 'Không thể cập nhật hội thoại.';
     showToast('❌ ' + msg, 'error');
     renderDirectorChat();
     return false;
@@ -5064,21 +5067,21 @@ function openModal(idx) {
         i * .07 + 's">\n            <span class="vote-pic">' +
         escHtml(r.pic || '') + '</span>\n            <span class="badge ' +
         (r.status === 'Approved' ? 'badge-green' : r.status === 'Rejected' ? 'badge-red' : 'badge-blue') + '">' +
-        escHtml(r.status || 'Noted') + '</span>\n            ' +
+        escHtml(r.status || 'Đã ghi nhận') + '</span>\n            ' +
         (r.result ? '<span style="color:var(--gold);font-weight:800;font-size:12px">' + escHtml(r.result) + '</span>' : '') + '\n            <span class="vote-note">' +
         escHtml(r.note || '') + '</span>\n            <span class="vote-date">' +
         escHtml(r.date || '') + '</span>\n          </div>';
     }).join('') + '\n      </div>\n    </div>' : '';
 
-  readOnlyNotice = '<div class="voted-notice approved-n"><div><strong>View only</strong></div><div style="font-size:12px;opacity:.85">Director view is read-only for this selection.</div></div>';
+  readOnlyNotice = '<div class="voted-notice approved-n"><div><strong>Chỉ xem</strong></div><div style="font-size:12px;opacity:.85">Bạn không có quyền chỉnh sửa lựa chọn này.</div></div>';
   dec = !currentCanEdit ? readOnlyNotice :
     (v ? '<div class="voted-notice ' +
       (v.status === 'Approved' ? 'approved-n' : 'rejected-n') + '">\n        <div><strong>' +
-      (v.status === 'Approved' ? 'Approved' : 'Rejected') + '</strong>' + (v.result ? ' - ' + escHtml(v.result) : '') + '</div>\n        ' +
+      (v.status === 'Approved' ? 'Đã duyệt' : 'Từ chối') + '</strong>' + (v.result ? ' - ' + escHtml(v.result) : '') + '</div>\n        ' +
       (v.note ? '<div style="font-size:12px;opacity:.8">' + escHtml(v.note) + '</div>' : '') + '\n      </div>' :
-      '<div class="decision-panel">\n        <h4>Decision by ' +
-      escHtml(currentUser) + '</h4>\n        <div class="decision-grid">\n          <button class="status-btn status-btn-approve" id="modal-btn-approve" onclick="setModalStatus(\'Approved\')">Approved</button>\n          <button class="status-btn status-btn-reject" id="modal-btn-reject" onclick="setModalStatus(\'Rejected\')">Rejected</button>\n        </div>\n        <button class="btn-submit" id="modal-submit" disabled\n          onclick="submitDecision(\'' +
-      esc(productKey(p)) + '\',\'' + esc(p.productName) + '\')">\n          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">\n            <path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9l20-7z"/>\n          </svg>\n          Submit Decision\n        </button>\n      </div>');
+      '<div class="decision-panel">\n        <h4>Quyết định bởi ' +
+      escHtml(currentUser) + '</h4>\n        <div class="decision-grid">\n          <button class="status-btn status-btn-approve" id="modal-btn-approve" onclick="setModalStatus(\'Approved\')">Duyệt</button>\n          <button class="status-btn status-btn-reject" id="modal-btn-reject" onclick="setModalStatus(\'Rejected\')">Từ chối</button>\n        </div>\n        <button class="btn-submit" id="modal-submit" disabled\n          onclick="submitDecision(\'' +
+      esc(productKey(p)) + '\',\'' + esc(p.productName) + '\')">\n          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">\n            <path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9l20-7z"/>\n          </svg>\n          Xác nhận quyết định\n        </button>\n      </div>');
 
   modalHtml = '\n<div class="modal-img-wrap">\n  ' +
     (img ? '<img src="' + img + '" alt="' + escHtml(textOrDash(p.productName)) + '" onerror="this.style.display=\'none\'">' : '<div style="font-size:52px;opacity:.2">&nbsp;</div>') +
@@ -5104,8 +5107,8 @@ function openModal(idx) {
     (competitorBenchmarkText ? '\n  <div class="section">\n    <div class="section-title">' + (isTuRole ? 'Retail Price Benchmark' : 'Competitors (Retail Price)') + '</div>\n    <div class="' + (isTuRole ? 'desc-block desc-block-prewrap' : 'competitor-block') + '">' + competitorBenchmarkHtml + '</div>\n  </div>' : '') + '\n\n  ' +
     (otherIncomeListingFeeText ? '\n  <div class="section">\n    <div class="section-title">Other Income + Listing Fee</div>\n    <div class="desc-block desc-block-prewrap">' + otherIncomeListingFeeHtml + '</div>\n  </div>' : '') + '\n\n  ' +
     (whyText ? '\n  <div class="section">\n    <div class="section-title">Why Do We List This Product?</div>\n    <div class="desc-block">' + multilineHtml(whyText) + '</div>\n  </div>' : '') + '\n\n  ' +
-    (noteText ? '\n  <div class="section">\n    <div class="section-title">Business Note</div>\n    <div class="desc-block">' + multilineHtml(noteText) + '</div>\n  </div>' : '') + '\n\n  <div class="section">\n    <div class="section-title">Internal Chat</div>\n    <div class="director-chat-panel" id="director-chat-panel"></div>\n  </div>\n\n  ' +
-    voteH + '\n\n  <div class="section">\n    <div class="section-title">Approval</div>\n    ' +
+    (noteText ? '\n  <div class="section">\n    <div class="section-title">Ghi chú</div>\n    <div class="desc-block">' + multilineHtml(noteText) + '</div>\n  </div>' : '') + '\n\n  <div class="section">\n    <div class="section-title">Hội thoại</div>\n    <div class="director-chat-panel" id="director-chat-panel"></div>\n  </div>\n\n  ' +
+  voteH + '\n\n  <div class="section">\n    <div class="section-title">Phê duyệt</div>\n    ' +
     dec + '\n  </div>\n</div>';
 
   document.getElementById('modal-content').innerHTML = modalHtml;
@@ -5119,6 +5122,7 @@ function openModal(idx) {
 }
 
 function closeModal() {
+  if (directorDecisionBusy) return;
   document.getElementById('modal-overlay').classList.add('hidden');
   var passwordHidden = document.getElementById('password-overlay').classList.contains('hidden');
   if (passwordHidden) document.body.style.overflow = '';
@@ -5128,7 +5132,7 @@ function closeModal() {
 function closeModalOutside(e) {if (e.target === document.getElementById('modal-overlay')) closeModal();}
 
 function setModalStatus(s) {
-  if (!currentCanEdit) return;
+  if (!currentCanEdit || directorDecisionBusy) return;
   selectedStatus = s;
   document.getElementById('modal-btn-approve').classList.toggle('active', s === 'Approved');
   document.getElementById('modal-btn-reject').classList.toggle('active', s === 'Rejected');
@@ -5136,8 +5140,9 @@ function setModalStatus(s) {
 }
 
 function submitDecision(pkey, pname) {
+  if (directorDecisionBusy) return;
   if (!currentCanEdit) {
-    showToast('View hiện tại chỉ được xem.', 'error');
+    showToast('Bạn chỉ có quyền xem.', 'error');
     return;
   }
   if (!selectedStatus) return;
@@ -5147,20 +5152,23 @@ function submitDecision(pkey, pname) {
 
   var result = ROLE_META[currentUser] && ROLE_META[currentUser].result || '';
   var btn = document.getElementById('modal-submit');
+  directorDecisionBusy = true;
   btn.disabled = true;
-  btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;border-top-color:#fff"></div> Saving...';
+  btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;border-top-color:#fff"></div> Đang lưu...';
 
   google.script.run.
   withSuccessHandler(function (res) {
-    showToast('✅ Saved successfully!', 'success');
+    directorDecisionBusy = false;
+    showToast('✅ Đã lưu quyết định', 'success');
     closeModal();
     refreshResults(true);
   }).
   withFailureHandler(function (err) {
+    directorDecisionBusy = false;
     if (handleSessionError(err)) return;
     showToast('❌ ' + toErrorText(err, 'Lưu thất bại'), 'error');
     btn.disabled = false;
-    btn.innerHTML = 'Submit Decision';
+    btn.innerHTML = 'Xác nhận quyết định';
   }).
   saveResult({ token: authToken, newProductId: pkey, productName: pname, status: selectedStatus, result: result, pic: currentUser });
 }
@@ -5227,7 +5235,7 @@ function refreshResults(silent) {
     applyFilters();
     if (!silent) {
       hideSyncOverlay(true);
-      showToast('🔄 Data synced', '');
+      showToast('Đã cập nhật dữ liệu', '');
     }
   }).
   catch(function (err) {

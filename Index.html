@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <base target="_top">
-  <title>NPA Product Dashboard</title>
+  <title>NPA Product Review</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
     href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap"
@@ -1877,12 +1877,75 @@
       width: 99vw;
       max-width: 1600px;
       height: 98vh;
+      position: relative;
       display: flex;
       flex-direction: column;
       overflow: hidden;
       box-shadow: 0 40px 100px rgba(0, 0, 0, .4);
       animation: mu .22s cubic-bezier(.34, 1.2, .64, 1);
       border: 1px solid rgba(255, 255, 255, .8)
+    }
+
+    .busy-card {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 13px 16px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, .96);
+      border: 1px solid rgba(203, 213, 225, .9);
+      box-shadow: 0 18px 42px rgba(15, 23, 42, .16);
+      color: var(--text);
+      font: 800 13px var(--font)
+    }
+
+    .busy-spinner {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      border: 3px solid #dbeafe;
+      border-top-color: var(--blue);
+      animation: spin .75s linear infinite;
+      flex-shrink: 0
+    }
+
+    .app-busy-overlay,
+    .m-busy-overlay {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      pointer-events: auto;
+      z-index: 1000
+    }
+
+    .app-busy-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(248, 250, 252, .55);
+      backdrop-filter: blur(2px)
+    }
+
+    .app-busy-overlay.show {
+      display: flex
+    }
+
+    .m-busy-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(240, 244, 248, .58);
+      backdrop-filter: blur(2px)
+    }
+
+    #overlay.is-modal-busy .m-busy-overlay {
+      display: flex
+    }
+
+    #overlay.is-modal-busy .modal {
+      pointer-events: none
+    }
+
+    #overlay.is-modal-busy .m-busy-overlay {
+      pointer-events: auto
     }
 
     .process-action-wrap {
@@ -1997,6 +2060,15 @@
 
     .process-close:hover {
       background: rgba(255, 255, 255, .18)
+    }
+
+    .process-overlay.is-process-busy .process-search input,
+    .process-overlay.is-process-busy .process-toolbar button,
+    .process-overlay.is-process-busy .process-toolbar select,
+    .process-overlay.is-process-busy .process-list-item,
+    .process-overlay.is-process-busy .process-copy-btn {
+      pointer-events: none;
+      opacity: .62
     }
 
     .process-toolbar {
@@ -7087,7 +7159,7 @@
 
   <header class="topbar">
     <div class="brand">
-      <div class="brand-mark">📦</div>NPA <span>Dashboard</span>
+      <div class="brand-mark">📦</div>NPA <span>Review</span>
     </div>
     <div class="topnav-group">
       <nav class="topnav" aria-label="Main sections">
@@ -7161,7 +7233,7 @@
     </div>
     <div class="sc" style="--ac:#7c3aed">
       <div class="sc-v" id="stSh">—</div>
-      <div class="sc-l">Sheet</div>
+      <div class="sc-l">View</div>
     </div>
   </div>
 
@@ -7293,8 +7365,8 @@
               </section>
 
               <section class="bfp-impact-panel bfp-impact-support">
-                <div class="bfp-mini-title">Warnings before apply</div>
-                <div class="bfp-mini-sub">Anything unsafe or incomplete stays pinned here while you configure the batch template.</div>
+                <div class="bfp-mini-title">Cần kiểm tra</div>
+                <div class="bfp-mini-sub">Các điểm cần xem lại sẽ hiển thị tại đây.</div>
                 <div class="bfw-warning-list" id="bfWarningList"></div>
               </section>
             </div>
@@ -7302,13 +7374,13 @@
 
           <div class="bfp-editor-pane">
             <section class="bfp-workbench-card bfp-editor-intro">
-              <div class="bfp-zone-kicker">Batch Change Template</div>
-              <div class="bfp-zone-title">Configure what will be overwritten</div>
-              <div class="bfp-zone-sub">Center panel is the main working area. Touched fields become the bulk template; untouched fields stay out of scope.</div>
+              <div class="bfp-zone-kicker">Cập nhật hàng loạt</div>
+              <div class="bfp-zone-title">Chọn thông tin cần áp dụng</div>
+              <div class="bfp-zone-sub">Chỉ những trường bạn chỉnh tại đây mới được áp dụng cho các sản phẩm đã chọn.</div>
               <div class="bfp-editor-topline">
                 <div class="bfp-copy-block">
-                  <div class="bfp-mini-title">Template Base</div>
-                  <div class="bfp-mini-sub">Optional. Copy one selected product, then keep only the fields you truly want to overwrite.</div>
+                  <div class="bfp-mini-title">Sao chép từ sản phẩm</div>
+                  <div class="bfp-mini-sub">Tùy chọn. Dùng một sản phẩm làm mẫu rồi chỉnh lại các trường cần áp dụng.</div>
                   <select id="bf_CopyFrom" class="bfp-fc" onchange="App.bfCopyFrom(this.value)">
                     <option value="">Choose a sample product</option>
                   </select>
@@ -7318,8 +7390,8 @@
                   </div>
                 </div>
                 <div class="bfp-template-block">
-                  <div class="bfp-mini-title">Template fields</div>
-                  <div class="bfp-mini-sub">Only the fields shown here will be pushed when you apply the batch template.</div>
+                  <div class="bfp-mini-title">Trường sẽ áp dụng</div>
+                  <div class="bfp-mini-sub">Danh sách này giúp bạn kiểm tra trước khi áp dụng.</div>
                   <div class="bfw-chip-list" id="bfTouchedSections"></div>
                   <div class="bfp-active-strip" id="bfActiveStrip">
                     <span class="bfp-empty-strip">No template fields selected yet.</span>
@@ -7546,7 +7618,7 @@
                 <div class="bfp-side-head">
                   <div>
                     <div class="bfp-zone-kicker">Selected Products</div>
-                    <div class="bfp-zone-title">Batch scope</div>
+                    <div class="bfp-zone-title">Sản phẩm đã chọn</div>
                     <div class="bfp-zone-sub">Right side answers who will receive the batch template. Click one product to inspect the original data before apply.</div>
                   </div>
                   <span class="cnt" id="bfPrevCnt">0</span>
@@ -7591,7 +7663,7 @@
                   </details>
 
                   <details class="qp-section" id="qpSecPricing" open>
-                    <summary><span>Pricing</span><span>></span></summary>
+                    <summary><span>Giá bán</span><span>></span></summary>
                     <table class="qp-table">
                       <tr><th>Purchase Price Excl VAT</th><td id="qpPP">-</td></tr>
                       <tr><th>Inbound VAT</th><td id="qpVAT">-</td></tr>
@@ -7605,7 +7677,7 @@
                   </details>
 
                   <details class="qp-section" id="qpSecStatus">
-                    <summary><span>Status & Timeline</span><span>></span></summary>
+                    <summary><span>Trạng thái & thời gian</span><span>></span></summary>
                     <table class="qp-table">
                       <tr><th>Status</th><td id="qpStatus">-</td></tr>
                       <tr><th>Present Date</th><td id="qpPresentDate">-</td></tr>
@@ -7615,7 +7687,7 @@
                   </details>
 
                   <details class="qp-section" id="qpSecOps">
-                    <summary><span>Additional Details</span><span>></span></summary>
+                    <summary><span>Thông tin bổ sung</span><span>></span></summary>
                     <table class="qp-table">
                       <tr><th>Storage Conditions</th><td id="qpStorage">-</td></tr>
                       <tr><th>Shelf Life</th><td id="qpShelf">-</td></tr>
@@ -7662,10 +7734,10 @@
       </div>
       <!-- Action bar -->
       <div class="m-actbar">
-        <button class="btn btn-ghost btn-sm" onclick="App.closeModal()">Close</button>
+        <button class="btn btn-ghost btn-sm" onclick="App.closeModal()">Đóng</button>
           <button class="btn btn-ghost btn-sm" onclick="App.resetModal()">Đặt lại</button>
-        <button class="btn btn-orange btn-sm" onclick="App.saveModal()">Save Product</button>
-        <button class="btn btn-green btn-sm" onclick="App.saveAll()">Save All</button>
+        <button class="btn btn-orange btn-sm" onclick="App.saveModal()">Lưu sản phẩm</button>
+        <button class="btn btn-green btn-sm" onclick="App.saveAll()">Lưu tất cả</button>
         <div class="m-pg-switcher" id="mProductGroupSwitcher">
           <select id="mProductGroupSelect" class="m-pg-select" aria-label="Product Group">
             <option value="">Product Group</option>
@@ -7677,12 +7749,15 @@
         </div>
         <span class="save-time" id="mSaveTime"></span>
       </div>
+      <div class="m-busy-overlay" id="modalBusyOverlay" aria-live="polite">
+        <div class="busy-card"><span class="busy-spinner"></span><span id="modalBusyText">Vui lòng chờ...</span></div>
+      </div>
 
       <div class="m-stepbar">
-        <button class="m-step-btn on" id="mStepBtn1" onclick="App.setDetailStep(1)">Overview</button>
-        <button class="m-step-btn" id="mStepBtn2" onclick="App.setDetailStep(2)">Edit Workspace</button>
+        <button class="m-step-btn on" id="mStepBtn1" onclick="App.setDetailStep(1)">Tổng quan</button>
+        <button class="m-step-btn" id="mStepBtn2" onclick="App.setDetailStep(2)">Cập nhật thông tin</button>
         <div class="m-step-meta">
-          <div class="m-step-meta-txt" id="mStepMetaTxt">Overview</div>
+          <div class="m-step-meta-txt" id="mStepMetaTxt">Tổng quan</div>
           <div class="m-step-progress"><div class="m-step-progress-fill" id="mStepProgressFill"></div></div>
         </div>
       </div>
@@ -7691,15 +7766,15 @@
         <div class="m-step-pane on" id="detailStep1">
           <div class="m-static-wrap">
             <div class="s1-flow">
-              <section class="s1-panel is-source-panel" id="ovSourcePanel" aria-label="Supplier Source Information">
+              <section class="s1-panel is-source-panel" id="ovSourcePanel" aria-label="Supplier Information">
                 <details class="s1-source-details" id="ovSourceDetails">
                   <summary class="s1-source-toggle">
                     <span class="s1-source-toggle-main">
                       <span class="s1-source-toggle-title">
-                        <span class="s1-source-show-label">Show source info</span>
-                        <span class="s1-source-hide-label">Hide source info</span>
+                        <span class="s1-source-show-label">Xem thông tin nhà cung cấp</span>
+                        <span class="s1-source-hide-label">Ẩn thông tin nhà cung cấp</span>
                       </span>
-                      <span class="s1-source-toggle-sub">Supplier baseline is hidden by default and only shows fields with data.</span>
+                      <span class="s1-source-toggle-sub">Mở khi bạn cần đối chiếu thêm.</span>
                     </span>
                     <span class="s1-source-caret">›</span>
                   </summary>
@@ -7709,11 +7784,11 @@
                 </details>
               </section>
 
-              <section class="s1-panel is-filled-panel" id="ovWorkspacePanel" aria-label="Workspace Information Summary">
+              <section class="s1-panel is-filled-panel" id="ovWorkspacePanel" aria-label="Product Information Summary">
                 <div class="s1-section-head">
                   <div>
-                    <div class="s1-section-title">Workspace Info</div>
-                    <div class="s1-section-sub">Only fields that already have values are shown.</div>
+                    <div class="s1-section-title">Thông tin đã nhập</div>
+                    <div class="s1-section-sub">Chỉ hiển thị các trường có dữ liệu.</div>
                   </div>
                 </div>
                 <div class="s1-overview-groups" id="ovFilledGroups"></div>
@@ -7737,7 +7812,7 @@
                     </span>
                     <span class="s2-tab-badge" id="mg1badge"></span>
                   </span>
-                  <span class="s2-tab-meta" id="mg1meta">Status, naming, reference and base classification.</span>
+                  <span class="s2-tab-meta" id="mg1meta">Trạng thái, tên sản phẩm và phân loại.</span>
                 </button>
                 <button type="button" class="s2-tab-btn" id="s2TabBtn2" data-step="2" role="tab" aria-controls="s2Pane2" aria-selected="false" onclick="App.setStep2Tab(2)">
                   <span class="s2-tab-top">
@@ -7748,7 +7823,7 @@
                     </span>
                     <span class="s2-tab-badge" id="mg2badge"></span>
                   </span>
-                  <span class="s2-tab-meta" id="mg2meta">Why list, description, targeting and pricing logic.</span>
+                  <span class="s2-tab-meta" id="mg2meta">Lý do listing, mô tả, khách hàng và giá bán.</span>
                 </button>
                 <button type="button" class="s2-tab-btn" id="s2TabBtn3" data-step="3" role="tab" aria-controls="s2Pane3" aria-selected="false" onclick="App.setStep2Tab(3)">
                   <span class="s2-tab-top">
@@ -7759,7 +7834,7 @@
                     </span>
                     <span class="s2-tab-badge" id="mg3badge"></span>
                   </span>
-                  <span class="s2-tab-meta" id="mg3meta">Display, logistics, UOM and execution setup.</span>
+                  <span class="s2-tab-meta" id="mg3meta">Trưng bày, vận hành, UOM và POG.</span>
                 </button>
                   </div>
                   <div class="s2-sub-progress"><div class="s2-sub-progress-fill" id="s2SubProgressFill"></div></div>
@@ -7771,8 +7846,8 @@
         <section class="s2-pane on" id="s2Pane1" role="tabpanel" aria-labelledby="s2TabBtn1">
           <div class="s2-pane-head">
             <div class="s2-pane-head-main">
-              <div class="s2-pane-title">Product Identity Workspace</div>
-              <div class="s2-pane-sub">Lock the product identity, naming, reference, and classification before making commercial decisions.</div>
+              <div class="s2-pane-title">Thông tin nhận diện sản phẩm</div>
+              <div class="s2-pane-sub">Kiểm tra tên, mã tham chiếu và phân loại trước khi lưu.</div>
             </div>
             <div class="s2-pane-status-card">
               <div class="s2-pane-status-top">
@@ -7857,8 +7932,8 @@
         <section class="s2-pane" id="s2Pane2" role="tabpanel" aria-labelledby="s2TabBtn2">
           <div class="s2-pane-head">
             <div class="s2-pane-head-main">
-              <div class="s2-pane-title">Commercial &amp; Positioning</div>
-              <div class="s2-pane-sub">Define why the product should exist in the assortment, who it serves, and how the pricing logic holds together.</div>
+              <div class="s2-pane-title">Thông tin thương mại</div>
+              <div class="s2-pane-sub">Hoàn thiện lý do listing, khách hàng mục tiêu và giá bán.</div>
             </div>
             <div class="s2-pane-status-card">
               <div class="s2-pane-status-top">
@@ -7875,7 +7950,7 @@
             <div class="dw-cluster-head">
               <div>
                 <div class="dw-cluster-title">Positioning &amp; Listing Logic</div>
-                <div class="dw-cluster-sub">Clarify the assortment role, brand positioning and why this product deserves space.</div>
+                <div class="dw-cluster-sub">Tóm tắt vai trò, định vị và lý do nên listing sản phẩm.</div>
               </div>
             </div>
 
@@ -7931,7 +8006,7 @@
             <div class="dw-cluster-head">
               <div>
                 <div class="dw-cluster-title">Store &amp; Customer Targeting</div>
-                <div class="dw-cluster-sub">Make the intended usage, store fit and customer fit explicit before saving.</div>
+                <div class="dw-cluster-sub">Chọn nhóm sử dụng, loại cửa hàng và khách hàng phù hợp.</div>
               </div>
             </div>
 
@@ -8068,8 +8143,8 @@
         <section class="s2-pane" id="s2Pane3" role="tabpanel" aria-labelledby="s2TabBtn3">
           <div class="s2-pane-head">
             <div class="s2-pane-head-main">
-              <div class="s2-pane-title">Operations &amp; Execution</div>
-              <div class="s2-pane-sub">Configure display, logistics, pricing strategy, facing decision, packaging and operating notes in one place.</div>
+              <div class="s2-pane-title">Vận hành &amp; triển khai</div>
+              <div class="s2-pane-sub">Hoàn thiện trưng bày, logistics, UOM và quyết định POG.</div>
             </div>
             <div class="s2-pane-status-card">
               <div class="s2-pane-status-top">
@@ -8086,7 +8161,7 @@
             <div class="dw-cluster-head">
               <div>
                 <div class="dw-cluster-title">Display, Inventory &amp; Logistics</div>
-                <div class="dw-cluster-sub">Operational setup starts with display placement, preservation requirement and routing rules.</div>
+                <div class="dw-cluster-sub">Kiểm tra trưng bày, bảo quản và phân tuyến vận hành.</div>
               </div>
             </div>
 
@@ -8140,7 +8215,7 @@
             <div class="dw-cluster-head">
               <div>
                 <div class="dw-cluster-title">Pricing Strategy &amp; POG Facing Decision</div>
-                <div class="dw-cluster-sub">Lock the pricing tier focus, then decide which reference products should be cut or reduced. The workflow expands only when the current slot is valid.</div>
+                <div class="dw-cluster-sub">Chọn tier giá và sản phẩm tham chiếu cần điều chỉnh.</div>
               </div>
             </div>
 
@@ -8150,8 +8225,8 @@
                 <div class="mc-body"><div class="sdrop ef" id="sd_Pricing_Strategy"></div></div>
               </div>
               <div class="pog-decision-note">
-                <div class="pog-decision-note-title">Decision Flow</div>
-                <div class="pog-decision-note-copy">Choose the pricing strategy first, then add only the products that need a cut or a facing reduction. Each slot stays paired and reindexes automatically after deletion, so the saved sheet values stay continuous and safe.</div>
+                <div class="pog-decision-note-title">Gợi ý nhập liệu</div>
+                <div class="pog-decision-note-copy">Chọn Pricing Strategy trước, sau đó thêm các sản phẩm cần cắt hoặc giảm facing.</div>
               </div>
             </div>
 
@@ -8162,8 +8237,8 @@
                 <input type="hidden" id="mf_POG_Choose_type_Reduce_product_facing">
                 <div class="pog-module">
                   <div class="pog-module-meta">
-                    <div class="pog-helper">Start with Product 1. Action is unlocked only after the product is chosen, and a new slot appears only after the current decision is complete.</div>
-                    <div class="pog-helper muted" id="pogModuleMeta">No POG reduce product selected yet.</div>
+                      <div class="pog-helper">Bắt đầu với sản phẩm 1. Chọn sản phẩm trước, sau đó chọn thao tác cần áp dụng.</div>
+                    <div class="pog-helper muted" id="pogModuleMeta">Chưa chọn sản phẩm POG.</div>
                   </div>
                   <div class="pog-slot-list" id="pogSlotList"></div>
                   <div class="pog-module-actions">
@@ -8247,11 +8322,11 @@
                       </div>
 
                       <div class="dw-uom-card">
-                        <div class="bf-uom-extra-title">Additional UOM Levels</div>
-                        <div class="dw-uom-helper">Optional multi-pack or case levels.</div>
+                        <div class="bf-uom-extra-title">Cấp UOM bổ sung</div>
+                        <div class="dw-uom-helper">Thêm pack hoặc case nếu có.</div>
                         <div class="bf-uom-extra-wrap" id="mfUomExtraWrap"></div>
                         <div class="bf-uom-actions">
-                          <button type="button" class="btn btn-ghost btn-sm" onclick="App.modalAddUom()">+ Add UOM</button>
+                          <button type="button" class="btn btn-ghost btn-sm" onclick="App.modalAddUom()">+ Thêm UOM</button>
                         </div>
                       </div>
                     </div>
@@ -8269,8 +8344,8 @@
         <section class="s2-check-card">
           <div class="s2-check-card-head">
             <div>
-              <div class="s2-check-card-title">Highest-signal changes</div>
-              <div class="s2-check-card-sub">Important edits stay surfaced without forcing a separate review tab.</div>
+              <div class="s2-check-card-title">Thay đổi nổi bật</div>
+              <div class="s2-check-card-sub">Các chỉnh sửa quan trọng được giữ ở đây để bạn kiểm tra nhanh.</div>
             </div>
           </div>
           <div class="dwov-summary-list" id="dwChangeSummary"></div>
@@ -8279,29 +8354,29 @@
         <section class="s2-check-card">
           <div class="s2-check-card-head">
             <div>
-              <div class="s2-check-card-title">Live review</div>
-              <div class="s2-check-card-sub">Changed fields, required checklist and validation stay side-by-side with the editor.</div>
+              <div class="s2-check-card-title">Kiểm tra trước khi lưu</div>
+              <div class="s2-check-card-sub">Xem lại trường đã chỉnh, thông tin bắt buộc và cảnh báo.</div>
             </div>
-            <div class="s2-check-meta" id="s2ReviewCount">0 pending changes</div>
+            <div class="s2-check-meta" id="s2ReviewCount">0 thay đổi</div>
           </div>
           <div class="s2-check-review-block">
             <div class="s2-check-review-section">
               <div class="s2-check-review-head">
-                <div class="s2-check-review-title">Changed fields</div>
+                <div class="s2-check-review-title">Trường đã chỉnh</div>
               </div>
               <div class="s2-review-list" id="s2ReviewChanges"></div>
             </div>
             <div class="s2-check-review-section">
               <div class="s2-check-review-head">
-                <div class="s2-check-review-title">Required checklist</div>
-                <div class="s2-check-meta" id="s2ReviewRequiredMeta">0/0 completed</div>
+                <div class="s2-check-review-title">Thông tin bắt buộc</div>
+                <div class="s2-check-meta" id="s2ReviewRequiredMeta">0/0 hoàn tất</div>
               </div>
               <div class="s2-review-list" id="s2ReviewRequired"></div>
             </div>
             <div class="s2-check-review-section">
               <div class="s2-check-review-head">
-                <div class="s2-check-review-title">Validation warnings</div>
-                <div class="s2-check-meta" id="s2ReviewWarnMeta">No warnings</div>
+                <div class="s2-check-review-title">Cần kiểm tra</div>
+                <div class="s2-check-meta" id="s2ReviewWarnMeta">Không có cảnh báo</div>
               </div>
               <div class="s2-review-list" id="s2ReviewWarnings"></div>
             </div>
@@ -8328,13 +8403,13 @@
       </div>
 
       <div class="s2-sticky-actions">
-        <div class="s2-nav-label" id="s2NavLabel">Section 1 of 3</div>
+        <div class="s2-nav-label" id="s2NavLabel">Phần 1/3</div>
         <div class="s2-nav-actions">
-          <button type="button" class="btn btn-ghost" id="s2BtnPrev" onclick="App.prevStep2Tab()">Previous Section</button>
-          <button type="button" class="btn btn-ghost" id="s2BtnNext" onclick="App.nextStep2Tab()">Next Section</button>
+          <button type="button" class="btn btn-ghost" id="s2BtnPrev" onclick="App.prevStep2Tab()">Phần trước</button>
+          <button type="button" class="btn btn-ghost" id="s2BtnNext" onclick="App.nextStep2Tab()">Phần tiếp theo</button>
           <button type="button" class="btn btn-ghost" onclick="App.resetModal()">Đặt lại</button>
-          <button type="button" class="btn btn-primary" onclick="App.saveModal()">Save Product</button>
-          <button type="button" class="btn btn-ghost" id="s2BtnSaveAll" onclick="App.saveAll()">Save All</button>
+          <button type="button" class="btn btn-primary" onclick="App.saveModal()">Lưu sản phẩm</button>
+          <button type="button" class="btn btn-ghost" id="s2BtnSaveAll" onclick="App.saveAll()">Lưu tất cả</button>
         </div>
       </div>
     </div><!-- /.s2-workflow -->
@@ -8347,9 +8422,9 @@
     <div class="process-modal">
       <div class="process-head">
         <div>
-          <div class="process-kicker">Theo dõi Process</div>
+          <div class="process-kicker">Theo dõi tiến trình</div>
           <div class="process-title">Theo dõi tiến trình sản phẩm</div>
-          <div class="process-sub">Ưu tiên hiển thị sẵn các sản phẩm đang process trong đúng <b>Product Group</b> bạn được phép xử lý. Tra mã chính xác chỉ là fallback an toàn.</div>
+          <div class="process-sub">Chọn sản phẩm để xem trạng thái và trao đổi liên quan.</div>
         </div>
         <button class="process-close" onclick="App.closeProcessModal()">×</button>
       </div>
@@ -8372,27 +8447,31 @@
             <span>Có Hội Thoại</span>
           </label>
         </div>
-        <div class="process-toolbar-note" id="processToolbarNote">Chỉ hiển thị các mã đang process thuộc Product Group trong scope hiện tại.</div>
+        <div class="process-toolbar-note" id="processToolbarNote">Chọn sản phẩm để xem tiến trình.</div>
       </div>
       <div class="process-body">
         <section class="process-board">
           <div class="process-queue-pane">
             <div class="process-pane-head">
               <div class="process-pane-title">Danh sách đang xử lý</div>
-              <div class="process-pane-sub" id="processListNote">Đang chuẩn bị danh sách process theo Product Group được phép xem.</div>
+              <div class="process-pane-sub" id="processListNote">Đang tải danh sách sản phẩm.</div>
             </div>
             <div class="process-list-body" id="processListBody"></div>
           </div>
           <div class="process-detail-pane">
             <div class="process-pane-head">
-              <div class="process-pane-title">Chi tiết tiến trình</div>
-              <div class="process-pane-sub">Tiến trình và hội thoại nội bộ</div>
+              <div class="process-pane-title">Chi tiết sản phẩm</div>
+              <div class="process-pane-sub">Xem trạng thái và trao đổi tại đây.</div>
             </div>
             <div class="process-list-body process-detail-body" id="processModalBody"></div>
           </div>
         </section>
       </div>
     </div>
+  </div>
+
+  <div class="app-busy-overlay" id="appBusyOverlay" aria-live="polite">
+    <div class="busy-card"><span class="busy-spinner"></span><span id="appBusyText">Đang xử lý...</span></div>
   </div>
 
   <div class="tstack" id="toasts"></div>
@@ -8406,7 +8485,7 @@
       var S = {
         headers: [], editableFields: [], allRows: [], rows: [], pending: {}, selected: {}, selectedRows: {},
         meta: { totalRows: 0, currentPage: 1, totalPages: 1, pageSize: 50, sheetName: '' },
-        modalRow: null, detailStep: 1, step2Tab: 1, busy: false, view: 'card', dropdowns: {}, mdProductIds: [], mdProductOptions: [],
+        modalRow: null, detailStep: 1, step2Tab: 1, busy: false, modalBusy: false, view: 'card', dropdowns: {}, mdProductIds: [], mdProductOptions: [],
         subcateMap: {}, subcateMasterMap: {}, subcateBench: {}, subcateBenchMaster: {}, refProductCache: {}, currentRefDetail: null,
         activeRow: null, batchActiveRow: null, navSection: 'list',
         processLookupByRow: {}, processLookupByKey: {}, processLookupWarning: null, processLookupSeq: 0, processLookupLoaded: false,
@@ -8448,7 +8527,39 @@
       function fmtMoney(v) { var n = parseFloat(v); return isNaN(n) || !n ? '—' : new Intl.NumberFormat('vi-VN').format(Math.round(n)) + ' ₫'; }
       function fmtPct(v) { var n = parseFloat(v); return isNaN(n) || !n ? '—' : n.toFixed(2) + '%'; }
       function setConn(m, t) { var el = document.getElementById('conn'); el.className = 'conn ' + m; document.getElementById('connTxt').textContent = t; }
-      function setBusy(b) { S.busy = b; document.getElementById('btnRef').disabled = b; }
+      function _setBusyOverlay(id, active, message) {
+        var overlay = document.getElementById(id);
+        if (!overlay) return;
+        overlay.classList.toggle('show', !!active);
+        var textId = id === 'modalBusyOverlay' ? 'modalBusyText' : 'appBusyText';
+        var textEl = document.getElementById(textId);
+        if (textEl && message) textEl.textContent = message;
+      }
+      function setGlobalBusy(active, message) {
+        _setBusyOverlay('appBusyOverlay', !!active, message || 'Đang xử lý...');
+      }
+      function setModalBusy(active, message) {
+        S.modalBusy = !!active;
+        var overlay = document.getElementById('overlay');
+        if (overlay) overlay.classList.toggle('is-modal-busy', !!active);
+        _setBusyOverlay('modalBusyOverlay', !!active, message || 'Đang xử lý...');
+      }
+      function isModalBusy() {
+        return !!S.modalBusy;
+      }
+      function setProcessBusy(active) {
+        var overlay = document.getElementById('processOverlay');
+        if (overlay) overlay.classList.toggle('is-process-busy', !!active);
+      }
+      function syncProcessBusyState() {
+        setProcessBusy(!!(S.processProductsLoading || S.processLoading));
+      }
+      function setBusy(b) {
+        S.busy = b;
+        var btn = document.getElementById('btnRef');
+        if (btn) btn.disabled = b;
+        setGlobalBusy(!!b, b ? 'Đang tải dữ liệu...' : '');
+      }
       function _rnKey(rn) { return String(parseInt(rn, 10)); }
       function _findVisibleRow(rn) {
         var rnInt = parseInt(rn, 10);
@@ -8919,7 +9030,7 @@
       }
       function _setProcessToolbarNote(text) {
         var el = document.getElementById('processToolbarNote');
-        if (el) el.textContent = text || 'Chỉ hiển thị các mã đang process thuộc Product Group trong scope hiện tại.';
+        if (el) el.textContent = text || 'Chọn sản phẩm để xem tiến trình.';
       }
       function _setProcessListNote(text) {
         var el = document.getElementById('processListNote');
@@ -9035,10 +9146,10 @@
       }
       function _formatProcessStepState(state) {
         var key = String(state || 'pending').toLowerCase();
-        if (key === 'done') return 'Done';
-        if (key === 'current') return 'Current';
-        if (key === 'rejected') return 'Rejected';
-        return 'Pending';
+        if (key === 'done') return 'Hoàn tất';
+        if (key === 'current') return 'Đang xử lý';
+        if (key === 'rejected') return 'Từ chối';
+        return 'Chưa đến';
       }
       function _buildProcessTimelineHtml(timeline) {
         var items = Array.isArray(timeline) ? timeline : _buildEmptyProcessTimeline();
@@ -9223,8 +9334,8 @@
           return '<div class="process-chat-muted">Chọn một mã để mở hội thoại.</div>';
         }
         return _buildProductChatThreadHtml({
-          title: 'Chat trong Process',
-          subtitle: ((_getEffectiveBusinessCurrentSheet(detail) || detail.currentSheet) ? ((_getEffectiveBusinessCurrentSheet(detail) || detail.currentSheet) + ' · ') : '') + (detail.key || ''),
+          title: 'Hội thoại tiến trình',
+          subtitle: detail.key || '',
           productKey: detail.key || '',
           history: S.processChatHistory || _normalizeProductChatHistoryPayload(null),
           loading: S.processChatLoading,
@@ -9242,8 +9353,8 @@
           cancelEditFn: 'cancelProcessChatEdit',
           saveEditFn: 'saveProcessChatEdit',
           deleteFn: 'deleteProcessChatMessage',
-          emptyText: 'Chưa có hội thoại trong Process.',
-          readOnlyText: 'Bạn đang ở chế độ chỉ xem trong view này.'
+          emptyText: 'Chưa có hội thoại.',
+          readOnlyText: 'Bạn đang ở chế độ chỉ xem.'
         });
       }
       function _renderProcessChatOnly() {
@@ -9275,7 +9386,7 @@
                 _renderProcessChatOnly();
                 return;
               }
-              S.processChatError = res && res.error ? res.error : { code: 'CHAT_READ_ERROR', message: 'Không thể tải chat.' };
+              S.processChatError = res && res.error ? res.error : { code: 'CHAT_READ_ERROR', message: 'Không thể tải hội thoại.' };
               _renderProcessChatOnly();
               return;
             }
@@ -9296,7 +9407,7 @@
               _renderProcessChatOnly();
               return;
             }
-            S.processChatError = { code: 'CHAT_READ_ERROR', message: (e && e.message) || 'Không thể tải chat.' };
+            S.processChatError = { code: 'CHAT_READ_ERROR', message: (e && e.message) || 'Không thể tải hội thoại.' };
             _renderProcessChatOnly();
           })
         .getProductChatHistory(_getProcessChatPayload({ newProductId: key }, detail));
@@ -9310,7 +9421,7 @@
       function _applyProcessChatResult(res, fallbackMessage) {
         if (!res || !res.ok) {
           if (handleAuthIssue(res)) return false;
-          var msg = (res && res.error && res.error.message) || fallbackMessage || 'Không thể cập nhật chat.';
+          var msg = (res && res.error && res.error.message) || fallbackMessage || 'Không thể cập nhật hội thoại.';
           toast(msg, 'error');
           _renderProcessChatOnly();
           return false;
@@ -9342,7 +9453,7 @@
           .withSuccessHandler(function (res) {
             S.processChatBusy = false;
             if (_normalizeProcessSearchKey(S.processDetail && S.processDetail.key) !== _normalizeProcessSearchKey(key)) return;
-            if (_applyProcessChatResult(res, 'Không thể gửi chat.')) toast('Đã gửi chat', 'success');
+            if (_applyProcessChatResult(res, 'Không thể gửi tin nhắn.')) toast('Đã gửi tin nhắn', 'success');
           })
           .withFailureHandler(function (e) {
             S.processChatBusy = false;
@@ -9375,7 +9486,7 @@
           .withSuccessHandler(function (res) {
             S.processChatBusy = false;
             if (_normalizeProcessSearchKey(S.processDetail && S.processDetail.key) !== _normalizeProcessSearchKey(key)) return;
-            if (_applyProcessChatResult(res, 'Không thể sửa chat.')) toast('Đã sửa chat', 'success');
+            if (_applyProcessChatResult(res, 'Không thể sửa tin nhắn.')) toast('Đã sửa tin nhắn', 'success');
           })
           .withFailureHandler(function (e) {
             S.processChatBusy = false;
@@ -9395,7 +9506,7 @@
           .withSuccessHandler(function (res) {
             S.processChatBusy = false;
             if (_normalizeProcessSearchKey(S.processDetail && S.processDetail.key) !== _normalizeProcessSearchKey(key)) return;
-            if (_applyProcessChatResult(res, 'Không thể xóa chat.')) toast('Đã xóa chat', 'success');
+            if (_applyProcessChatResult(res, 'Không thể xóa tin nhắn.')) toast('Đã xóa tin nhắn', 'success');
           })
           .withFailureHandler(function (e) {
             S.processChatBusy = false;
@@ -9437,32 +9548,31 @@
       }
       function _buildWorkspaceChatHandoffHtml(row) {
         var key = _getRowProcessPrimaryKey(row);
-        var currentSheet = _getRowBusinessCurrentSheet(row) || 'bước khác trong flow';
-        var selectedSheet = _getSelectedBusinessSheetName();
+        var currentSheet = _getRowBusinessCurrentSheet(row) || 'bước khác';
         if (!key) {
           return '<div class="process-chat-muted">Chưa có mã sản phẩm để mở hội thoại.</div>';
         }
         return '<div class="workspace-chat-handoff">'
-          + '<div><div class="workspace-chat-handoff-title">Mã này hiện đang được xử lý ở bước ' + esc(currentSheet) + '</div>'
-          + '<div class="workspace-chat-handoff-copy">Vui lòng tiếp tục trao đổi trong Process. Hội thoại được đồng bộ theo mã sản phẩm và giữ đúng ngữ cảnh ' + esc(selectedSheet || 'view hiện tại') + '.</div>'
+          + '<div><div class="workspace-chat-handoff-title">Sản phẩm này đang ở bước ' + esc(currentSheet) + '</div>'
+          + '<div class="workspace-chat-handoff-copy">Vui lòng tiếp tục trao đổi trong phần theo dõi tiến trình.</div>'
           + '<div class="workspace-chat-handoff-sheet">' + esc(key) + '</div></div>'
-          + '<button class="btn btn-primary btn-sm" type="button" onclick="App.openModalProcessThread()">Mở Process</button>'
+          + '<button class="btn btn-primary btn-sm" type="button" onclick="App.openModalProcessThread()">Mở tiến trình</button>'
           + '</div>';
       }
       function _buildWorkspaceChatHtml() {
         var row = _getSelectedRowSnapshot(S.modalRow);
-        if (!row) return '<div class="process-chat-muted">Mở một sản phẩm để bắt đầu hội thoại tại Workspace.</div>';
+        if (!row) return '<div class="process-chat-muted">Mở một sản phẩm để bắt đầu hội thoại.</div>';
         if (S.workspaceChatMode === 'resolving') {
           return '<div class="process-chat-head">'
             + '<div><div class="process-chat-title">Chat nội bộ</div><div class="process-chat-sub">' + esc(_getRowProcessPrimaryKey(row) || '') + '</div></div>'
-            + '<div class="process-chat-sub">Đang xác định bước xử lý</div>'
-            + '</div><div class="process-chat-muted">Đang kiểm tra bước nghiệp vụ trước khi mở hội thoại...</div>';
+            + '<div class="process-chat-sub">Đang chuẩn bị</div>'
+            + '</div><div class="process-chat-muted">Đang chuẩn bị hội thoại...</div>';
         }
         if (!_shouldRenderWorkspaceChat(row)) return _buildWorkspaceChatHandoffHtml(row);
         var key = _getRowProcessPrimaryKey(row);
         return _buildProductChatThreadHtml({
-          title: 'Chat tại Workspace',
-          subtitle: (_getSelectedBusinessSheetName() || 'Workspace') + ' · ' + (key || ''),
+          title: 'Hội thoại nội bộ',
+          subtitle: key || '',
           productKey: key,
           history: S.workspaceChatHistory || _normalizeProductChatHistoryPayload(null),
           loading: S.workspaceChatLoading,
@@ -9480,8 +9590,8 @@
           cancelEditFn: 'cancelWorkspaceChatEdit',
           saveEditFn: 'saveWorkspaceChatEdit',
           deleteFn: 'deleteWorkspaceChatMessage',
-          emptyText: 'Chưa có hội thoại tại Workspace.',
-          readOnlyText: 'Bạn đang ở chế độ chỉ xem trong Workspace.'
+          emptyText: 'Chưa có hội thoại.',
+          readOnlyText: 'Bạn đang ở chế độ chỉ xem.'
         });
       }
       function _renderWorkspaceChatOnly() {
@@ -9568,7 +9678,7 @@
             S.workspaceChatLoading = false;
             if (!res || !res.ok) {
               if (handleAuthIssue(res)) return;
-              S.workspaceChatError = res && res.error ? res.error : { code: 'CHAT_READ_ERROR', message: 'Không thể tải chat workspace.' };
+              S.workspaceChatError = res && res.error ? res.error : { code: 'CHAT_READ_ERROR', message: 'Không thể tải hội thoại.' };
               _renderWorkspaceChatOnly();
               return;
             }
@@ -9581,7 +9691,7 @@
             if (seq !== S.workspaceChatSeq || S.workspaceChatKey !== key || parseInt(S.workspaceChatRowNumber, 10) !== parseInt(rn, 10)) return;
             if (handleAuthIssue(e)) return;
             S.workspaceChatLoading = false;
-            S.workspaceChatError = { code: 'CHAT_READ_ERROR', message: (e && e.message) || 'Không thể tải chat workspace.' };
+            S.workspaceChatError = { code: 'CHAT_READ_ERROR', message: (e && e.message) || 'Không thể tải hội thoại.' };
             _renderWorkspaceChatOnly();
           })
           .getProductChatHistory(_getWorkspaceChatPayload({ newProductId: key, rowNumber: rn }));
@@ -9593,7 +9703,7 @@
       function _applyWorkspaceChatResult(res, fallbackMessage) {
         if (!res || !res.ok) {
           if (handleAuthIssue(res)) return false;
-          var msg = (res && res.error && res.error.message) || fallbackMessage || 'Không thể cập nhật chat.';
+          var msg = (res && res.error && res.error.message) || fallbackMessage || 'Không thể cập nhật hội thoại.';
           toast(msg, 'error');
           _renderWorkspaceChatOnly();
           return false;
@@ -9622,7 +9732,7 @@
           .withSuccessHandler(function (res) {
             S.workspaceChatBusy = false;
             if (S.workspaceChatKey !== key || parseInt(S.workspaceChatRowNumber, 10) !== parseInt(rn, 10)) return;
-            if (_applyWorkspaceChatResult(res, 'Không thể gửi chat workspace.')) toast('Đã gửi chat', 'success');
+            if (_applyWorkspaceChatResult(res, 'Không thể gửi tin nhắn.')) toast('Đã gửi tin nhắn', 'success');
           })
           .withFailureHandler(function (e) {
             S.workspaceChatBusy = false;
@@ -9656,7 +9766,7 @@
           .withSuccessHandler(function (res) {
             S.workspaceChatBusy = false;
             if (S.workspaceChatKey !== key || parseInt(S.workspaceChatRowNumber, 10) !== parseInt(rn, 10)) return;
-            if (_applyWorkspaceChatResult(res, 'Không thể sửa chat workspace.')) toast('Đã sửa chat', 'success');
+            if (_applyWorkspaceChatResult(res, 'Không thể sửa tin nhắn.')) toast('Đã sửa tin nhắn', 'success');
           })
           .withFailureHandler(function (e) {
             S.workspaceChatBusy = false;
@@ -9677,7 +9787,7 @@
           .withSuccessHandler(function (res) {
             S.workspaceChatBusy = false;
             if (S.workspaceChatKey !== key || parseInt(S.workspaceChatRowNumber, 10) !== parseInt(rn, 10)) return;
-            if (_applyWorkspaceChatResult(res, 'Không thể xóa chat workspace.')) toast('Đã xóa chat', 'success');
+            if (_applyWorkspaceChatResult(res, 'Không thể xóa tin nhắn.')) toast('Đã xóa tin nhắn', 'success');
           })
           .withFailureHandler(function (e) {
             S.workspaceChatBusy = false;
@@ -9731,6 +9841,7 @@
         }
       }
       function _renderProcessList(options) {
+        syncProcessBusyState();
         var opts = options || {};
         var body = document.getElementById('processListBody');
         if (!body) return;
@@ -9740,35 +9851,35 @@
         var allowedGroups = Array.isArray(meta.allowedGroups) ? meta.allowedGroups : [];
         var note = '';
         if (allowedGroups.length) {
-          note = 'Product Group: ' + allowedGroups.join(', ');
+          note = 'Nhóm sản phẩm: ' + allowedGroups.join(', ');
         } else if (meta.warning && meta.warning.message) {
           note = meta.warning.message;
         } else {
-          note = 'Chỉ hiển thị các mã process thuộc Product Group bạn được phép xử lý.';
+          note = 'Đang hiển thị các sản phẩm bạn phụ trách.';
         }
         if (typeof meta.total === 'number') {
           var datasetTotal = typeof meta.datasetTotal === 'number' ? meta.datasetTotal : meta.total;
-          note = (meta.total ? (meta.total + '/' + datasetTotal + ' mã đang process') : 'Hiện chưa có mã nào đang process') + (allowedGroups.length ? (' · ' + allowedGroups.join(', ')) : '');
+          note = (meta.total ? (meta.total + '/' + datasetTotal + ' sản phẩm đang xử lý') : 'Hiện chưa có sản phẩm đang xử lý') + (allowedGroups.length ? (' · ' + allowedGroups.join(', ')) : '');
         }
         if (meta.query) {
           note = 'Đang lọc "' + meta.query + '" · ' + note;
         }
         if (meta.productGroup) {
-          note = 'Group ' + meta.productGroup + ' · ' + note;
+          note = 'Nhóm ' + meta.productGroup + ' · ' + note;
         }
         if (meta.hasConversationOnly) {
-          note = 'Có Hội Thoại · ' + note;
+          note = 'Có hội thoại · ' + note;
         }
         _setProcessListNote(note);
 
         if (S.processProductsLoading) {
-          body.innerHTML = '<div class="process-loading"><strong>Đang tải danh sách đang xử lý...</strong><p>Đang đọc Process và lọc theo Product Group hợp lệ cho tài khoản hiện tại.</p></div>';
+          body.innerHTML = '<div class="process-loading"><strong>Đang tải danh sách...</strong><p>Vui lòng chờ trong giây lát.</p></div>';
           if (opts.resetScroll === true) body.scrollTop = 0;
           return;
         }
 
         if (S.processProductsError) {
-          body.innerHTML = '<div class="process-error"><strong>Không thể tải danh sách đang xử lý</strong><p>' + esc(S.processProductsError.message || 'Không thể tải danh sách Process.') + '</p><div class="process-actions"><button class="btn btn-ghost btn-sm" onclick="App.reloadProcessQueue()">Thử lại</button></div></div>';
+          body.innerHTML = '<div class="process-error"><strong>Không thể tải danh sách</strong><p>' + esc(S.processProductsError.message || 'Vui lòng thử lại.') + '</p><div class="process-actions"><button class="btn btn-ghost btn-sm" onclick="App.reloadProcessQueue()">Thử lại</button></div></div>';
           if (opts.resetScroll === true) body.scrollTop = 0;
           return;
         }
@@ -9776,9 +9887,9 @@
         if (!S.processProducts.length) {
           var hasLocalFilter = !!(S.processSearchValue || S.processGroupFilter || S.processHasConversationOnly);
           var emptyMsg = hasLocalFilter
-            ? 'Không có mã process nào khớp với bộ lọc hiện tại trên dữ liệu đã tải.'
-            : 'Hiện chưa có mã nào đang process trong Product Group bạn phụ trách.';
-          body.innerHTML = '<div class="process-empty"><strong>' + (hasLocalFilter ? 'Không có kết quả phù hợp' : 'Chưa có mã đang xử lý trong scope') + '</strong><p>' + esc(emptyMsg) + '</p><div class="process-actions"><button class="btn btn-ghost btn-sm" onclick="App.reloadProcessQueue()">Tải lại danh sách</button></div></div>';
+            ? 'Không có sản phẩm nào khớp với bộ lọc hiện tại.'
+            : 'Hiện chưa có sản phẩm nào đang xử lý.';
+          body.innerHTML = '<div class="process-empty"><strong>' + (hasLocalFilter ? 'Không có kết quả phù hợp' : 'Chưa có sản phẩm đang xử lý') + '</strong><p>' + esc(emptyMsg) + '</p><div class="process-actions"><button class="btn btn-ghost btn-sm" onclick="App.reloadProcessQueue()">Tải lại danh sách</button></div></div>';
           if (opts.resetScroll === true) body.scrollTop = 0;
           return;
         }
@@ -9789,39 +9900,40 @@
         else body.scrollTop = prevScrollTop;
       }
       function _renderProcessModalBody(fallbackRow, fallbackSummary) {
+        syncProcessBusyState();
         var body = document.getElementById('processModalBody');
         if (!body) return;
 
         if (S.processLoading) {
-          _setProcessToolbarNote('Đang đọc chi tiết Process và xác minh quyền hiển thị.');
-          body.innerHTML = '<div class="process-loading"><strong>Đang tải chi tiết tiến trình...</strong><p>Dashboard chính vẫn hoạt động bình thường trong lúc panel bên phải được tải.</p></div>';
+          _setProcessToolbarNote('Đang tải chi tiết...');
+          body.innerHTML = '<div class="process-loading"><strong>Đang tải chi tiết...</strong><p>Vui lòng chờ trong giây lát.</p></div>';
           return;
         }
 
         if (S.processError) {
           var errorCode = String(S.processError.code || '').toUpperCase();
-          var errorMessage = S.processError.message || 'Không thể tải chi tiết Process.';
+          var errorMessage = S.processError.message || 'Không thể tải chi tiết.';
           if (errorCode === 'PROCESS_NOT_FOUND' || errorCode === 'MISSING_QUERY') {
-            _setProcessToolbarNote('Không tìm thấy chi tiết Process phù hợp cho mã vừa tra.');
-            body.innerHTML = '<div class="process-empty"><strong>Không tìm thấy chi tiết Process</strong><p>' + esc(errorMessage) + '</p><div class="process-actions"><button class="btn btn-ghost btn-sm" onclick="App.lookupProcessExactCode()">Tra mã chính xác</button></div></div>';
+            _setProcessToolbarNote('Không tìm thấy chi tiết phù hợp.');
+            body.innerHTML = '<div class="process-empty"><strong>Không tìm thấy chi tiết</strong><p>' + esc(errorMessage) + '</p><div class="process-actions"><button class="btn btn-ghost btn-sm" onclick="App.lookupProcessExactCode()">Tìm mã</button></div></div>';
             return;
           }
-          _setProcessToolbarNote('Chi tiết Process hiện chưa tải được. Bạn có thể thử lại hoặc tra mã chính xác.');
-          body.innerHTML = '<div class="process-error"><strong>Không thể tải chi tiết Process</strong><p>' + esc(errorMessage) + '</p><div class="process-actions"><button class="btn btn-ghost btn-sm" onclick="App.retryProcessDetail()">Thử lại</button><button class="btn btn-ghost btn-sm" onclick="App.lookupProcessExactCode()">Tra mã chính xác</button></div></div>';
+          _setProcessToolbarNote('Chi tiết hiện chưa tải được. Bạn có thể thử lại.');
+          body.innerHTML = '<div class="process-error"><strong>Không thể tải chi tiết</strong><p>' + esc(errorMessage) + '</p><div class="process-actions"><button class="btn btn-ghost btn-sm" onclick="App.retryProcessDetail()">Thử lại</button><button class="btn btn-ghost btn-sm" onclick="App.lookupProcessExactCode()">Tìm mã</button></div></div>';
           return;
         }
 
         if (!S.processDetail) {
           var fallback = _mergeProcessFallback(fallbackRow, fallbackSummary);
-          _setProcessToolbarNote('Chọn một mã ở panel bên trái để xem timeline, hoặc tra mã chính xác nếu mã không còn trong danh sách hiện tại.');
-          body.innerHTML = '<div class="process-empty"><strong>Chọn một mã đang xử lý</strong><p>Panel bên trái ưu tiên hiển thị sẵn các mã đang process theo đúng Product Group của bạn.' + (fallback.key ? (' Bạn cũng có thể tra nhanh mã <b>' + esc(fallback.key) + '</b>.') : '') + '</p><div class="process-actions"><button class="btn btn-ghost btn-sm" onclick="App.reloadProcessQueue()">Làm mới danh sách</button><button class="btn btn-ghost btn-sm" onclick="App.lookupProcessExactCode()">Tra mã chính xác</button></div></div>';
+          _setProcessToolbarNote('Chọn một sản phẩm để xem chi tiết.');
+          body.innerHTML = '<div class="process-empty"><strong>Chọn một sản phẩm đang xử lý</strong><p>Chọn ở danh sách bên trái để xem trạng thái và trao đổi.' + (fallback.key ? (' Bạn cũng có thể tìm nhanh mã <b>' + esc(fallback.key) + '</b>.') : '') + '</p><div class="process-actions"><button class="btn btn-ghost btn-sm" onclick="App.reloadProcessQueue()">Làm mới danh sách</button><button class="btn btn-ghost btn-sm" onclick="App.lookupProcessExactCode()">Tìm mã</button></div></div>';
           return;
         }
 
         var detail = S.processDetail;
         var hasImage = !!detail.imageUrl;
         var effectiveCurrentSheet = _getEffectiveBusinessCurrentSheet(detail) || detail.currentSheet || '';
-        _setProcessToolbarNote(detail.displayStageLabel || 'Đã tải chi tiết Process.');
+        _setProcessToolbarNote(detail.displayStageLabel || 'Đã tải chi tiết.');
         body.innerHTML = ''
           + '<div class="process-card">'
           + '  <aside class="process-hero">'
@@ -9831,25 +9943,25 @@
           + '    </div>'
           + '    <div class="process-hero-meta">'
           + '      <div class="process-keychip">' + esc(detail.key || 'Chưa có mã') + '</div>'
-          + '      <div class="process-hero-note">Trạng thái Process và hội thoại nội bộ được đồng bộ theo mã sản phẩm.</div>'
+          + '      <div class="process-hero-note">Theo dõi trạng thái và trao đổi liên quan đến sản phẩm này.</div>'
           +        (detail.imageOriginalUrl ? ('<a class="process-link" href="' + esc(detail.imageOriginalUrl) + '" target="_blank" rel="noopener noreferrer">Mở ảnh gốc</a>') : '')
           + '    </div>'
           + '  </aside>'
           + '  <section class="process-summary">'
-          + '    <div class="process-stage-pill">' + esc(detail.displayStageLabel || 'Chi tiết Process') + '</div>'
+          + '    <div class="process-stage-pill">' + esc(detail.displayStageLabel || 'Chi tiết tiến trình') + '</div>'
           + '    <div class="process-product-name">' + esc(detail.productName || 'Chưa có tên sản phẩm') + '</div>'
           + '    <div class="process-barcode">' + esc(detail.barcodeOrUom || 'Chưa có Barcode / UOM Information.') + '</div>'
           + '    <div class="process-meta-grid">'
           + '      <div class="process-meta-card"><div class="process-meta-label">Mã chính</div><div class="process-meta-value">' + esc(detail.key || '—') + '</div></div>'
           + '      <div class="process-meta-card"><div class="process-meta-label">Product Group</div><div class="process-meta-value">' + esc(detail.productGroup || '—') + '</div></div>'
           + '      <div class="process-meta-card"><div class="process-meta-label">Lần cập nhật</div><div class="process-meta-value">' + esc(detail.lastSeen || '—') + '</div></div>'
-          + '      <div class="process-meta-card"><div class="process-meta-label">Bước hiện tại</div><div class="process-meta-value">' + esc(effectiveCurrentSheet || '—') + '</div></div>'
+          + '      <div class="process-meta-card"><div class="process-meta-label">Đang ở bước</div><div class="process-meta-value">' + esc(effectiveCurrentSheet || '—') + '</div></div>'
           + '      <div class="process-meta-card"><div class="process-meta-label">Trạng thái hiện tại</div><div class="process-meta-value">' + esc(detail.currentStatus || '—') + '</div></div>'
           + '      <div class="process-meta-card"><div class="process-meta-label">Tiến trình</div><div class="process-meta-value">' + esc(detail.displayStageLabel || '—') + '</div></div>'
           + '    </div>'
           + '    <div class="process-timeline-wrap">'
           + '      <div class="process-timeline-head">'
-          + '        <div><div class="process-timeline-title">Timeline 6 bước</div><div class="process-timeline-sub">Category → Manager → Director → Present List → Final Information → Setup Product ID</div></div>'
+          + '        <div><div class="process-timeline-title">Các bước xử lý chính</div><div class="process-timeline-sub">Theo dõi trạng thái qua từng bước.</div></div>'
           + '      </div>'
           + '      <div class="process-timeline">' + _buildProcessTimelineHtml(detail.stageTimeline) + '</div>'
           + '    </div>'
@@ -10368,7 +10480,11 @@
       var PATTERN_FIELD = 'Pattern';
       var LOGISTICS_FIELD_SOUTH = 'Logistics Group South';
       var LOGISTICS_FIELD_NORTH = 'Logistics Group North';
-      var PATTERN_OPTIONS = ['Miền Nam', 'Miền Bắc', 'Hai miền'];
+      var PATTERN_OPTIONS = [
+        { value: 'South', label: 'Miền Nam' },
+        { value: 'North', label: 'Miền Bắc' },
+        { value: 'South, North', label: 'Hai miền' }
+      ];
       var OTHER_INCOME_FIELD = 'Other Income + Listing Fee';
       var PRODUCT_GROUP_FIELD = 'Product Group';
       var PRODUCT_GROUP_OPTIONS = [
@@ -10615,7 +10731,7 @@
         var items = _trimTrailingEmptyTokens(_splitCsvListPreserve(raw));
         if (!items.length) return '';
         return items.map(function (item, idx) {
-          var fallback = kind === 'action' ? 'Pending action' : 'Pending product';
+          var fallback = kind === 'action' ? 'Chưa chọn thao tác' : 'Chưa chọn sản phẩm';
           var value = String(item || '').trim();
           if (kind === 'product' && value) value = _getPogDisplayValue(value);
           return (idx + 1) + '. ' + (value || fallback);
@@ -10629,11 +10745,11 @@
         if (!max) return '';
         var lines = [];
         for (var i = 0; i < max; i++) {
-          var product = _getPogDisplayValue(products[i] || '') || 'Pending product';
+          var product = _getPogDisplayValue(products[i] || '') || 'Chưa chọn sản phẩm';
           var intent = _getPogActionIntent(actions[i] || '');
           var actionLabel = intent === 'cut'
-            ? 'Cut'
-            : (intent === 'reduce' ? 'Reduce facing' : 'Pending action');
+            ? 'Cắt'
+            : (intent === 'reduce' ? 'Giảm facing' : 'Chưa chọn thao tác');
           lines.push('Product ' + (i + 1) + ': ' + product + ' \u2192 ' + actionLabel);
         }
         return lines.join('\n');
@@ -10649,13 +10765,13 @@
           var action = String(actions[i] || '').trim();
           if (!product) continue;
           var key = _getPogProductKey(product);
-          if (key && seenProducts[key]) warnings.push('POG reduce product slot cannot repeat the same product.');
+          if (key && seenProducts[key]) warnings.push('Sản phẩm POG không được lặp lại.');
           if (key) seenProducts[key] = true;
-          if (!action) warnings.push('POG action is missing for Product ' + (i + 1) + '.');
-          else if (!_normalizePogActionForSlot(action, i + 1)) warnings.push('POG action for Product ' + (i + 1) + ' must match the same slot.');
+          if (!action) warnings.push('Chưa chọn thao tác POG cho sản phẩm ' + (i + 1) + '.');
+          else if (!_normalizePogActionForSlot(action, i + 1)) warnings.push('Thao tác POG của sản phẩm ' + (i + 1) + ' chưa hợp lệ.');
         }
         for (var j = products.length; j < actions.length; j++) {
-          if (String(actions[j] || '').trim()) warnings.push('POG action cannot exist without a selected product.');
+          if (String(actions[j] || '').trim()) warnings.push('Có thao tác POG nhưng chưa chọn sản phẩm.');
         }
         return _dedupeMessages(warnings);
       }
@@ -10679,9 +10795,9 @@
 
       function _getCanonicalPatternValue(value) {
         var token = _normalizePatternToken(value);
-        if (token === 'south') return 'Miền Nam';
-        if (token === 'north') return 'Miền Bắc';
-        if (token === 'both') return 'Hai miền';
+        if (token === 'south') return 'South';
+        if (token === 'north') return 'North';
+        if (token === 'both') return 'South, North';
         var raw = String(value == null ? '' : value).trim();
         return raw || '';
       }
@@ -11214,13 +11330,13 @@
         var statusLabel = _cleanDisplayValue(row['Status']);
         if (statusLabel) {
           chips += pill(statusLabel) + ' ';
-          if (statusLabel === 'Approved') chips += '<span style="display:inline-flex;align-items:center;gap:4px;background:#dcfce7;color:#166534;border:1px solid #86efac;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:700">Approved by Director</span> ';
-          else if (statusLabel === 'Rejected') chips += '<span style="display:inline-flex;align-items:center;gap:4px;background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:700">Rejected by Director</span> ';
+          if (statusLabel === 'Approved') chips += '<span style="display:inline-flex;align-items:center;gap:4px;background:#dcfce7;color:#166534;border:1px solid #86efac;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:700">Director đã duyệt</span> ';
+          else if (statusLabel === 'Rejected') chips += '<span style="display:inline-flex;align-items:center;gap:4px;background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:700">Director từ chối</span> ';
         }
         if (_cleanDisplayValue(row[PRODUCT_GROUP_FIELD])) chips += '<span class="sp sp-vl">' + esc(_cleanDisplayValue(row[PRODUCT_GROUP_FIELD])) + '</span> ';
         if (_cleanDisplayValue(row['Category'])) chips += '<span class="sp sp-vl">' + esc(_cleanDisplayValue(row['Category'])) + '</span> ';
         if (_cleanDisplayValue(row['Sub Category'])) chips += '<span class="sp sp-sky">' + esc(_cleanDisplayValue(row['Sub Category'])) + '</span> ';
-        if (S.pending[rn]) chips += '<span class="sp sp-or">Pending</span>';
+        if (S.pending[rn]) chips += '<span class="sp sp-or">Chưa lưu</span>';
         var chipBox = document.getElementById('mChips');
         if (chipBox) chipBox.innerHTML = chips;
       }
@@ -11258,6 +11374,7 @@
 
       function changeModalProductGroup() {
         if (!_ensureEditableAction()) return;
+        if (isModalBusy()) return;
         var rn = S.modalRow;
         var row = _findAnyRowByRn(rn);
         var select = document.getElementById('mProductGroupSelect');
@@ -11272,11 +11389,13 @@
         var changes = {};
         changes[PRODUCT_GROUP_FIELD] = next;
         _setProductGroupQuickBusy_(true);
-        setConn('loading', 'Updating Product Group...');
+        setModalBusy(true, 'Đang cập nhật Product Group...');
+        setConn('loading', 'Đang cập nhật Product Group...');
         google.script.run
           .withSuccessHandler(function (res) {
             _setProductGroupQuickBusy_(false);
-            setConn('ok', 'ÄÃ£ káº¿t ná»‘i');
+            setModalBusy(false);
+            setConn('ok', 'Đã kết nối');
             if (!res || !res.ok) {
               if (handleAuthIssue(res)) return;
               select.value = _isAllowedProductGroupValue_(current) ? current : '';
@@ -11302,7 +11421,8 @@
           })
           .withFailureHandler(function (err) {
             _setProductGroupQuickBusy_(false);
-            setConn('err', 'Error');
+            setModalBusy(false);
+            setConn('err', 'Lỗi');
             select.value = _isAllowedProductGroupValue_(current) ? current : '';
             if (handleAuthIssue(err)) return;
             toast('Error: ' + (err && err.message ? err.message : 'Cannot update Product Group'), 'error');
@@ -11390,7 +11510,7 @@
           if (bodyEl) bodyEl.style.display = 'none';
           if (emptyEl) emptyEl.textContent = emptyMsg;
           _setQuickText('qpName', 'No product selected');
-          _setQuickText('qpMeta', isBatchFill ? 'Select a product from the selected scope to view the current supplier snapshot.' : 'Click a product to view details.');
+          _setQuickText('qpMeta', isBatchFill ? 'Chọn một sản phẩm trong danh sách đã chọn để xem nhanh thông tin.' : 'Bấm vào sản phẩm để xem chi tiết.');
           var batchTitleEmpty = document.getElementById('bfImpactPreviewTitle');
           if (isBatchFill && batchTitleEmpty) batchTitleEmpty.textContent = 'Select one product to preview';
           if (isBatchFill) renderBatchImpactPreview();
@@ -12046,7 +12166,7 @@
             label.appendChild(state);
           }
         }
-        if (state) state.textContent = modified ? 'Will overwrite' : 'Keep existing';
+        if (state) state.textContent = modified ? 'Sẽ cập nhật' : 'Giữ nguyên';
         card.querySelectorAll('.bfp-fc').forEach(function (inp) {
           inp.classList.toggle('modified', !!modified);
         });
@@ -12081,7 +12201,7 @@
 
       function _formatBatchImpactValueHtml(value) {
         var txt = String(value == null ? '' : value).trim();
-        if (!txt) return '<span style="color:var(--text4);font-style:italic">Blank</span>';
+        if (!txt) return '<span style="color:var(--text4);font-style:italic">Trống</span>';
         return esc(txt).replace(/\n/g, '<br>');
       }
 
@@ -12158,49 +12278,49 @@
         });
 
         var warnings = [];
-        if (!selRns.length) warnings.push('No selected products in scope.');
+        if (!selRns.length) warnings.push('Chưa chọn sản phẩm.');
         dirtyKeys.forEach(function (key) {
           var field = BF_MAP[key];
           var val = template[field];
           if (_isRequiredProductField(field) && !_isFieldCompleteForReview(field, val)) {
-            warnings.push(_fieldUiLabel(field) + ' is required and cannot be blank.');
+            warnings.push(_fieldUiLabel(field) + ' là thông tin bắt buộc.');
           }
         });
         _getRequiredProductFieldsForValues(currentValues).forEach(function (field) {
           if (!_isConditionalLogisticsField(field)) return;
           if (dirtyKeys.indexOf('Pattern') < 0 && dirtyKeys.indexOf(BF_MAP_REV[field]) < 0) return;
           if (!_isFieldCompleteForReview(field, currentValues[field])) {
-            warnings.push(_fieldUiLabel(field) + ' is required and cannot be blank.');
+            warnings.push(_fieldUiLabel(field) + ' là thông tin bắt buộc.');
           }
         });
         if (Object.prototype.hasOwnProperty.call(template, 'PIC input Product Name (Dưới 40 kí tự)') && String(template['PIC input Product Name (Dưới 40 kí tự)'] || '').length > 40) {
-          warnings.push('PIC Product Name exceeds 40 characters.');
+          warnings.push('Tên sản phẩm PIC vượt quá 40 ký tự.');
         }
         if (Object.prototype.hasOwnProperty.call(template, 'Product description (Dưới 250 Kí tự)') && String(template['Product description (Dưới 250 Kí tự)'] || '').length > 250) {
-          warnings.push('Product Description exceeds 250 characters.');
+          warnings.push('Mô tả sản phẩm vượt quá 250 ký tự.');
         }
         if (dirtyKeys.length) {
-          if (selRns.length && affectedCount === 0) warnings.push('Current template matches every selected product. Nothing new would be applied.');
+          if (selRns.length && affectedCount === 0) warnings.push('Không có thay đổi mới cho các sản phẩm đã chọn.');
           if (selRns.length >= 15 && dirtyKeys.length >= 6) warnings.push('Batch có ảnh hưởng lớn. Vui lòng kiểm tra kỹ phạm vi và tác động trước khi áp dụng.');
         }
         warnings = _dedupeMessages(warnings);
 
         var stateClass = 'state-idle';
-        var stateLabel = 'Ready to start';
+        var stateLabel = 'Sẵn sàng';
         var stateNote = selRns.length
-          ? (selRns.length + ' product(s) in scope. Choose fields to build the batch template.')
-          : 'Select one or more products, then choose the fields you want to apply.';
+          ? (selRns.length + ' sản phẩm đã chọn. Chọn trường cần áp dụng.')
+          : 'Chọn một hoặc nhiều sản phẩm, sau đó chọn trường cần áp dụng.';
         if (dirtyKeys.length && !selRns.length) {
           stateClass = 'state-warn';
-          stateLabel = 'Add scope';
-          stateNote = 'Choose at least one product before applying the template.';
+          stateLabel = 'Chọn sản phẩm';
+          stateNote = 'Chọn ít nhất một sản phẩm trước khi áp dụng.';
         } else if (dirtyKeys.length && warnings.length) {
           stateClass = 'state-warn';
-          stateLabel = affectedCount === 0 ? 'No impact' : 'Needs attention';
+          stateLabel = affectedCount === 0 ? 'Không có thay đổi' : 'Cần kiểm tra';
           stateNote = warnings[0];
         } else if (dirtyKeys.length) {
           stateClass = 'state-ready';
-          stateLabel = 'Ready to apply';
+          stateLabel = 'Sẵn sàng áp dụng';
           stateNote = dirtyKeys.length + ' trường sẽ cập nhật ' + affectedCount + ' / ' + selRns.length + ' sản phẩm đã chọn.';
         }
 
@@ -12474,7 +12594,7 @@
           }
         });
         if (!selectedCount) {
-          meta.textContent = 'No POG decision yet. Start with Product 1, then add more only when the current decision is complete.';
+          meta.textContent = 'Chưa có quyết định POG. Bắt đầu với sản phẩm 1, rồi thêm sản phẩm tiếp theo khi cần.';
           return;
         }
         meta.textContent = selectedCount + ' product decision(s) selected'
@@ -13067,7 +13187,7 @@
             : dirtyKeys.map(function (k) {
                 var field = BF_MAP[k];
                 var val = state.template[field];
-                return '<span class="active-tag">' + esc(_fieldUiLabel(field)) + ': ' + (val ? esc(_truncateReviewText(val, 28)) : 'Blank') + '</span>';
+                return '<span class="active-tag">' + esc(_fieldUiLabel(field)) + ': ' + (val ? esc(_truncateReviewText(val, 28)) : 'Trống') + '</span>';
               }).join('');
         }
 
@@ -13079,7 +13199,7 @@
         if (!S.selected[_rnKey(S.batchActiveRow)]) S.batchActiveRow = selRns.length ? parseInt(selRns[0], 10) : null;
         if (selRns.length === 0) {
           S.batchActiveRow = null;
-          list.innerHTML = '<div class="prev-empty">No selected products.</div>';
+          list.innerHTML = '<div class="prev-empty">Chưa chọn sản phẩm.</div>';
           renderBatchImpactPreview();
           _markBatchPreviewSelection();
           return;
@@ -13312,7 +13432,7 @@
           'Logistics Group South': 'Select Logistics Group South',
           'Logistics Group North': 'Select Logistics Group North',
           'Pattern': 'Select Pattern',
-          'POG_Choose Reduce product facing': 'Select product for POG reduce / cut decision',
+          'POG_Choose Reduce product facing': 'Chọn sản phẩm cần cắt hoặc giảm facing',
           'SAME PRICE PRODUCT': 'Select Same Price Option',
           'REFERENCE PRODUCT ID (Nếu không có điền NO)': 'Select Reference Product ID (or NO)'
         };
@@ -13789,33 +13909,33 @@
         var sameSub = !!fallbackSub && fallbackSub.replace(/\s+/g, ' ').trim().toLowerCase() === sc.toLowerCase();
         var group = sameSub ? _cleanDisplayValue(fallbackRow['Group'] || fallbackRow['GROUP'] || '') : '';
         var category = sameSub ? _cleanDisplayValue(fallbackRow['Category'] || fallbackRow['CATEGORY'] || '') : '';
-        var groupSource = group ? 'Current row value' : '';
-        var categorySource = category ? 'Current row value' : '';
+        var groupSource = group ? 'Giá trị hiện tại' : '';
+        var categorySource = category ? 'Giá trị hiện tại' : '';
         var mapGroup = map && map.group ? _cleanDisplayValue(map.group) : '';
         var mapCategory = map && map.category ? _cleanDisplayValue(map.category) : '';
         if (!group && mapGroup) {
           group = mapGroup;
-          groupSource = 'Sub category mapping';
+          groupSource = 'Theo Sub Category';
         }
         if (!category && mapCategory) {
           category = mapCategory;
-          categorySource = 'Sub category mapping';
+          categorySource = 'Theo Sub Category';
         }
         if ((!group || !category) && fallbackRow && !sameSub) {
           if (!group) {
             group = _cleanDisplayValue(fallbackRow['Group'] || fallbackRow['GROUP'] || '');
-            if (group) groupSource = 'Current row value';
+            if (group) groupSource = 'Giá trị hiện tại';
           }
           if (!category) {
             category = _cleanDisplayValue(fallbackRow['Category'] || fallbackRow['CATEGORY'] || '');
-            if (category) categorySource = 'Current row value';
+            if (category) categorySource = 'Giá trị hiện tại';
           }
         }
         return {
           group: group,
           category: category,
-          groupSource: groupSource || 'No auto value yet',
-          categorySource: categorySource || 'No auto value yet'
+          groupSource: groupSource || 'Chưa có gợi ý',
+          categorySource: categorySource || 'Chưa có gợi ý'
         };
       }
 
@@ -13825,7 +13945,7 @@
         var metaEl = document.getElementById(metaId);
         var clean = _cleanDisplayValue(value);
         if (valueEl) valueEl.textContent = clean || '—';
-        if (metaEl) metaEl.textContent = clean ? (sourceLabel || 'Auto resolved') : 'No auto value yet';
+        if (metaEl) metaEl.textContent = clean ? (sourceLabel || 'Tự động điền') : 'Chưa có gợi ý';
         if (wrapEl) wrapEl.classList.toggle('is-empty', !clean);
       }
 
@@ -14167,6 +14287,7 @@
 
       /* ══ MODAL ══ */
       function setDetailStep(step) {
+        if (isModalBusy()) return;
         var target = step === 2 ? 2 : 1;
         if (target === 2 && !USER_CAN_EDIT) {
           toast('Chế độ chỉ xem chỉ mở Step 1.', 'info');
@@ -14183,7 +14304,7 @@
         if (p2) p2.classList.toggle('on', target === 2);
         if (b1) b1.classList.toggle('on', target === 1);
         if (b2) b2.classList.toggle('on', target === 2);
-        if (metaTxt) metaTxt.textContent = target === 1 ? 'Overview' : 'Edit Workspace';
+        if (metaTxt) metaTxt.textContent = target === 1 ? 'Tổng quan' : 'Cập nhật thông tin';
         if (progressFill) progressFill.style.width = target === 1 ? '50%' : '100%';
         if (target === 2) setStep2Tab(S.step2Tab || 1);
       }
@@ -14304,7 +14425,7 @@
 
       function _formatOverviewValueHtml(value, maxLen) {
         var txt = _truncateReviewText(value, maxLen || 56);
-        return txt ? esc(txt) : '<span style="color:var(--text4);font-style:italic">Blank</span>';
+        return txt ? esc(txt) : '<span style="color:var(--text4);font-style:italic">Trống</span>';
       }
 
       function _fmtOverviewMoney(text) {
@@ -15222,13 +15343,13 @@
         if (statusLabel) {
           chips += pill(statusLabel) + ' ';
           // Show Director-set badge when status has been decided
-          if (statusLabel === 'Approved') chips += '<span style="display:inline-flex;align-items:center;gap:4px;background:#dcfce7;color:#166534;border:1px solid #86efac;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:700">🔒 Approved by Director</span> ';
-          else if (statusLabel === 'Rejected') chips += '<span style="display:inline-flex;align-items:center;gap:4px;background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:700">🔒 Rejected by Director</span> ';
+          if (statusLabel === 'Approved') chips += '<span style="display:inline-flex;align-items:center;gap:4px;background:#dcfce7;color:#166534;border:1px solid #86efac;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:700">Director đã duyệt</span> ';
+          else if (statusLabel === 'Rejected') chips += '<span style="display:inline-flex;align-items:center;gap:4px;background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:700">Director từ chối</span> ';
         }
         if (_cleanDisplayValue(row['Product Group'])) chips += '<span class="sp sp-vl">' + esc(_cleanDisplayValue(row['Product Group'])) + '</span> ';
         if (_cleanDisplayValue(row['Category'])) chips += '<span class="sp sp-vl">' + esc(_cleanDisplayValue(row['Category'])) + '</span> ';
         if (_cleanDisplayValue(row['Sub Category'])) chips += '<span class="sp sp-sky">' + esc(_cleanDisplayValue(row['Sub Category'])) + '</span> ';
-        if (S.pending[rn]) chips += '<span class="sp sp-or">✏ Pending</span>';
+        if (S.pending[rn]) chips += '<span class="sp sp-or">Chưa lưu</span>';
         document.getElementById('mChips').innerHTML = chips;
         _populateProductGroupQuickControl(row);
         fillPresetSummary(row);
@@ -15310,6 +15431,7 @@
         });
       }
       function closeModal() {
+        if (isModalBusy()) return;
         var ov = document.getElementById('overlay');
         ov.style.transition = 'opacity .15s';
         ov.style.opacity = '0';
@@ -15318,6 +15440,7 @@
         _resetWorkspaceChatState('empty');
       }
       function resetModal() {
+        if (isModalBusy()) return;
         var rn = S.modalRow; if (!rn) return;
         var row = _findAnyRowByRn(rn); if (!row) return;
         // Restore all fields to original row data (ignoring pending)
@@ -15343,6 +15466,7 @@
       }
       function saveModal() {
         if (!_ensureEditableAction()) return;
+        if (isModalBusy()) return;
         var rn = S.modalRow; if (!rn) return;
         var row = _findAnyRowByRn(rn); if (!row) return;
         if (MODAL_UOM_DIRTY) _syncModalUomField();
@@ -15448,9 +15572,16 @@
         var ch = S.pending[rn];
         if (!ch) return;
         var cfg = opts || {};
+        if (cfg.fromModal) {
+          if (isModalBusy()) return;
+          setModalBusy(true, 'Đang lưu dữ liệu...');
+        } else {
+          setGlobalBusy(true, 'Đang lưu dữ liệu...');
+        }
         setConn('loading', 'Đang lưu...');
         google.script.run
           .withSuccessHandler(function (res) {
+            if (cfg.fromModal) setModalBusy(false); else setGlobalBusy(false);
             setConn('ok', 'Đã kết nối');
             if (!res || !res.ok) {
               if (handleAuthIssue(res)) return;
@@ -15467,6 +15598,7 @@
             render();
           })
           .withFailureHandler(function (e) {
+            if (cfg.fromModal) setModalBusy(false); else setGlobalBusy(false);
             if (handleAuthIssue(e)) return;
             setConn('err', 'Lỗi');
             toast('Lỗi: ' + (e && e.message ? e.message : 'Unknown'), 'error');
@@ -15477,8 +15609,9 @@
         if (!_ensureEditableAction()) return;
         var keys = Object.keys(S.pending); if (!keys.length) { toast('Không có thay đổi nào để lưu', 'info'); return; }
         var updates = keys.map(function (k) { return { rowNumber: parseInt(k), changes: S.pending[k] }; });
+        setGlobalBusy(true, 'Đang lưu tất cả thay đổi...');
         setConn('loading', 'Đang lưu ' + keys.length + ' sản phẩm...');
-        google.script.run.withSuccessHandler(function (res) { setConn('ok', 'Đã kết nối'); if (!res || !res.ok) { if (handleAuthIssue(res)) return; toast('Lỗi lưu hàng loạt', 'error'); return; } var d = res.data; d.results.forEach(function (r) { if (r.success) delete S.pending[r.rowNumber]; }); toast('✅ Lưu ' + d.successful + '/' + d.totalUpdates + ' sản phẩm' + (d.failed ? ', ' + d.failed + ' lỗi' : '') + '!', d.failed ? 'warning' : 'success'); render(); }).withFailureHandler(function (e) { if (handleAuthIssue(e)) return; setConn('err', 'Lỗi'); toast('Lỗi: ' + (e && e.message ? e.message : 'Unknown'), 'error'); }).updateBatch({ token: AUTH_TOKEN, updates: updates, source: 'INDEX_SAVE_ALL' });
+        google.script.run.withSuccessHandler(function (res) { setGlobalBusy(false); setConn('ok', 'Đã kết nối'); if (!res || !res.ok) { if (handleAuthIssue(res)) return; toast('Lỗi lưu hàng loạt', 'error'); return; } var d = res.data; d.results.forEach(function (r) { if (r.success) delete S.pending[r.rowNumber]; }); toast('✅ Lưu ' + d.successful + '/' + d.totalUpdates + ' sản phẩm' + (d.failed ? ', ' + d.failed + ' lỗi' : '') + '!', d.failed ? 'warning' : 'success'); render(); }).withFailureHandler(function (e) { setGlobalBusy(false); if (handleAuthIssue(e)) return; setConn('err', 'Lỗi'); toast('Lỗi: ' + (e && e.message ? e.message : 'Unknown'), 'error'); }).updateBatch({ token: AUTH_TOKEN, updates: updates, source: 'INDEX_SAVE_ALL' });
       }
       function cancelEdit(rn) { delete S.pending[rn]; toast('Đã hủy chỉnh sửa dòng ' + rn, 'info'); render(); }
 
@@ -15600,7 +15733,7 @@
       }
       function logout() {
         if (logoutBusy) return;
-        if (!confirm('Log out?')) return;
+        if (!confirm('Đăng xuất khỏi tài khoản này?')) return;
 
         var tokenForLogout = String(AUTH_TOKEN || '').trim();
         if (!tokenForLogout) {
@@ -15614,7 +15747,7 @@
           .withSuccessHandler(function (res) {
             if (!res || !res.ok) {
               setLogoutBusy(false);
-              toast('Logout failed: ' + getLogoutErrorMessage(res, 'Không thể đóng phiên đăng nhập.'), 'error');
+              toast('Không thể đăng xuất: ' + getLogoutErrorMessage(res, 'Vui lòng thử lại.'), 'error');
               return;
             }
             clearSessionState();
@@ -15622,7 +15755,7 @@
           })
           .withFailureHandler(function (err) {
             setLogoutBusy(false);
-            toast('Logout failed: ' + getLogoutErrorMessage(err, 'Không thể đóng phiên đăng nhập.'), 'error');
+            toast('Không thể đăng xuất: ' + getLogoutErrorMessage(err, 'Vui lòng thử lại.'), 'error');
           })
           .logoutSession({ token: tokenForLogout });
       }
