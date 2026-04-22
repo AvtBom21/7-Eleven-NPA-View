@@ -2176,6 +2176,54 @@
       word-break: break-word;
     }
 
+    .supplier-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .supplier-name {
+      flex: 1 1 220px;
+      min-width: 0;
+    }
+
+    .supplier-profile-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      border: 1px solid #bfdbfe;
+      background: var(--bluebg);
+      color: var(--blue);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .02em;
+      line-height: 1;
+      padding: 7px 11px;
+      transition: transform .12s ease, box-shadow .18s ease, border-color .18s ease;
+      white-space: nowrap;
+    }
+
+    .supplier-profile-btn:hover {
+      border-color: #93c5fd;
+      box-shadow: 0 6px 14px rgba(37, 99, 235, .2);
+      transform: translateY(-1px);
+    }
+
+    .supplier-profile-btn:active {
+      transform: translateY(0);
+    }
+
+    .supplier-profile-empty {
+      font-size: 12px;
+      color: var(--text3);
+      font-style: italic;
+      white-space: nowrap;
+    }
+
     .competitor-block {
       background: var(--amberbg);
       border: 1px solid #fde68a;
@@ -4667,6 +4715,15 @@ function normalizeImageUrl(raw) {
 
   return /^https?:\/\//i.test(candidate) ? candidate : '';
 }
+function normalizeProfileUrl(raw) {
+  var src = safeText(raw, '').trim();
+  if (!src) return '';
+
+  // Support plain links, rich text exports, or formula strings by extracting first URL.
+  var embedded = src.match(/https?:\/\/[^"'\s)]+/i);
+  var candidate = embedded ? embedded[0] : src;
+  return /^https?:\/\//i.test(candidate) ? candidate : '';
+}
 function thumb(p) {
   var candidates = [p && p.imagePath, p && p.urlImage];
   for (var i = 0; i < candidates.length; i++) {
@@ -4967,6 +5024,8 @@ function openModal(idx) {
   var otherIncomeListingFeeHtml;
   var noteText;
   var replacementImpactHtml;
+  var supplierProfileUrl;
+  var supplierProfileActionHtml;
   var tiers;
   var rows;
   var kpis;
@@ -5002,6 +5061,10 @@ function openModal(idx) {
   otherIncomeListingFeeHtml = escHtml(otherIncomeListingFeeText).replace(/\n/g, '<br>');
   noteText = safeText(p.note, '').trim();
   replacementImpactHtml = renderReplacementImpactSection(p);
+  supplierProfileUrl = normalizeProfileUrl(p.supplierProfile);
+  supplierProfileActionHtml = supplierProfileUrl
+    ? '<a class="supplier-profile-btn" href="' + escHtml(supplierProfileUrl) + '" target="_blank" rel="noopener noreferrer">Xem hồ sơ NCC</a>'
+    : '<span class="supplier-profile-empty">Chưa có thông tin</span>';
 
   function gpBar(pct) {
     var raw = parseLooseNumber(pct);
@@ -5101,8 +5164,8 @@ function openModal(idx) {
     replacementImpactHtml + '\n\n  <div class="section">\n    <div class="section-title">Price & GP by Tier' +
     (hasRef ? ' (vs ' + escHtml(p.refProductName || p.refProductId) + ')' : '') + '</div>\n    <div class="pricing-wrap">\n      <table class="pricing-table">\n        <thead><tr>\n          <th>Tier</th><th>Retail Price</th><th>GP%</th><th>GP Amount</th>\n          ' +
     (hasRef ? '<th>Ref Price</th><th>Ref GP%</th>' : '') + '\n        </tr></thead>\n        <tbody>' +
-    rows + '</tbody>\n      </table>\n    </div>\n  </div>\n\n  <div class="section">\n    <div class="section-title">Supplier Information</div>\n    <div class="info-grid info-grid-product">\n      <div class="info-item"><div class="info-label">Supplier</div><div class="info-val">' +
-    escHtml(textOrDash(p.supplierName)) + '</div></div>\n      <div class="info-item info-item-compact"><div class="info-label">Pattern / Region</div><div class="info-val">' +
+    rows + '</tbody>\n      </table>\n    </div>\n  </div>\n\n  <div class="section">\n    <div class="section-title">Supplier Information</div>\n    <div class="info-grid info-grid-product">\n      <div class="info-item"><div class="info-label">Supplier</div><div class="info-val supplier-row"><span class="supplier-name">' +
+    escHtml(textOrDash(p.supplierName)) + '</span>' + supplierProfileActionHtml + '</div></div>\n      <div class="info-item info-item-compact"><div class="info-label">Pattern / Region</div><div class="info-val">' +
     escHtml(textOrDash(p.pattern)) + '</div></div>\n    </div>\n  </div>\n\n  ' +
     (competitorBenchmarkText ? '\n  <div class="section">\n    <div class="section-title">' + (isTuRole ? 'Retail Price Benchmark' : 'Competitors (Retail Price)') + '</div>\n    <div class="' + (isTuRole ? 'desc-block desc-block-prewrap' : 'competitor-block') + '">' + competitorBenchmarkHtml + '</div>\n  </div>' : '') + '\n\n  ' +
     (otherIncomeListingFeeText ? '\n  <div class="section">\n    <div class="section-title">Other Income + Listing Fee</div>\n    <div class="desc-block desc-block-prewrap">' + otherIncomeListingFeeHtml + '</div>\n  </div>' : '') + '\n\n  ' +
