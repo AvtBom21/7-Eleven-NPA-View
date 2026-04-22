@@ -507,6 +507,7 @@ function _buildLoginBootstrap_(access, token, message) {
 var PIC_EDITABLE_FIELDS = [
   'Present Date',
   'Status',
+  'Product Group',
   'New product type',
   'Why Do We List This Product?',
   'Premium products',
@@ -541,6 +542,28 @@ var DIRECTOR_EDITABLE_FIELDS = [
 ];
 
 var EDITABLE_FIELDS = PIC_EDITABLE_FIELDS.slice();
+
+var PRODUCT_GROUP_OPTIONS = [
+  'Non Alcoholic',
+  'Alcoholic',
+  'Tobacco',
+  'Packaged Snacks',
+  'Health and Beauty',
+  'Instant Food',
+  'Condiments',
+  'Groceries',
+  'Confectionery',
+  'Toys',
+  'Stationery',
+  'Household',
+  'Home Care',
+  'Clothing and Accessories'
+];
+
+function _isAllowedProductGroup_(value) {
+  var v = String(value || '').trim();
+  return !!v && PRODUCT_GROUP_OPTIONS.indexOf(v) >= 0;
+}
 
 function _safeErrorText_(err, fallback) {
   var fb = fallback || 'Unknown error';
@@ -3032,6 +3055,12 @@ function _validateChanges(changes) {
   if ('Status' in changes) {
     var status = changes['Status'];
     if (!status || String(status).trim() === '') errors.push('Status là bắt buộc');
+  }
+
+  if ('Product Group' in changes) {
+    if (!_isAllowedProductGroup_(changes['Product Group'])) {
+      errors.push('Product Group khong hop le.');
+    }
   }
 
   if (changes['Retail Price (+VAT) in Tier 6'] !== undefined) {

@@ -2937,6 +2937,7 @@
       padding: 7px 16px;
       display: flex;
       align-items: center;
+      flex-wrap: wrap;
       gap: 8px;
       flex-shrink: 0;
       box-shadow: 0 1px 4px rgba(0, 0, 0, .06)
@@ -2946,6 +2947,45 @@
       font: 400 10px var(--mono);
       color: var(--text3);
       margin-left: auto
+    }
+
+    .m-pg-switcher {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: 4px;
+      padding-left: 8px;
+      border-left: 1px solid var(--border);
+      min-width: 0;
+    }
+
+    .m-pg-select {
+      height: 30px;
+      min-width: 170px;
+      max-width: 230px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--text);
+      font: 700 11px var(--font);
+      padding: 0 28px 0 9px;
+      outline: none;
+      appearance: none;
+      background-image: linear-gradient(45deg, transparent 50%, var(--text3) 50%), linear-gradient(135deg, var(--text3) 50%, transparent 50%);
+      background-position: calc(100% - 13px) 12px, calc(100% - 8px) 12px;
+      background-size: 5px 5px, 5px 5px;
+      background-repeat: no-repeat;
+    }
+
+    .m-pg-select:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+    }
+
+    .m-pg-select:disabled,
+    .m-pg-btn:disabled {
+      opacity: .55;
+      cursor: not-allowed;
     }
 
     .m-dirty-badge {
@@ -4958,6 +4998,7 @@
     .oi-row {
       display: flex;
       align-items: center;
+      flex-wrap: wrap;
       gap: 10px;
     }
 
@@ -4986,7 +5027,13 @@
       min-width: 150px;
     }
 
-    .oi-amount:disabled {
+    .oi-note {
+      flex: 1.25;
+      min-width: 210px;
+    }
+
+    .oi-amount:disabled,
+    .oi-note:disabled {
       background: #f1f5f9;
       color: #94a3b8;
       cursor: not-allowed;
@@ -4999,6 +5046,26 @@
 
       .oi-row {
         gap: 8px;
+      }
+
+      .oi-amount,
+      .oi-note {
+        flex-basis: calc(100% - 150px);
+        min-width: 0;
+      }
+
+      .m-pg-switcher {
+        order: 4;
+        width: 100%;
+        margin-left: 0;
+        padding-left: 0;
+        border-left: 0;
+      }
+
+      .m-pg-select {
+        flex: 1;
+        max-width: none;
+        min-width: 0;
       }
     }
 
@@ -7382,6 +7449,7 @@
                       <span>Orther Income</span>
                     </label>
                     <input type="text" class="bfp-fc oi-amount" id="bf_OtherIncomeAmount" placeholder="Nhập số tiền" inputmode="numeric" oninput="App.otherIncomeAmountInput('batch','other',this.value)" disabled>
+                    <input type="text" class="bfp-fc oi-note" id="bf_OtherIncomeNote" placeholder="Note (optional)" oninput="App.otherIncomeNoteInput('batch','other')" disabled>
                   </div>
                   <div class="oi-row">
                     <label class="oi-check" for="bf_ListingFeeCheck">
@@ -7389,6 +7457,7 @@
                       <span>Listing Fee</span>
                     </label>
                     <input type="text" class="bfp-fc oi-amount" id="bf_ListingFeeAmount" placeholder="Nhập số tiền" inputmode="numeric" oninput="App.otherIncomeAmountInput('batch','listing',this.value)" disabled>
+                    <input type="text" class="bfp-fc oi-note" id="bf_ListingFeeNote" placeholder="Note (optional)" oninput="App.otherIncomeNoteInput('batch','listing')" disabled>
                   </div>
                   <input type="hidden" id="bf_OtherIncome">
                 </div>
@@ -7597,6 +7666,12 @@
           <button class="btn btn-ghost btn-sm" onclick="App.resetModal()">Đặt lại</button>
         <button class="btn btn-orange btn-sm" onclick="App.saveModal()">Save Product</button>
         <button class="btn btn-green btn-sm" onclick="App.saveAll()">Save All</button>
+        <div class="m-pg-switcher" id="mProductGroupSwitcher">
+          <select id="mProductGroupSelect" class="m-pg-select" aria-label="Product Group">
+            <option value="">Product Group</option>
+          </select>
+          <button class="btn btn-ghost btn-sm m-pg-btn" id="mProductGroupBtn" onclick="App.changeModalProductGroup()">Chuyển Product Group</button>
+        </div>
         <div class="m-dirty-badge" id="mDirtyBadge">
           <div class="m-dirty-dot"></div><span id="mDirtyTxt">0 thay đổi</span>
         </div>
@@ -7836,6 +7911,7 @@
                       <span>Orther Income</span>
                     </label>
                     <input type="text" id="mf_OtherIncomeAmount" class="oi-amount" placeholder="Nhập số tiền" inputmode="numeric" oninput="App.otherIncomeAmountInput('modal','other',this.value)" disabled>
+                    <input type="text" id="mf_OtherIncomeNote" class="oi-note" placeholder="Note (optional)" oninput="App.otherIncomeNoteInput('modal','other')" disabled>
                   </div>
                   <div class="oi-row">
                     <label class="oi-check" for="mf_ListingFeeCheck">
@@ -7843,6 +7919,7 @@
                       <span>Listing Fee</span>
                     </label>
                     <input type="text" id="mf_ListingFeeAmount" class="oi-amount" placeholder="Nhập số tiền" inputmode="numeric" oninput="App.otherIncomeAmountInput('modal','listing',this.value)" disabled>
+                    <input type="text" id="mf_ListingFeeNote" class="oi-note" placeholder="Note (optional)" oninput="App.otherIncomeNoteInput('modal','listing')" disabled>
                   </div>
                   <input type="hidden" id="mf_Other_Income_Listing_Fee">
                 </div>
@@ -10293,6 +10370,23 @@
       var LOGISTICS_FIELD_NORTH = 'Logistics Group North';
       var PATTERN_OPTIONS = ['Miền Nam', 'Miền Bắc', 'Hai miền'];
       var OTHER_INCOME_FIELD = 'Other Income + Listing Fee';
+      var PRODUCT_GROUP_FIELD = 'Product Group';
+      var PRODUCT_GROUP_OPTIONS = [
+        'Non Alcoholic',
+        'Alcoholic',
+        'Tobacco',
+        'Packaged Snacks',
+        'Health and Beauty',
+        'Instant Food',
+        'Condiments',
+        'Groceries',
+        'Confectionery',
+        'Toys',
+        'Stationery',
+        'Household',
+        'Home Care',
+        'Clothing and Accessories'
+      ];
       var PRICING_STRATEGY_FIELD = 'Pricing Strategy';
       var PRICING_STRATEGY_OPTIONS = ['Tier 7', 'Tier 8', 'Tier 9'];
       var POG_PRODUCT_FIELD = 'POG_Choose Reduce product facing';
@@ -10641,7 +10735,56 @@
 
       function _formatMoneyStorageText_(digits) {
         var formatted = _formatMoneyWithComma_(digits);
-        return formatted ? (formatted + 'đ') : '';
+        return formatted || '';
+      }
+
+      function _cleanOtherIncomeNote_(value) {
+        return String(value == null ? '' : value)
+          .replace(/\r?\n/g, ' ')
+          .replace(/\s*\|\s*/g, ' / ')
+          .replace(/\s+/g, ' ')
+          .trim();
+      }
+
+      function _splitOtherIncomeAmountAndNote_(value) {
+        var text = String(value == null ? '' : value).trim();
+        var parts = text.split(/\|\s*note\s*:/i);
+        return {
+          amountText: String(parts.shift() || '').trim(),
+          note: _cleanOtherIncomeNote_(parts.length ? parts.join(' | Note: ') : '')
+        };
+      }
+
+      function _parseOtherIncomeLabeledLine_(line, out) {
+        var text = String(line || '').trim();
+        if (!text) return;
+
+        var otherMatch = text.match(/^\s*(orther|other)\s*income\s*:?\s*/i);
+        var listingMatch = text.match(/^\s*listing\s*fee\s*:?\s*/i);
+        var isOther = !!otherMatch;
+        var isListing = !!listingMatch;
+        if (!isOther && !isListing) return;
+
+        var payload = text;
+        if (isOther) payload = payload.slice(otherMatch[0].length);
+        else payload = payload.slice(listingMatch[0].length);
+
+        var split = _splitOtherIncomeAmountAndNote_(payload);
+        var digits = _extractMoneyDigits_(split.amountText);
+        if (!digits) return;
+
+        if (isOther) {
+          out.otherChecked = true;
+          out.otherAmount = digits;
+          out.otherNote = split.note;
+          out.recognized = true;
+        }
+        if (isListing) {
+          out.listingChecked = true;
+          out.listingAmount = digits;
+          out.listingNote = split.note;
+          out.recognized = true;
+        }
       }
 
       function _parseOtherIncomeListingFee_(raw) {
@@ -10649,29 +10792,37 @@
         var out = {
           otherChecked: false,
           otherAmount: '',
+          otherNote: '',
           listingChecked: false,
           listingAmount: '',
+          listingNote: '',
           recognized: false
         };
         if (!text) return out;
 
-        var match;
-        var otherRegex = /(orther|other)\s*income[^0-9]*([0-9][0-9,.\s]*)/ig;
-        while ((match = otherRegex.exec(text))) {
-          var otherDigits = _extractMoneyDigits_(match[2]);
-          if (!otherDigits) continue;
-          out.otherChecked = true;
-          out.otherAmount = otherDigits;
-          out.recognized = true;
-        }
+        text.split(/\n+/).forEach(function (line) {
+          _parseOtherIncomeLabeledLine_(line, out);
+        });
 
-        var listingRegex = /listing\s*fee[^0-9]*([0-9][0-9,.\s]*)/ig;
-        while ((match = listingRegex.exec(text))) {
-          var listingDigits = _extractMoneyDigits_(match[1]);
-          if (!listingDigits) continue;
-          out.listingChecked = true;
-          out.listingAmount = listingDigits;
-          out.recognized = true;
+        if (!out.recognized) {
+          var match;
+          var otherRegex = /(orther|other)\s*income[^0-9]*([0-9][0-9,.\s]*)/ig;
+          while ((match = otherRegex.exec(text))) {
+            var otherDigits = _extractMoneyDigits_(match[2]);
+            if (!otherDigits) continue;
+            out.otherChecked = true;
+            out.otherAmount = otherDigits;
+            out.recognized = true;
+          }
+
+          var listingRegex = /listing\s*fee[^0-9]*([0-9][0-9,.\s]*)/ig;
+          while ((match = listingRegex.exec(text))) {
+            var listingDigits = _extractMoneyDigits_(match[1]);
+            if (!listingDigits) continue;
+            out.listingChecked = true;
+            out.listingAmount = listingDigits;
+            out.recognized = true;
+          }
         }
 
         if (!out.recognized) {
@@ -10702,13 +10853,24 @@
         return out;
       }
 
+      function _serializeOtherIncomeLine_(label, amount, note) {
+        var digits = _extractMoneyDigits_(amount);
+        if (!digits) return '';
+        var text = label + ': ' + _formatMoneyStorageText_(digits);
+        var noteText = _cleanOtherIncomeNote_(note);
+        if (noteText) text += ' | Note: ' + noteText;
+        return text;
+      }
+
       function _serializeOtherIncomeListingFee_(state) {
         var lines = [];
-        if (state && state.otherChecked && _extractMoneyDigits_(state.otherAmount)) {
-          lines.push('Orther Income: ' + _formatMoneyStorageText_(state.otherAmount));
+        if (state && state.otherChecked) {
+          var otherLine = _serializeOtherIncomeLine_('Orther Income', state.otherAmount, state.otherNote);
+          if (otherLine) lines.push(otherLine);
         }
-        if (state && state.listingChecked && _extractMoneyDigits_(state.listingAmount)) {
-          lines.push('Listing Fee: ' + _formatMoneyStorageText_(state.listingAmount));
+        if (state && state.listingChecked) {
+          var listingLine = _serializeOtherIncomeLine_('Listing Fee', state.listingAmount, state.listingNote);
+          if (listingLine) lines.push(listingLine);
         }
         return lines.join('\n').trim();
       }
@@ -10728,8 +10890,10 @@
         return {
           otherCheck: document.getElementById(prefix + '_OtherIncomeCheck'),
           otherAmount: document.getElementById(prefix + '_OtherIncomeAmount'),
+          otherNote: document.getElementById(prefix + '_OtherIncomeNote'),
           listingCheck: document.getElementById(prefix + '_ListingFeeCheck'),
           listingAmount: document.getElementById(prefix + '_ListingFeeAmount'),
+          listingNote: document.getElementById(prefix + '_ListingFeeNote'),
           hidden: document.getElementById(isBatch ? 'bf_OtherIncome' : 'mf_Other_Income_Listing_Fee')
         };
       }
@@ -10742,9 +10906,17 @@
           els.otherAmount.disabled = !otherOn;
           els.otherAmount.style.display = otherOn ? '' : 'none';
         }
+        if (els.otherNote) {
+          els.otherNote.disabled = !otherOn;
+          els.otherNote.style.display = otherOn ? '' : 'none';
+        }
         if (els.listingAmount) {
           els.listingAmount.disabled = !listingOn;
           els.listingAmount.style.display = listingOn ? '' : 'none';
+        }
+        if (els.listingNote) {
+          els.listingNote.disabled = !listingOn;
+          els.listingNote.style.display = listingOn ? '' : 'none';
         }
       }
 
@@ -10754,8 +10926,10 @@
         var parsed = _parseOtherIncomeListingFee_(rawValue);
         if (els.otherCheck) els.otherCheck.checked = !!parsed.otherChecked;
         if (els.otherAmount) els.otherAmount.value = parsed.otherChecked ? _formatMoneyInputText_(parsed.otherAmount) : '';
+        if (els.otherNote) els.otherNote.value = parsed.otherChecked ? parsed.otherNote : '';
         if (els.listingCheck) els.listingCheck.checked = !!parsed.listingChecked;
         if (els.listingAmount) els.listingAmount.value = parsed.listingChecked ? _formatMoneyInputText_(parsed.listingAmount) : '';
+        if (els.listingNote) els.listingNote.value = parsed.listingChecked ? parsed.listingNote : '';
         _syncOtherIncomeRowState_(els);
       }
 
@@ -10779,6 +10953,8 @@
         var listingChecked = !!(els.listingCheck && els.listingCheck.checked);
         var otherDigits = otherChecked ? _extractMoneyDigits_(els.otherAmount && els.otherAmount.value) : '';
         var listingDigits = listingChecked ? _extractMoneyDigits_(els.listingAmount && els.listingAmount.value) : '';
+        var otherNote = otherChecked ? _cleanOtherIncomeNote_(els.otherNote && els.otherNote.value) : '';
+        var listingNote = listingChecked ? _cleanOtherIncomeNote_(els.listingNote && els.listingNote.value) : '';
 
         if (els.otherAmount) els.otherAmount.value = otherDigits ? _formatMoneyInputText_(otherDigits) : '';
         if (els.listingAmount) els.listingAmount.value = listingDigits ? _formatMoneyInputText_(listingDigits) : '';
@@ -10787,11 +10963,25 @@
         var serialized = _serializeOtherIncomeListingFee_({
           otherChecked: otherChecked,
           otherAmount: otherDigits,
+          otherNote: otherNote,
           listingChecked: listingChecked,
-          listingAmount: listingDigits
+          listingAmount: listingDigits,
+          listingNote: listingNote
         });
         els.hidden.value = serialized;
         return serialized;
+      }
+
+      function _getOtherIncomeUiValidationError_(scope) {
+        var els = _getOtherIncomeUiElements_(scope);
+        if (!els || !els.hidden) return '';
+        if (els.otherCheck && els.otherCheck.checked && !_extractMoneyDigits_(els.otherAmount && els.otherAmount.value)) {
+          return 'Other Income is enabled but amount is empty.';
+        }
+        if (els.listingCheck && els.listingCheck.checked && !_extractMoneyDigits_(els.listingAmount && els.listingAmount.value)) {
+          return 'Listing Fee is enabled but amount is empty.';
+        }
+        return '';
       }
 
       function otherIncomeToggle(scope, kind) {
@@ -10801,7 +10991,9 @@
         var els = _getOtherIncomeUiElements_(targetScope);
         if (!els.hidden) return;
         if (kind === 'other' && els.otherCheck && !els.otherCheck.checked && els.otherAmount) els.otherAmount.value = '';
+        if (kind === 'other' && els.otherCheck && !els.otherCheck.checked && els.otherNote) els.otherNote.value = '';
         if (kind === 'listing' && els.listingCheck && !els.listingCheck.checked && els.listingAmount) els.listingAmount.value = '';
+        if (kind === 'listing' && els.listingCheck && !els.listingCheck.checked && els.listingNote) els.listingNote.value = '';
 
         var serialized = _syncOtherIncomeHiddenFromUi_(targetScope);
         if (targetScope === 'batch') {
@@ -10820,6 +11012,20 @@
         var inputEl = kind === 'listing' ? els.listingAmount : els.otherAmount;
         if (inputEl) inputEl.value = _formatMoneyInputText_(_extractMoneyDigits_(rawValue));
 
+        var serialized = _syncOtherIncomeHiddenFromUi_(targetScope);
+        if (targetScope === 'batch') {
+          bfChange('OtherIncome', serialized);
+          return;
+        }
+        _dispatchInputEvent_(els.hidden);
+      }
+
+      function otherIncomeNoteInput(scope, kind) {
+        var targetScope = scope === 'batch' ? 'batch' : 'modal';
+        if (targetScope === 'modal' && !_ensureEditableAction()) return;
+
+        var els = _getOtherIncomeUiElements_(targetScope);
+        if (!els.hidden) return;
         var serialized = _syncOtherIncomeHiddenFromUi_(targetScope);
         if (targetScope === 'batch') {
           bfChange('OtherIncome', serialized);
@@ -10974,6 +11180,7 @@
           btn.disabled = !USER_CAN_EDIT;
           btn.title = USER_CAN_EDIT ? '' : 'View hiện tại đang ở chế độ chỉ xem';
         });
+        _setProductGroupQuickBusy_(false);
         var saveMeta = document.getElementById('mSaveTime');
         if (!USER_CAN_EDIT && saveMeta) {
           saveMeta.textContent = 'Chế độ chỉ xem - workspace hiện tại không cho phép chỉnh sửa.';
@@ -10990,6 +11197,119 @@
         else if (v.includes('hold') || v.includes('pause')) c = 'sp-vl';
         return '<span class="sp ' + c + '">' + esc(val) + '</span>';
       }
+      function _renderModalHeroSummary(row) {
+        if (!row) return;
+        var rn = row._rowNumber || S.modalRow || '';
+        var heroMeta = [];
+        if (_cleanDisplayValue(row['Brand Name'])) heroMeta.push('Brand: ' + _cleanDisplayValue(row['Brand Name']));
+        if (_cleanDisplayValue(row['Supplier Name'])) heroMeta.push('Supplier: ' + _cleanDisplayValue(row['Supplier Name']));
+        if (_cleanDisplayValue(row['Zone'])) heroMeta.push('Zone: ' + _cleanDisplayValue(row['Zone']));
+        if (_cleanDisplayValue(row['Present Date'])) heroMeta.push('Present: ' + _cleanDisplayValue(row['Present Date']));
+        var tick = document.getElementById('mTick');
+        if (tick) tick.textContent = heroMeta.join('  ·  ') || ('Row ' + rn);
+        var name = document.getElementById('mName');
+        if (name) name.textContent = _cleanDisplayValue(row['Product Name']) || _cleanDisplayValue(row['PIC input Product Name (Dưới 40 kí tự)']) || 'Product detail';
+
+        var chips = '';
+        var statusLabel = _cleanDisplayValue(row['Status']);
+        if (statusLabel) {
+          chips += pill(statusLabel) + ' ';
+          if (statusLabel === 'Approved') chips += '<span style="display:inline-flex;align-items:center;gap:4px;background:#dcfce7;color:#166534;border:1px solid #86efac;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:700">Approved by Director</span> ';
+          else if (statusLabel === 'Rejected') chips += '<span style="display:inline-flex;align-items:center;gap:4px;background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:700">Rejected by Director</span> ';
+        }
+        if (_cleanDisplayValue(row[PRODUCT_GROUP_FIELD])) chips += '<span class="sp sp-vl">' + esc(_cleanDisplayValue(row[PRODUCT_GROUP_FIELD])) + '</span> ';
+        if (_cleanDisplayValue(row['Category'])) chips += '<span class="sp sp-vl">' + esc(_cleanDisplayValue(row['Category'])) + '</span> ';
+        if (_cleanDisplayValue(row['Sub Category'])) chips += '<span class="sp sp-sky">' + esc(_cleanDisplayValue(row['Sub Category'])) + '</span> ';
+        if (S.pending[rn]) chips += '<span class="sp sp-or">Pending</span>';
+        var chipBox = document.getElementById('mChips');
+        if (chipBox) chipBox.innerHTML = chips;
+      }
+
+      function _isAllowedProductGroupValue_(value) {
+        return PRODUCT_GROUP_OPTIONS.indexOf(String(value || '').trim()) >= 0;
+      }
+
+      function _populateProductGroupQuickControl(row) {
+        var select = document.getElementById('mProductGroupSelect');
+        var btn = document.getElementById('mProductGroupBtn');
+        if (!select) return;
+        var current = _cleanDisplayValue(row && row[PRODUCT_GROUP_FIELD]);
+        select.innerHTML = '<option value="">Product Group</option>' + PRODUCT_GROUP_OPTIONS.map(function (value) {
+          return '<option value="' + esc(value) + '">' + esc(value) + '</option>';
+        }).join('');
+        select.value = _isAllowedProductGroupValue_(current) ? current : '';
+        select.dataset.currentValue = current;
+        select.title = current && !_isAllowedProductGroupValue_(current)
+          ? ('Current value is outside allowed list: ' + current)
+          : '';
+        select.disabled = !USER_CAN_EDIT;
+        if (btn) btn.disabled = !USER_CAN_EDIT;
+      }
+
+      function _setProductGroupQuickBusy_(busy) {
+        var select = document.getElementById('mProductGroupSelect');
+        var btn = document.getElementById('mProductGroupBtn');
+        if (select) select.disabled = !!busy || !USER_CAN_EDIT;
+        if (btn) {
+          btn.disabled = !!busy || !USER_CAN_EDIT;
+          btn.textContent = busy ? 'Updating...' : 'Chuyển Product Group';
+        }
+      }
+
+      function changeModalProductGroup() {
+        if (!_ensureEditableAction()) return;
+        var rn = S.modalRow;
+        var row = _findAnyRowByRn(rn);
+        var select = document.getElementById('mProductGroupSelect');
+        if (!rn || !row || !select) return;
+
+        var next = String(select.value || '').trim();
+        var current = _cleanDisplayValue(row[PRODUCT_GROUP_FIELD]);
+        if (!next) { toast('Please choose a Product Group.', 'warning'); return; }
+        if (!_isAllowedProductGroupValue_(next)) { toast('Invalid Product Group.', 'error'); return; }
+        if (next === current) { toast('Product Group has no change.', 'info'); return; }
+
+        var changes = {};
+        changes[PRODUCT_GROUP_FIELD] = next;
+        _setProductGroupQuickBusy_(true);
+        setConn('loading', 'Updating Product Group...');
+        google.script.run
+          .withSuccessHandler(function (res) {
+            _setProductGroupQuickBusy_(false);
+            setConn('ok', 'ÄÃ£ káº¿t ná»‘i');
+            if (!res || !res.ok) {
+              if (handleAuthIssue(res)) return;
+              select.value = _isAllowedProductGroupValue_(current) ? current : '';
+              toast('Error: ' + ((res && res.error && res.error.message) || 'Cannot update Product Group'), 'error');
+              return;
+            }
+
+            row[PRODUCT_GROUP_FIELD] = next;
+            _touchSelectedRow(rn, changes);
+            if (S.pending[rn] && Object.prototype.hasOwnProperty.call(S.pending[rn], PRODUCT_GROUP_FIELD)) {
+              delete S.pending[rn][PRODUCT_GROUP_FIELD];
+              if (!Object.keys(S.pending[rn]).length) delete S.pending[rn];
+            }
+            _populateProductGroupQuickControl(row);
+            _renderModalHeroSummary(row);
+            fillPresetSummary(row);
+            refreshDirtyState(row);
+            populateDropdowns();
+            render();
+            renderQuickPanel();
+            updateStats();
+            toast('Product Group updated to ' + next, 'success');
+          })
+          .withFailureHandler(function (err) {
+            _setProductGroupQuickBusy_(false);
+            setConn('err', 'Error');
+            select.value = _isAllowedProductGroupValue_(current) ? current : '';
+            if (handleAuthIssue(err)) return;
+            toast('Error: ' + (err && err.message ? err.message : 'Cannot update Product Group'), 'error');
+          })
+          .updateRow({ token: AUTH_TOKEN, rowNumber: rn, changes: changes, source: 'INDEX_CHANGE_PRODUCT_GROUP' });
+      }
+
       function fillSel(id, obj) { var sel = document.getElementById(id); if (!sel) return; var cur = sel.value; while (sel.options.length > 1) sel.remove(1); Object.keys(obj).sort().forEach(function (v) { var o = document.createElement('option'); o.value = o.textContent = v; sel.appendChild(o); }); sel.value = cur; }
       function populateDropdowns() { var z = {}, st = {}, g = {}; S.allRows.forEach(function (r) { if (r['Zone']) z[r['Zone']] = 1; if (r['Status']) st[r['Status']] = 1; if (r['Product Group']) g[r['Product Group']] = 1; }); fillSel('fZ', z); fillSel('fS', st); fillSel('fG', g); }
       function setView(vw) { S.view = vw; document.getElementById('vCard').className = 'vbtn' + (vw === 'card' ? ' on' : ''); document.getElementById('vTbl').className = 'vbtn' + (vw === 'table' ? ' on' : ''); render(); }
@@ -12630,6 +12950,11 @@
         
         var selRns = Object.keys(S.selected);
         if (!selRns.length) { toast('Chưa chọn sản phẩm', 'warning'); return; }
+
+        if (dirtyKeys.indexOf('OtherIncome') >= 0) {
+          var oiBatchErr = _getOtherIncomeUiValidationError_('batch');
+          if (oiBatchErr) { toast(oiBatchErr, 'error'); return; }
+        }
 
         var template = {};
         dirtyKeys.forEach(function (key) {
@@ -14905,6 +15230,7 @@
         if (_cleanDisplayValue(row['Sub Category'])) chips += '<span class="sp sp-sky">' + esc(_cleanDisplayValue(row['Sub Category'])) + '</span> ';
         if (S.pending[rn]) chips += '<span class="sp sp-or">✏ Pending</span>';
         document.getElementById('mChips').innerHTML = chips;
+        _populateProductGroupQuickControl(row);
         fillPresetSummary(row);
         S.step2Tab = 1;
         setDetailStep(1);
@@ -15005,6 +15331,7 @@
         }
         _loadOtherIncomeUiFromValue_('modal', document.getElementById('mf_Other_Income_Listing_Fee') ? document.getElementById('mf_Other_Income_Listing_Fee').value : '');
         _loadModalUomField(document.getElementById('mf_UOMInfo') ? document.getElementById('mf_UOMInfo').value : '');
+        _populateProductGroupQuickControl(row);
         initModalDropdowns(row);
         _loadModalPogField(
           document.getElementById('mf_POG_Choose_Reduce_product_facing') ? document.getElementById('mf_POG_Choose_Reduce_product_facing').value : '',
@@ -15020,6 +15347,8 @@
         var row = _findAnyRowByRn(rn); if (!row) return;
         if (MODAL_UOM_DIRTY) _syncModalUomField();
         _syncModalPogHiddenFields();
+        var oiModalErr = _getOtherIncomeUiValidationError_('modal');
+        if (oiModalErr) { toast(oiModalErr, 'error'); return; }
         var currentValues = _syncDetailPatternDependencies(_collectCurrentDetailValues());
         var ch = {}, has = false;
         for (var field in FIELD_MAP) {
@@ -15095,6 +15424,9 @@
           if (!_isFieldCompleteForReview(conditionalField, values[conditionalField])) {
             return _fieldUiLabel(conditionalField) + ' là bắt buộc';
           }
+        }
+        if (Object.prototype.hasOwnProperty.call(ch, PRODUCT_GROUP_FIELD) && !_isAllowedProductGroupValue_(ch[PRODUCT_GROUP_FIELD])) {
+          return 'Invalid Product Group.';
         }
         if (Object.prototype.hasOwnProperty.call(ch, 'Retail Price (+VAT) in Tier 6')) {
           var raw = String(ch['Retail Price (+VAT) in Tier 6'] || '').replace(/[^0-9.-]/g, '');
@@ -15557,7 +15889,8 @@
         modalUomInput: modalUomInput, modalAddUom: modalAddUom, modalRemoveUom: modalRemoveUom, modalUomFileChange: modalUomFileChange,
         modalPogSlotChange: modalPogSlotChange, modalAddPogSlot: modalAddPogSlot, modalClearPogSlot: modalClearPogSlot,
         setToggle: setToggle,
-        otherIncomeToggle: otherIncomeToggle, otherIncomeAmountInput: otherIncomeAmountInput,
+        otherIncomeToggle: otherIncomeToggle, otherIncomeAmountInput: otherIncomeAmountInput, otherIncomeNoteInput: otherIncomeNoteInput,
+        changeModalProductGroup: changeModalProductGroup,
         goSection: goSection, clearActiveProduct: clearActiveProduct, openViewSelector: openViewSelector, logout: logout,
         selectBatchPreviewProduct: selectBatchPreviewProduct,
         openSelectedModal: openSelectedModal, previewSelected: previewSelected,
