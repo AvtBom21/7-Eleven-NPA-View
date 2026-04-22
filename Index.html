@@ -3564,6 +3564,29 @@
       box-shadow: 0 0 0 3px rgba(251, 146, 60, .15) !important
     }
 
+    .mc.field-jump-highlight {
+      border-color: #2563eb !important;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, .18), 0 12px 28px rgba(37, 99, 235, .16) !important;
+      animation: fieldJumpGlow 1.8s ease both
+    }
+
+    @keyframes fieldJumpGlow {
+      0% {
+        transform: translateY(0);
+        box-shadow: 0 0 0 0 rgba(37, 99, 235, 0), 0 1px 4px rgba(0, 0, 0, .05)
+      }
+
+      18% {
+        transform: translateY(-1px);
+        box-shadow: 0 0 0 5px rgba(37, 99, 235, .18), 0 14px 30px rgba(37, 99, 235, .18)
+      }
+
+      100% {
+        transform: translateY(0);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, .08), 0 1px 4px rgba(0, 0, 0, .05)
+      }
+    }
+
     .mc.wide {
       grid-column: span 2
     }
@@ -4322,6 +4345,37 @@
       border-color: #fdba74;
       background: #fff7ed;
       color: #c2410c
+    }
+
+    button.s2-review-check {
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      appearance: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: transform .14s ease, border-color .14s ease, box-shadow .14s ease, background .14s ease
+    }
+
+    button.s2-review-check:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(15, 23, 42, .08)
+    }
+
+    button.s2-review-check:active {
+      transform: translateY(0)
+    }
+
+    button.s2-review-check:focus-visible {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, .16)
+    }
+
+    .s2-review-check-status {
+      font-weight: 800;
+      flex-shrink: 0
     }
 
     .s2-review-empty {
@@ -15026,7 +15080,7 @@
           var val = values[f] || '';
           var ok = _isFieldCompleteForReview(f, val);
           if (ok) reqOk++;
-          return '<div class="s2-review-check ' + (ok ? 'ok' : 'bad') + '">' + (ok ? 'OK' : 'Missing') + ' · ' + esc(_fieldUiLabel(f)) + '</div>';
+          return _renderRequiredReviewItem(f, ok);
         }).join('');
         if (boxReq) boxReq.innerHTML = reqHtml;
         var reqMeta = document.getElementById('s2ReviewRequiredMeta');
@@ -15244,6 +15298,153 @@
         'POG_Choose Reduce product facing': 'mc_pogmodule',
         'POG_Choose type Reduce product facing': 'mc_pogmodule'
       };
+
+      var REVIEW_FIELD_FOCUS_OVERRIDES = {};
+      REVIEW_FIELD_FOCUS_OVERRIDES[OTHER_INCOME_FIELD] = '#mf_OtherIncomeCheck, #mf_OtherIncomeAmount, #mf_ListingFeeCheck, #mf_ListingFeeAmount';
+      REVIEW_FIELD_FOCUS_OVERRIDES[POG_PRODUCT_FIELD] = '#pog_product_0 .sdrop-input, #pogAddBtn';
+      REVIEW_FIELD_FOCUS_OVERRIDES[POG_ACTION_FIELD] = '#pog_action_0, #pog_product_0 .sdrop-input, #pogAddBtn';
+      REVIEW_FIELD_FOCUS_OVERRIDES['UOM Information'] = '#mf_uom_base_barcode, #mf_uom_base_uom';
+
+      var REVIEW_FIELD_FALLBACK_TARGETS = {
+        'Logistics Group South': 'Pattern',
+        'Logistics Group North': 'Pattern'
+      };
+
+      function _getReviewFieldStep(field) {
+        for (var step = 1; step <= 3; step++) {
+          var fields = MG_FIELDS[step] || [];
+          if (fields.indexOf(field) >= 0) return step;
+        }
+        return 1;
+      }
+
+      function _getReviewFieldCardId(field) {
+        return MC_FIELD_MAP[field] || MC_FIELD_MAP[REVIEW_FIELD_FALLBACK_TARGETS[field]] || '';
+      }
+
+      function _getReviewFieldFocusSelector(field) {
+        if (REVIEW_FIELD_FOCUS_OVERRIDES[field]) return REVIEW_FIELD_FOCUS_OVERRIDES[field];
+        var dropdownId = DETAIL_DROPDOWN_FIELD_IDS[field];
+        if (dropdownId) return '#' + dropdownId + ' .sdrop-input';
+        var inputKey = FIELD_MAP[field];
+        if (inputKey) return '#mf_' + inputKey;
+        return '';
+      }
+
+      function _isVisibleFieldTarget(el) {
+        if (!el) return false;
+        if (el.hidden) return false;
+        var style = window.getComputedStyle ? window.getComputedStyle(el) : null;
+        if (style && (style.display === 'none' || style.visibility === 'hidden')) return false;
+        return !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length);
+      }
+
+      function _queryFirstVisible(root, selectors) {
+        if (!root || !selectors) return null;
+        var list = String(selectors).split(',');
+        for (var i = 0; i < list.length; i++) {
+          var selector = list[i].trim();
+          if (!selector) continue;
+          var el = null;
+          try {
+            el = root.querySelector(selector);
+          } catch (err) {
+            el = null;
+          }
+          if (el && _isVisibleFieldTarget(el) && !el.disabled) return el;
+        }
+        return null;
+      }
+
+      function _getFocusableInReviewTarget(card, field) {
+        if (!card) return null;
+        var focus = _queryFirstVisible(card, _getReviewFieldFocusSelector(field));
+        if (focus) return focus;
+        return _queryFirstVisible(card, 'input:not([type="hidden"]), textarea, select, button, .sdrop-input[tabindex]');
+      }
+
+      function _resolveReviewFieldTarget(field) {
+        var targetField = String(field || '').trim();
+        var cardId = _getReviewFieldCardId(targetField);
+        var card = cardId ? document.getElementById(cardId) : null;
+        if (card && _isVisibleFieldTarget(card)) {
+          return { field: targetField, step: _getReviewFieldStep(targetField), card: card };
+        }
+
+        var fallbackField = REVIEW_FIELD_FALLBACK_TARGETS[targetField];
+        if (fallbackField) {
+          var fallbackId = _getReviewFieldCardId(fallbackField);
+          var fallbackCard = fallbackId ? document.getElementById(fallbackId) : null;
+          if (fallbackCard) return { field: fallbackField, originalField: targetField, step: _getReviewFieldStep(fallbackField), card: fallbackCard };
+        }
+        return { field: targetField, step: _getReviewFieldStep(targetField), card: card };
+      }
+
+      function _scrollReviewTargetIntoModal(card) {
+        if (!card) return;
+        var scroller = document.getElementById('detailStep2');
+        if (scroller && scroller.scrollHeight > scroller.clientHeight) {
+          var cardRect = card.getBoundingClientRect();
+          var scrollerRect = scroller.getBoundingClientRect();
+          var nextTop = scroller.scrollTop + (cardRect.top - scrollerRect.top) - Math.max(18, (scroller.clientHeight - cardRect.height) / 3);
+          scroller.scrollTo({ top: Math.max(0, nextTop), behavior: 'smooth' });
+          return;
+        }
+        card.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+      }
+
+      function _flashReviewTarget(card) {
+        if (!card) return;
+        card.classList.remove('field-jump-highlight');
+        void card.offsetWidth;
+        card.classList.add('field-jump-highlight');
+        window.clearTimeout(card._fieldJumpTimer);
+        card._fieldJumpTimer = window.setTimeout(function () {
+          card.classList.remove('field-jump-highlight');
+        }, 1900);
+      }
+
+      function _focusReviewTarget(target) {
+        if (!target || !target.card) return;
+        var focusEl = _getFocusableInReviewTarget(target.card, target.field);
+        if (!focusEl) return;
+        try {
+          focusEl.focus({ preventScroll: true });
+        } catch (err) {
+          focusEl.focus();
+        }
+      }
+
+      function _renderRequiredReviewItem(field, ok) {
+        var status = ok ? 'OK' : 'Missing';
+        return '<button type="button" class="s2-review-check is-clickable ' + (ok ? 'ok' : 'bad') + '" data-review-field="' + esc(field) + '" onclick="App.jumpToReviewField(this.getAttribute(\'data-review-field\'))">'
+          + '<span class="s2-review-check-status">' + status + '</span>'
+          + '<span> - ' + esc(_fieldUiLabel(field)) + '</span>'
+          + '</button>';
+      }
+
+      function jumpToReviewField(field) {
+        if (isModalBusy()) return;
+        var targetField = String(field || '').trim();
+        if (!targetField) return;
+
+        var targetStep = _getReviewFieldStep(targetField);
+        if (S.detailStep !== 2) setDetailStep(2);
+        if ((S.step2Tab || 1) !== targetStep) setStep2Tab(targetStep);
+
+        window.setTimeout(function () {
+          var target = _resolveReviewFieldTarget(targetField);
+          if (!target || !target.card || !_isVisibleFieldTarget(target.card)) {
+            toast('Khong tim thay vi tri can dien.', 'warning');
+            return;
+          }
+          _scrollReviewTargetIntoModal(target.card);
+          _flashReviewTarget(target.card);
+          window.setTimeout(function () {
+            _focusReviewTarget(target);
+          }, 260);
+        }, 90);
+      }
 
       function refreshDirtyState(row) {
         var total = 0;
@@ -16014,6 +16215,7 @@
         saveModal: saveModal, resetModal: resetModal, saveRow: saveRow, saveAll: saveAll, cancelEdit: cancelEdit,
         clearFilters: clearFilters, goPage: goPage, doSearch: doSearch, switchTab: switchTab, setDetailStep: setDetailStep,
         setStep2Tab: setStep2Tab, prevStep2Tab: prevStep2Tab, nextStep2Tab: nextStep2Tab, openDetailWorkspaceStep: openDetailWorkspaceStep,
+        jumpToReviewField: jumpToReviewField,
         toggleSelect: toggleSelect, toggleSelectAll: toggleSelectAll, clearSelection: clearSelection,
         openBatchFill: openBatchFill, closeBatchFill: closeBatchFill,
         bfChange: bfChange, bfToggleAcc: bfToggleAcc,
