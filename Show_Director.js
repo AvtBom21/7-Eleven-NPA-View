@@ -567,6 +567,8 @@ function updateDirectorBatch(payload) {
 // ========================================
 
 var DIRECTOR_MOBILE_ROLE_DIRECTOR = 'DIRECTOR';
+// Temporary deploy check: set true to log max 3 rows of resolved replacement fields.
+var DIRECTOR_MOBILE_DEBUG_REPLACEMENT_FIELD_RESOLUTION = false;
 
 var DIRECTOR_MOBILE_FIELD_ALIASES = {
   noPresent: ['No.Present', 'No Present'],
@@ -654,15 +656,28 @@ var DIRECTOR_MOBILE_FIELD_ALIASES = {
   targetStores: ['Target #Stores'],
   salesMonthlySubcat: ['Sales Monthly of Subcategory'],
   gpMonthlySubcat: ['GP Monthly of Subcategory'],
-  pricingStrategy: ['Pricing strategy'],
-  pogChooseReduce: ['POG choose to reduce'],
-  pogChooseTypeReduce: ['POG choose Type to reduce'],
+  pricingStrategy: [
+    'Pricing Strategy',
+    'Pricing strategy',
+    'Pricing Strategy <Ch\u1ecdn tier gi\u00e1 focus c\u1ee7a s\u1ea3n ph\u1ea9m>'
+  ],
+  pogChooseReduce: ['POG_Choose Reduce product facing', 'POG choose to reduce'],
+  pogChooseTypeReduce: ['POG_Choose type Reduce product facing', 'POG choose Type to reduce'],
   totalSaleCut: ['Total Sales of Product to be CUT'],
   totalGpCut: ['Total GP of Product to be CUT'],
   pogReduceFacingProducts: ['POG_Choose Reduce product facing', 'POG choose to reduce'],
   pogReduceFacingType: ['POG_Choose type Reduce product facing', 'POG choose Type to reduce'],
-  totalSaleCutReduceFacing: ['Total Sales per month to CUT Reduce Facing Product', 'Total Sales of Product to be CUT'],
-  totalGpCutReduceFacing: ['Total GP per month to CUT Reduce Facing Product', 'Total GP of Product to be CUT'],
+  totalSaleCutReduceFacing: [
+    'Total Sale per Month of SKU Cut/Reduce Facing product',
+    'Total Sales per Month of SKU Cut/Reduce Facing product',
+    'Total Sales per month to CUT Reduce Facing Product',
+    'Total Sales of Product to be CUT'
+  ],
+  totalGpCutReduceFacing: [
+    'Total GP per Month of SKU Cut/Reduce Facing product',
+    'Total GP per month to CUT Reduce Facing Product',
+    'Total GP of Product to be CUT'
+  ],
   fcSalePerMonth: ['FC Sale per month of new product'],
   fcGpAmountPerMonth: ['FC GP per month of new product'],
   saleImpactVsSubCategory: ['%Sale Impact vs Subcategory'],
@@ -747,6 +762,18 @@ function _directorMobileResolveIndex_(headers, headerMap, aliases) {
     var key = _directorMobileNormalizeToken_(list[i]);
     if (key && headerMap[key] !== undefined) return headerMap[key];
   }
+
+  // Support sheet headers that keep the canonical field name on the first line
+  // and add syntax/help text after it, e.g. "Pricing Strategy\n<...>".
+  for (var p = 0; p < list.length; p++) {
+    var aliasKey = _directorMobileNormalizeToken_(list[p]);
+    if (!aliasKey) continue;
+    for (var hp = headerList.length - 1; hp >= 0; hp--) {
+      var headerKey = _directorMobileNormalizeToken_(headerList[hp]);
+      if (headerKey === aliasKey || headerKey.indexOf(aliasKey + ' ') === 0) return hp;
+    }
+  }
+
   for (var j = 0; j < list.length; j++) {
     var loose = _findHeaderIndexLoose_(headers, list[j]);
     if (loose >= 0) return loose;
@@ -768,6 +795,33 @@ function _directorMobileGetValue_(row, colMap, field) {
   var idx = colMap[field];
   if (idx === undefined || idx < 0 || idx >= row.length) return '';
   return _directorMobileToOutputValue_(row[idx]);
+}
+
+function _directorMobileLogReplacementFieldResolution_(headers, colMap, row, product) {
+  if (!DIRECTOR_MOBILE_DEBUG_REPLACEMENT_FIELD_RESOLUTION) return false;
+
+  var fields = [
+    'pricingStrategy',
+    'pogReduceFacingProducts',
+    'pogReduceFacingType',
+    'totalSaleCutReduceFacing',
+    'totalGpCutReduceFacing'
+  ];
+  var parts = [];
+  for (var i = 0; i < fields.length; i++) {
+    var field = fields[i];
+    var idx = colMap[field];
+    var header = idx >= 0 && idx < headers.length ? headers[idx] : '';
+    var rawValue = idx >= 0 && idx < row.length ? _directorMobileToOutputValue_(row[idx]) : '';
+    parts.push(field + '[idx=' + idx + ', header="' + _directorMobileSafeString_(header, '').replace(/[\r\n]+/g, ' / ') + '", value="' + _directorMobileSafeString_(rawValue, '').replace(/[\r\n]+/g, ' / ') + '"]');
+  }
+
+  Logger.log(
+    '[DirectorMobile replacement field debug] row=' + product.rowIndex +
+    ', product=' + _directorMobileSafeString_(product.newProductId || product.productName, '') +
+    ' :: ' + parts.join(' | ')
+  );
+  return true;
 }
 
 function _directorMobileCoalesce_(primary, fallback) {
@@ -1068,6 +1122,7 @@ function getProductsAndResults(params) {
     var colMap = _directorMobileBuildColumnMap_(headers);
     var products = [];
     var results = [];
+    var replacementDebugLogCount = 0;
 
     for (var i = 0; i < rows.length; i++) {
       var row = rows[i];
@@ -1076,6 +1131,9 @@ function getProductsAndResults(params) {
       var rowNumber = CONFIG.DATA_START_ROW + i;
       var product = _directorMobileBuildProduct_(row, rowNumber, colMap);
       if (!_directorMobileHasValue_(product.productName) && !_directorMobileHasValue_(product.newProductId)) continue;
+      if (DIRECTOR_MOBILE_DEBUG_REPLACEMENT_FIELD_RESOLUTION && replacementDebugLogCount < 3) {
+        if (_directorMobileLogReplacementFieldResolution_(headers, colMap, row, product)) replacementDebugLogCount++;
+      }
 
       products.push(product);
 
